@@ -1,0 +1,5 @@
+# install missing libraries to maven
+mvn install:install-file -DgroupId=org.eclipse.jface -DartifactId=org.eclipse.jface -Dversion=3.9 -Dpackaging=jar -Dfile=org.eclipse.jface_3.9.1.v20130725-1141.jar
+mvn install:install-file -DgroupId=org.eclipse.swt -DartifactId=org.eclipse.swt.cocoa.macosx.x86_64 -Dversion=3.1 -Dpackaging=jar -Dfile=org.eclipse.swt.cocoa.macosx.x86_64_3.102.1.v20130827-2048.jar
+mvn install:install-file -DgroupId=org.eclipse.swt -DartifactId=org.eclipse.swt -Dversion=3.1 -Dpackaging=jar -Dfile=org.eclipse.swt_3.102.1.v20130827-2021.jar
+

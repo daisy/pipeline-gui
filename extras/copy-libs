@@ -1,0 +1,12 @@
+# copy a different launcher
+echo "Copying swt-version-of-launcher.jar"
+cp swt-version-of-launcher.jar ../../pipeline-assembly/target/bundles/bootstrap
+
+# copy the equinox libs
+echo "Copying equinox.common and equinox.supplement jars"
+cp org.eclipse.equinox.common_3.6.200.v20130402-1505.jar ../../pipeline-assembly/target/bundles/libs
+cp org.eclipse.equinox.supplement_1.5.0.v20130812-2109.jar ../../pipeline-assembly/target/bundles/libs
+
+# copy the GUI jar
+echo "Copying gui jar"
+cp ../target/gui-1.0-SNAPSHOT.jar ../../pipeline-assembly/target/bundles/pipeline

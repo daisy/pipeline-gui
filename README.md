@@ -15,12 +15,11 @@ Build the GUI:
     cd pipeline-gui
     mvn clean install
 
-Then switch to the "gui" branch of the pipeline-assembly project and build the dev launcher version:
-    mvn clean package -P dev-launcher
+Use this launcher/ subdir from this branch in pipeline-framework master:
+https://github.com/daisy/pipeline-framework/tree/launcher
 
-Run this script to copy the correct libraries into the built pipeline-assembly directory:
-    cd pipeline-gui/extras
-    ./copy-libs
+Then build the pipeline-assembly project (optionally use the dev-launcher version):
+    mvn clean package -P dev-launcher
 
 # Project description
 

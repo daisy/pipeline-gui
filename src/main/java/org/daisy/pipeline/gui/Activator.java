@@ -17,18 +17,6 @@ public class Activator implements BundleActivator, Runnable {
         window.open();
         Display.getCurrent().dispose();
         
-		// System.out.println("Hello from the GUI");
-		// try {
-		// 	Display display = new Display ();
-		// 	Shell shell = new Shell(display);
-		// 	shell.open ();
-		// 	while (!shell.isDisposed ()) {
-		// 		if (!display.readAndDispatch ()) display.sleep ();
-		// 	}
-		// 	display.dispose ();
-		// } catch (Exception e) {
-		// 	e.printStackTrace();
-		// }
 	}
 
 	public void start(BundleContext context) throws Exception {

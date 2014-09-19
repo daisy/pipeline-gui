@@ -40,76 +40,12 @@ import com.google.common.base.Supplier;
 
 public class MainWindow extends ApplicationWindow {
 
-	/** The job manager. */
-    private JobManagerFactory jobManagerFactory;
+    EntryPoint entryPoint; // DI data in here
 
-    /** The script registry. */
-    private ScriptRegistry scriptRegistry;
-   // private ClientStorage clientStorage;
-
-    public void init(BundleContext ctxt) {
-    	
-    }
-    
-    // there was a naming conflict with "close()" so i used "uninit()" 
-    public void uninit() throws Exception {
-    	
-    }
-    
-//    
-//    private Supplier<JobManager> jobManager= new Supplier<JobManager>() {
-//
-//        @Override
-//        public JobManager get() {
-//                return jobManagerFactory.createFor(clientStorage.defaultClient());
-//        }
-//
-//};
-
-    /**
-     * Gets the job manager.
-     *
-     * @return the job manager
-     */
-    public JobManager getJobManager(Client client) {
-            return jobManagerFactory.createFor(client);
-    }
-
-    /**
-     * Sets the job manager.
-     *
-     * @param jobManager the new job manager
-     */
-    public void setJobManagerFactory(JobManagerFactory jobManagerFactory) {
-    	System.out.println("Setting job manager factory");
-            this.jobManagerFactory = jobManagerFactory;
-    }
-    
-    
-    /**
-     * Gets the script registry.
-     *
-     * @return the script registry
-     */
-    public ScriptRegistry getScriptRegistry() {
-    	System.out.println("setting script registry for GUI");
-            return scriptRegistry;
-    }
-
-    /**
-     * Sets the script registry.
-     *
-     * @param scriptRegistry the new script registry
-     */
-    public void setScriptRegistry(ScriptRegistry scriptRegistry) {
-            this.scriptRegistry = scriptRegistry;
-    }
-//    public void setWebserviceStorage(WebserviceStorage storage) {
-//        this.clientStorage = storage.getClientStorage();
-//        
-//}
-	public MainWindow(Shell parentShell) {
+	
+	public MainWindow(Shell parentShell, EntryPoint entryPoint) {
 		super(parentShell);
+        this.entryPoint = entryPoint;
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -122,18 +58,12 @@ public class MainWindow extends ApplicationWindow {
 	    return parent;
 	}
 
-    protected void configureShell(Shell newShell) {
-        super.configureShell(newShell);
-        newShell.setText("New Application");
-    }
-    protected Point getInitialSize() {
-        return new Point(500, 375);
-    }
     private void addList(Shell shell){
         final List list = new List (shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
         
-        if (this.scriptRegistry != null) {
-	        Iterable<XProcScriptService> scripts = this.scriptRegistry.getScripts();
+        ScriptRegistry scriptRegistry = this.entryPoint.getScriptRegistry();
+        if (scriptRegistry != null) {
+	        Iterable<XProcScriptService> scripts = scriptRegistry.getScripts();
 	        Iterator<XProcScriptService> it = scripts.iterator();
 	        while (it.hasNext()) {
 	        	XProcScriptService script = it.next();
@@ -141,14 +71,5 @@ public class MainWindow extends ApplicationWindow {
 	        }
         }
         
-        
-        //Rectangle clientArea = shell.getClientArea();
-        //list.setBounds (clientArea.x, clientArea.y, 100, 100);
-        list.addListener (SWT.Selection, new Listener () {
-            @Override
-            public void handleEvent (Event e) {
-            	
-            }
-        });
     }
 }

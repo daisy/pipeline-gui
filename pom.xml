@@ -1,30 +1,32 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
- <!-- <parent>
+  <!-- <parent>
     <groupId>org.daisy.pipeline</groupId>
     <artifactId>framework-parent</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent> -->
-<parent>
+  <parent>
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>2</version>
-    <relativePath />
+    <relativePath/>
   </parent>
-  
+
   <groupId>org.daisy.pipeline</groupId>
-  <artifactId>org.daisy.pipeline.gui</artifactId>
+  <artifactId>gui</artifactId>
   <packaging>bundle</packaging>
   <version>1.0-SNAPSHOT</version>
-  
+
   <name>gui</name>
   <description>A lightweight cross-platform GUI for the Pipeline2</description>
   <url>https://github.com/daisy-consortium/pipeline-gui</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.7</java.version>
   </properties>
 
   <dependencyManagement>
@@ -46,51 +48,83 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    
-     <dependency>
+
+    <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>framework-core</artifactId>
     </dependency>
-    
+
     <dependency>
-        <groupId>org.eclipse.swt</groupId>
-        <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
-        <version>3.1</version>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>cocoa.macosx.x86_64</artifactId>
+      <version>3.1</version>
     </dependency>
-    
-     <dependency>
+
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <!-- TODO declare version elsewhere as in other poms -->
-      <version>4.2.0</version>
+      <version>4.3.1</version>
     </dependency>
     
     <dependency>
-    	 <groupId>org.eclipse.jface</groupId>
-        <artifactId>org.eclipse.jface</artifactId>
-        <version>3.9</version>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>4.3.1</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.eclipse.jface</groupId>
+      <artifactId>jface</artifactId>
+      <version>3.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>databinding</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.jface</groupId>
+        <artifactId>databinding</artifactId>
+        <version>1.6.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.core</groupId>
+        <artifactId>commands</artifactId>
+        <version>3.6</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.daisy.pipeline</groupId>
+    	<artifactId>webservice-utils</artifactId>
+    </dependency>
   </dependencies>
 
-    <build>
-      <plugins>
-        
-        <plugin>
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <!-- <configuration>
           <instructions>
             <Bundle-Activator>org.daisy.pipeline.gui.Activator</Bundle-Activator>
-            
+<!--            <Service-Component>OSGI-INF/gui.xml</Service-Component>-->
           </instructions>
         </configuration> -->
       </plugin>
     </plugins>
   </build>
-  
-  <repositories>
-        
-    </repositories>
+
+  <repositories> </repositories>
 
 </project>

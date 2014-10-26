@@ -1,62 +1,56 @@
 package org.daisy.pipeline.gui;
 
-import java.util.Iterator;
-
 import org.daisy.pipeline.clients.Client;
-import org.daisy.pipeline.clients.ClientStorage;
+import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.job.JobManager;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
-import org.daisy.pipeline.script.XProcScriptService;
-//import org.daisy.pipeline.webserviceutils.storage.WebserviceStorage;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.*;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.StatusLineManager;
-import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.window.ApplicationWindow;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
-import org.osgi.framework.BundleContext;
-
-import com.google.common.base.Supplier;
  
 
 public class MainWindow extends ApplicationWindow {
 
+<<<<<<< HEAD
     EntryPoint entryPoint; // DI data in here
 
 	
 	public MainWindow(Shell parentShell, EntryPoint entryPoint) {
 		super(parentShell);
         this.entryPoint = entryPoint;
+=======
+    private JobManager jobManager = null;
+    private ScriptRegistry scriptRegistry = null;    
+    private Client client = null;
+    private EventBusListener eventBusListener = null;
+    private GuiController guiController;
+	
+    
+	public MainWindow(Shell parentShell, ScriptRegistry scriptRegistry, 
+			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider) {
+		super(parentShell);
+		Display.setAppName("DAISY Pipeline 2");
+		this.scriptRegistry = scriptRegistry;
+		this.jobManager = jobManagerFactory.createFor(client);
+		this.client = client; 
+		guiController = new GuiController();
+		eventBusListener = new EventBusListener(eventBusProvider, guiController, getJobManager());
+				
+>>>>>>> development
 	}
 	
 	protected Control createContents(Composite parent) {
-        Shell shell = getShell();
-        shell.setText("JFace experiment");
-        shell.setSize(300, 200);
-        shell.setLayout(new FillLayout(SWT.HORIZONTAL));
-        addList(shell);
-        shell.pack();
+		guiController.buildGui(this);
+        this.getShell().pack();
 	    return parent;
 	}
+<<<<<<< HEAD
 
     private void addList(Shell shell){
         final List list = new List (shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
@@ -71,5 +65,19 @@ public class MainWindow extends ApplicationWindow {
 	        }
         }
         
+=======
+    
+    public JobManager getJobManager() {
+    	return jobManager;
     }
+    
+    public ScriptRegistry getScriptRegistry() {
+    	return scriptRegistry;
+    }
+    
+    public GuiController getGuiController() {
+    	return guiController;
+>>>>>>> development
+    }
+        	
 }

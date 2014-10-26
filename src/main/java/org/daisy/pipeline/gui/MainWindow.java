@@ -17,14 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class MainWindow extends ApplicationWindow {
 
-<<<<<<< HEAD
-    EntryPoint entryPoint; // DI data in here
-
 	
-	public MainWindow(Shell parentShell, EntryPoint entryPoint) {
-		super(parentShell);
-        this.entryPoint = entryPoint;
-=======
     private JobManager jobManager = null;
     private ScriptRegistry scriptRegistry = null;    
     private Client client = null;
@@ -42,7 +35,6 @@ public class MainWindow extends ApplicationWindow {
 		guiController = new GuiController();
 		eventBusListener = new EventBusListener(eventBusProvider, guiController, getJobManager());
 				
->>>>>>> development
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -50,22 +42,6 @@ public class MainWindow extends ApplicationWindow {
         this.getShell().pack();
 	    return parent;
 	}
-<<<<<<< HEAD
-
-    private void addList(Shell shell){
-        final List list = new List (shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-        
-        ScriptRegistry scriptRegistry = this.entryPoint.getScriptRegistry();
-        if (scriptRegistry != null) {
-	        Iterable<XProcScriptService> scripts = scriptRegistry.getScripts();
-	        Iterator<XProcScriptService> it = scripts.iterator();
-	        while (it.hasNext()) {
-	        	XProcScriptService script = it.next();
-	        	list.add(script.getDescription());
-	        }
-        }
-        
-=======
     
     public JobManager getJobManager() {
     	return jobManager;
@@ -77,7 +53,6 @@ public class MainWindow extends ApplicationWindow {
     
     public GuiController getGuiController() {
     	return guiController;
->>>>>>> development
     }
         	
 }

@@ -67,7 +67,6 @@ public class JobPanelNewJobView extends Composite{
 		Iterable<XProcPortInfo> outputPorts = scriptInfo.getOutputPorts();
 		Iterable<XProcOptionInfo> options = scriptInfo.getOptions();
 		
-		// TODO support input sequences
 		for (XProcPortInfo input : inputPorts) {
 			XProcPortMetadata meta = script.getPortMetadata(input.getName());
 			Text fileName = addFilePicker(input.getName(), meta.getNiceName(), meta.getDescription(), false, 
@@ -78,7 +77,6 @@ public class JobPanelNewJobView extends Composite{
 			}
 		}
 		
-		// TODO support sequences of options
 		for (XProcOptionInfo option: options) {
 			XProcOptionMetadata meta = script.getOptionMetadata(option.getName());
 			String type = meta.getType();
@@ -182,6 +180,7 @@ public class JobPanelNewJobView extends Composite{
 		return text;
 	}
 
+	
 	private Text addFilePicker(String name, String nicename, String description, boolean isDir, boolean isRequired) {
 		Label label = new Label(this, 0);
 		if (isRequired) {

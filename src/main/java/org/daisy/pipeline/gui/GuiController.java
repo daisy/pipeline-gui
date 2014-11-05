@@ -167,14 +167,17 @@ public class GuiController {
         MenuItem refreshMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
         refreshMenuItem.setText("&Refresh");
         refreshMenuItem.addSelectionListener(new RefreshJobsListener(this));
+        refreshMenuItem.setAccelerator(SWT.CTRL + 'R');
         
         deleteJobMenuItem = new MenuItem(fileMenu, SWT.PUSH);
         deleteJobMenuItem.setText("&Delete job");
         deleteJobMenuItem.addSelectionListener(new DeleteJobListener(this));
         deleteJobMenuItem.setEnabled(false);
+        deleteJobMenuItem.setAccelerator(SWT.CTRL + 'D');
     	
         MenuItem fileExitMenuItem = new MenuItem(fileMenu, SWT.PUSH);
         fileExitMenuItem.setText("E&xit");
+        fileExitMenuItem.setAccelerator(SWT.CTRL + 'Q'); // TODO make platform-savvy
         
         fileExitMenuItem.addSelectionListener(new ExitListener(this));
         

@@ -13,6 +13,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.launch.Framework;
  
 
 public class MainWindow extends ApplicationWindow {
@@ -23,11 +28,14 @@ public class MainWindow extends ApplicationWindow {
     private Client client = null;
     private EventBusListener eventBusListener = null;
     private GuiController guiController;
+    private BundleContext bundleContext;
 	
     
 	public MainWindow(Shell parentShell, ScriptRegistry scriptRegistry, 
-			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider) {
+			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
+			BundleContext context) {
 		super(parentShell);
+		this.bundleContext = context;
 		Display.setAppName("DAISY Pipeline 2");
 		this.scriptRegistry = scriptRegistry;
 		this.jobManager = jobManagerFactory.createFor(client);
@@ -54,5 +62,11 @@ public class MainWindow extends ApplicationWindow {
     public GuiController getGuiController() {
     	return guiController;
     }
+
+	public void exit() throws BundleException {
+		this.close();
+		((Framework)bundleContext.getBundle(0)).stop();
+		
+	}
         	
 }

@@ -26,7 +26,7 @@ public class Activator implements BundleActivator, Runnable {
 	private JobManagerFactory jobManagerFactory = null;
 	private EventBusProvider eventBusProvider = null;
 	private WebserviceStorage webserviceStorage = null;
-	
+	private BundleContext bundleContext = null;
 
 	private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 	
@@ -44,7 +44,8 @@ public class Activator implements BundleActivator, Runnable {
 			monitor.enterWhen(pipelineServicesAvailable);
 			logger.debug("Running GUI");
 			window = new MainWindow(null, scriptRegistry, jobManagerFactory, 
-					webserviceStorage.getClientStorage().defaultClient(), eventBusProvider);
+					webserviceStorage.getClientStorage().defaultClient(), eventBusProvider,
+					bundleContext);
 			window.setBlockOnOpen(true);
 		    window.open();
 		    Display.getCurrent().dispose();
@@ -62,6 +63,7 @@ public class Activator implements BundleActivator, Runnable {
 
 
 	public void start(final BundleContext context) throws Exception {
+		bundleContext = context;
 		context.registerService(Runnable.class.getName(), this, null);
 		
 		ServiceTracker<ScriptRegistry, ScriptRegistry> scriptRegistryTracker = new ServiceTracker<ScriptRegistry, ScriptRegistry>(
@@ -194,6 +196,7 @@ public class Activator implements BundleActivator, Runnable {
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		this.window.exit();
 	}
 
 }

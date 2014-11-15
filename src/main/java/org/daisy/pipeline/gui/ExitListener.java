@@ -2,6 +2,7 @@ package org.daisy.pipeline.gui;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.osgi.framework.BundleException;
 
 
 public class ExitListener extends SelectionAdapter {
@@ -10,6 +11,11 @@ public class ExitListener extends SelectionAdapter {
 		this.guiController = guiController;
 	}
 	public void widgetSelected(SelectionEvent event) {
-		guiController.getWindow().getShell().close();
+		try {
+			guiController.getWindow().exit();
+		} catch (BundleException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

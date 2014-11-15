@@ -165,22 +165,33 @@ public class GuiController {
         newJobMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
         newJobMenuItem.setText("&New job");
         
-        MenuItem refreshMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
+        MenuItem refreshMenuItem = new MenuItem(fileMenu, SWT.PUSH);
         refreshMenuItem.setText("&Refresh");
         refreshMenuItem.addSelectionListener(new RefreshJobsListener(this));
-        refreshMenuItem.setAccelerator(SWT.CTRL + 'R');
+        if (isMac()) {
+        	refreshMenuItem.setAccelerator(SWT.COMMAND + 'R');
+        }
+        else {
+        	refreshMenuItem.setAccelerator(SWT.CTRL + 'R');
+        }
         
         deleteJobMenuItem = new MenuItem(fileMenu, SWT.PUSH);
         deleteJobMenuItem.setText("&Delete job");
         deleteJobMenuItem.addSelectionListener(new DeleteJobListener(this));
         deleteJobMenuItem.setEnabled(false);
-        deleteJobMenuItem.setAccelerator(SWT.CTRL + 'D');
+        if (isMac()) {
+        	deleteJobMenuItem.setAccelerator(SWT.COMMAND + 'D');
+        }
+        else {
+        	deleteJobMenuItem.setAccelerator(SWT.CTRL + 'D');
+        }
     	
-        MenuItem fileExitMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-        fileExitMenuItem.setText("E&xit");
-        fileExitMenuItem.setAccelerator(SWT.CTRL + 'Q'); // TODO make platform-savvy
-        
-        fileExitMenuItem.addSelectionListener(new ExitListener(this));
+        if (!isMac()){ // OSX gets an application menu with a 'Quit' entry
+        	MenuItem fileExitMenuItem = new MenuItem(fileMenu, SWT.PUSH);
+        	fileExitMenuItem.addSelectionListener(new ExitListener(this));
+        	fileExitMenuItem.setText("E&xit");
+        	fileExitMenuItem.setAccelerator(SWT.CTRL + 'X');
+        }
         
     	Menu scriptChoices = new Menu(window.getShell(), SWT.DROP_DOWN);
         newJobMenuItem.setMenu(scriptChoices);
@@ -221,6 +232,10 @@ public class GuiController {
 		if (msg.getJobId().equals(job.getId().toString())) {
 			jobPanelDetailView.refreshData(theJob);
 		}
+	}
+	
+	private static boolean isMac() {
+		return System.getProperty("os.name").toLowerCase().contains("mac"); 
 	}
 
 }

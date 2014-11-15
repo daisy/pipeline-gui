@@ -13,6 +13,6 @@ public class NewJobListener extends SelectionAdapter {
 	}
 	public void widgetSelected(SelectionEvent event) {
 		XProcScript script = (XProcScript)event.widget.getData();
-		guiController.showNewJobPanel(script);
+		guiController.showNewJobView(script);
 	}
 }

@@ -118,7 +118,7 @@ public class GuiController {
 		jobDetailParentComposite.layout();
 	}
 	
-	public void showNewJobPanel(XProcScript script) {
+	public void showNewJobView(XProcScript script) {
 		deleteJobMenuItem.setEnabled(false);
 		
 		// create the panel from scratch
@@ -128,6 +128,7 @@ public class GuiController {
 		jobPanelNewJobView = new JobPanelNewJobView(jobDetailParentComposite, script, this);
 		// bring into view
 		jobDetailParentStackLayout.topControl = jobPanelNewJobView;
+		jobPanelNewJobView.pack();
 		jobPanelNewJobView.layout(true);
 		jobDetailParentComposite.layout(true);
 		getWindow().getShell().layout(true);

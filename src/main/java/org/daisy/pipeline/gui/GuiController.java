@@ -1,16 +1,27 @@
 package org.daisy.pipeline.gui;
 
 import org.daisy.common.messaging.Message;
+import org.daisy.pipeline.gui.handlers.AboutAction;
+import org.daisy.pipeline.gui.handlers.DeleteJobAction;
+import org.daisy.pipeline.gui.handlers.ExitAction;
+import org.daisy.pipeline.gui.handlers.NewJobAction;
+import org.daisy.pipeline.gui.handlers.PreferencesAction;
+import org.daisy.pipeline.gui.handlers.QuitListener;
+import org.daisy.pipeline.gui.handlers.RefreshJobsAction;
+import org.daisy.pipeline.gui.utils.CocoaUIEnhancer;
+import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.StatusMessage;
 import org.daisy.pipeline.script.ScriptRegistry;
 import org.daisy.pipeline.script.XProcScript;
 import org.daisy.pipeline.script.XProcScriptService;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -24,7 +35,7 @@ public class GuiController {
 	// the panel to show when no job is selected
 	JobPanelEmptyView jobPanelEmptyView;
 	// the panel to show when the user wants to create a new job
-	JobPanelNewJobView jobPanelNewJobView = null;
+	private JobPanelNewJobView jobPanelNewJobView = null;
 	// the panel to show when the user has selected a job from the sidebar
 	JobPanelDetailView jobPanelDetailView;
 	
@@ -34,11 +45,13 @@ public class GuiController {
 	
 	// the application window
 	private MainWindow window;
-	private MenuItem newJobMenuItem;
-	private MenuItem deleteJobMenuItem;
-	private Menu fileMenu = null;
+	//private MenuItem newJobMenuItem;
+	//private MenuItem deleteJobMenuItem;
+	//private Menu fileMenu = null;
+	DeleteJobAction deleteJobAction;
+	PreferencesAction preferencesAction;
 	private EventBusListener eventBusListener;
-	JobTable jobTable;
+	private JobTable jobTable;
 	
 	
 	private static final Logger logger = LoggerFactory.getLogger(GuiController.class);
@@ -66,7 +79,7 @@ public class GuiController {
 		
         // jobs list area
 		Composite jobTableComposite = new Composite(sashForm, SWT.PUSH);
-		jobTable = new JobTable(jobTableComposite, this);
+		setJobTable(new JobTable(jobTableComposite, this));
 		
         // jobs detail area
         jobDetailParentStackLayout = new StackLayout();
@@ -85,13 +98,20 @@ public class GuiController {
         jobPanelEmptyView = new JobPanelEmptyView(jobDetailParentComposite);
         jobPanelDetailView = new JobPanelDetailView(jobDetailParentComposite, this);
         
+        deleteJobAction = new DeleteJobAction(this);
+        deleteJobAction.setEnabled(false);
+        preferencesAction = new PreferencesAction(this);
+        preferencesAction.setEnabled(false);
+        
         buildMenus();
-        jobTable.refreshJobs();
+        
+        getJobTable().refreshJobs();
 	}
 	
 	public void showJobDetailView(Job job){
 		// also enable the job-specific menu items
-		deleteJobMenuItem.setEnabled(true);
+		//deleteJobMenuItem.setEnabled(true);
+		deleteJobAction.setEnabled(true);
 		
 		// make sure the job object is up to date
 		Job theJob = this.getWindow().getJobManager().getJob(job.getId()).get();
@@ -99,19 +119,23 @@ public class GuiController {
     	jobPanelDetailView.refreshData(theJob);
     	// bring panel into view
     	jobDetailParentStackLayout.topControl = jobPanelDetailView;
+    	jobPanelDetailView.pack();
 		jobDetailParentComposite.layout();
 		
     }
     public void showEmptyView(){
-    	deleteJobMenuItem.setEnabled(false);
+    	//deleteJobMenuItem.setEnabled(false);
+    	deleteJobAction.setEnabled(false);
     	jobPanelEmptyView.setLabel(JobPanelEmptyView.SELECT_A_JOB);
     	// bring panel into view
     	jobDetailParentStackLayout.topControl = jobPanelEmptyView;
-		jobDetailParentComposite.layout();
+    	jobPanelEmptyView.pack();
+    	jobDetailParentComposite.layout();
     }
     
     public void showMultipleSelectedView() {
-		deleteJobMenuItem.setEnabled(true);
+		//deleteJobMenuItem.setEnabled(true);
+    	deleteJobAction.setEnabled(true);
 		this.jobPanelEmptyView.setLabel(JobPanelEmptyView.MULTIPLE_SELECTED);
     	// bring panel into view
     	jobDetailParentStackLayout.topControl = jobPanelEmptyView;
@@ -119,17 +143,18 @@ public class GuiController {
 	}
 	
 	public void showNewJobView(XProcScript script) {
-		deleteJobMenuItem.setEnabled(false);
+		//deleteJobMenuItem.setEnabled(false);
+		deleteJobAction.setEnabled(false);
 		
 		// create the panel from scratch
-		if (jobPanelNewJobView != null && !jobPanelNewJobView.isDisposed()) {
-			jobPanelNewJobView.dispose();
+		if (getJobPanelNewJobView() != null && !getJobPanelNewJobView().isDisposed()) {
+			getJobPanelNewJobView().dispose();
 		}
-		jobPanelNewJobView = new JobPanelNewJobView(jobDetailParentComposite, script, this);
+		setJobPanelNewJobView(new JobPanelNewJobView(jobDetailParentComposite, script, this));
 		// bring into view
-		jobDetailParentStackLayout.topControl = jobPanelNewJobView;
-		jobPanelNewJobView.pack();
-		jobPanelNewJobView.layout(true);
+		jobDetailParentStackLayout.topControl = getJobPanelNewJobView();
+		getJobPanelNewJobView().pack();
+		getJobPanelNewJobView().layout(true);
 		jobDetailParentComposite.layout(true);
 		getWindow().getShell().layout(true);
 	    
@@ -138,7 +163,7 @@ public class GuiController {
 	// in lieu of a perfectly working event bus, here's a manual refresh method
 	public void refreshAll() {
 
-		jobTable.refreshJobs();
+		getJobTable().refreshJobs();
 		
 		// update the view if we are looking at this job currently
 		if (this.jobDetailParentStackLayout.topControl == this.jobPanelDetailView) {
@@ -149,74 +174,55 @@ public class GuiController {
 		}
 	}
 
-	
-    
-    private void buildMenus(){
-    	Shell shell = window.getShell();
-    	Menu menuBar = new Menu(shell, SWT.BAR);
-    	shell.setMenuBar(menuBar);
-    	
-    	MenuItem fileMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
-        fileMenuHeader.setText("&File");
-
-        fileMenu = new Menu(shell, SWT.DROP_DOWN);
-        fileMenuHeader.setMenu(fileMenu);
-
-        newJobMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
-        newJobMenuItem.setText("&New job");
-        
-        MenuItem refreshMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-        refreshMenuItem.setText("&Refresh");
-        refreshMenuItem.addSelectionListener(new RefreshJobsListener(this));
-        if (isMac()) {
-        	refreshMenuItem.setAccelerator(SWT.COMMAND + 'R');
-        }
-        else {
-        	refreshMenuItem.setAccelerator(SWT.CTRL + 'R');
-        }
-        
-        deleteJobMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-        deleteJobMenuItem.setText("&Delete job");
-        deleteJobMenuItem.addSelectionListener(new DeleteJobListener(this));
-        deleteJobMenuItem.setEnabled(false);
-        if (isMac()) {
-        	deleteJobMenuItem.setAccelerator(SWT.COMMAND + 'D');
-        }
-        else {
-        	deleteJobMenuItem.setAccelerator(SWT.CTRL + 'D');
-        }
-    	
-        if (!isMac()){ // OSX gets an application menu with a 'Quit' entry
-        	MenuItem fileExitMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-        	fileExitMenuItem.addSelectionListener(new ExitListener(this));
-        	fileExitMenuItem.setText("E&xit");
-        	fileExitMenuItem.setAccelerator(SWT.CTRL + 'X');
-        }
-        
-    	Menu scriptChoices = new Menu(window.getShell(), SWT.DROP_DOWN);
-        newJobMenuItem.setMenu(scriptChoices);
-        
-        ScriptRegistry scriptRegistry = window.getScriptRegistry();
-        
+	private void buildMenus() {
+		MenuManager menuBar = new MenuManager();
+		MenuManager fileMenu = new MenuManager("&File");
+		MenuManager newJobMenu = new MenuManager("&New job");
+		menuBar.add(fileMenu);
+		fileMenu.add(newJobMenu);
+		fileMenu.add(new RefreshJobsAction(this));
+		fileMenu.add(deleteJobAction);
+		
+		// macs get their own "quit" action automatically
+		if (!PlatformUtils.isMac()) {
+			fileMenu.add(new ExitAction(this));
+		}
+		
+		// add scripts to the "new job" menu
+		ScriptRegistry scriptRegistry = window.getScriptRegistry();
         Iterable<XProcScriptService> scripts = scriptRegistry.getScripts();
         for (XProcScriptService scriptServ : scripts) {
-        	MenuItem scriptChoice = new MenuItem(scriptChoices, SWT.PUSH);
         	XProcScript script = scriptServ.load();
-            scriptChoice.setText(script.getName()); 
-            scriptChoice.setData(script);
-            scriptChoice.addSelectionListener(new NewJobListener(this));
+        	NewJobAction action = new NewJobAction(this, script);
+        	newJobMenu.add(action);
         }
         
-        menuBar.setVisible(true);
-        menuBar.setEnabled(true);
+        if (PlatformUtils.isMac()) {
+        	// TODO make this work
+//            CocoaUIEnhancer enhancer = new CocoaUIEnhancer( "DAISY Pipeline 2" );
+//            enhancer.hookApplicationMenu(window.getShell().getDisplay(), 
+//            		new QuitListener(this), 
+//            		new AboutAction(this), 
+//            		preferencesAction);
+        } 
+        else {
+        	// TODO add preferences (when we have some)
+        	fileMenu.add(new ExitAction(this));
+        	MenuManager helpMenu = new MenuManager("&Help");
+        	helpMenu.add(new AboutAction(this));
+        	menuBar.add(helpMenu);
+        }
         
-    }
+        window.getShell().setMenuBar(menuBar.createMenuBar((Decorations)window.getShell()));
+		
+	}
+    
     
 	// these two methods come from the event bus and cause an 'invalid thread access' error
 	public void statusUpdate(StatusMessage msg) {
 		Job job = jobPanelDetailView.getJob();
 		Job theJob = window.getJobManager().getJob(job.getId()).get();
-		jobTable.refreshJobs();
+		getJobTable().refreshJobs();
 		
 		// update the view if we are looking at this job currently
 		if (msg.getJobId().equals(job.getId().toString())) {
@@ -227,15 +233,26 @@ public class GuiController {
 	public void messageUpdate(Message msg) {
 		Job job = jobPanelDetailView.getJob();
 		Job theJob = window.getJobManager().getJob(job.getId()).get();
-		//jobList.update(theJob, null);
 		// update the view if we are looking at this job currently
 		if (msg.getJobId().equals(job.getId().toString())) {
 			jobPanelDetailView.refreshData(theJob);
 		}
 	}
-	
-	private static boolean isMac() {
-		return System.getProperty("os.name").toLowerCase().contains("mac"); 
+
+	public JobTable getJobTable() {
+		return jobTable;
+	}
+
+	public void setJobTable(JobTable jobTable) {
+		this.jobTable = jobTable;
+	}
+
+	public JobPanelNewJobView getJobPanelNewJobView() {
+		return jobPanelNewJobView;
+	}
+
+	public void setJobPanelNewJobView(JobPanelNewJobView jobPanelNewJobView) {
+		this.jobPanelNewJobView = jobPanelNewJobView;
 	}
 
 }

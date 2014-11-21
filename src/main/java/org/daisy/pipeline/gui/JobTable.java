@@ -3,6 +3,7 @@ package org.daisy.pipeline.gui;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.daisy.pipeline.gui.handlers.JobSelectionListener;
 import org.daisy.pipeline.job.Job;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;

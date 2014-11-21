@@ -1,6 +1,6 @@
 // from https://gist.github.com/mpost/6077907
 
-package org.daisy.pipeline.gui;
+package org.daisy.pipeline.gui.utils;
 
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;

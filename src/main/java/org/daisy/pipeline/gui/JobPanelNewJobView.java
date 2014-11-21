@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcPipelineInfo;
 import org.daisy.common.xproc.XProcPortInfo;
+import org.daisy.pipeline.gui.handlers.CancelNewJobListener;
+import org.daisy.pipeline.gui.handlers.RunNewJobListener;
+import org.daisy.pipeline.gui.utils.GridDataUtil;
+import org.daisy.pipeline.gui.utils.GridLayoutUtil;
 import org.daisy.pipeline.script.XProcOptionMetadata;
 import org.daisy.pipeline.script.XProcPortMetadata;
 import org.daisy.pipeline.script.XProcScript;
@@ -32,7 +36,7 @@ public class JobPanelNewJobView extends Composite{
 	ArrayList<Text> outputArguments;
 	GuiController guiController;
 	
-	ArrayList<Text> requiredArguments; // the required arguments; used later in validation
+	private ArrayList<Text> requiredArguments; // the required arguments; used later in validation
 	
 	// standard vertical indents
 	static int VINDENT = 8; 
@@ -48,7 +52,7 @@ public class JobPanelNewJobView extends Composite{
 		inputArguments = new ArrayList<Text>();
 		optionArguments = new ArrayList<Widget>();
 		outputArguments = new ArrayList<Text>();
-		requiredArguments = new ArrayList<Text>();
+		setRequiredArguments(new ArrayList<Text>());
 		
 		GridLayoutUtil.applyGridLayout(this).numColumns(3);
 		
@@ -73,7 +77,7 @@ public class JobPanelNewJobView extends Composite{
 					meta.isRequired());
 			inputArguments.add(fileName);
 			if (meta.isRequired()) {
-				requiredArguments.add(fileName);
+				getRequiredArguments().add(fileName);
 			}
 		}
 		
@@ -86,7 +90,7 @@ public class JobPanelNewJobView extends Composite{
 						meta.getNiceName(), meta.getDescription(), false, option.isRequired());
 				optionArguments.add(fileName);
 				if (option.isRequired()) {
-					requiredArguments.add(fileName);
+					getRequiredArguments().add(fileName);
 				}
 			}
 			else if (type.equals("anyDirURI")) {
@@ -94,7 +98,7 @@ public class JobPanelNewJobView extends Composite{
 						meta.getNiceName(), meta.getDescription(), true, option.isRequired());
 				optionArguments.add(fileName);
 				if (option.isRequired()) {
-					requiredArguments.add(fileName);
+					getRequiredArguments().add(fileName);
 				}
 			}
 			else if (type.equals("boolean")) {
@@ -108,7 +112,7 @@ public class JobPanelNewJobView extends Composite{
 						option.isRequired());
 				optionArguments.add(text);
 				if (option.isRequired()) {
-					requiredArguments.add(text);
+					getRequiredArguments().add(text);
 				}
 			}
 		}
@@ -119,7 +123,7 @@ public class JobPanelNewJobView extends Composite{
 					meta.isRequired());
 			outputArguments.add(fileName);
 			if (meta.isRequired()) {
-				requiredArguments.add(fileName);
+				getRequiredArguments().add(fileName);
 			}
 		}
 	
@@ -248,6 +252,14 @@ public class JobPanelNewJobView extends Composite{
 		FontDescriptor italicDescriptor = FontDescriptor.createFrom(label.getFont()).setStyle(SWT.ITALIC);
 		Font italicFont = italicDescriptor.createFont(label.getDisplay());
 		return italicFont;
+	}
+
+	public ArrayList<Text> getRequiredArguments() {
+		return requiredArguments;
+	}
+
+	public void setRequiredArguments(ArrayList<Text> requiredArguments) {
+		this.requiredArguments = requiredArguments;
 	}
 	
 	

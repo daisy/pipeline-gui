@@ -8,6 +8,8 @@ import org.daisy.common.messaging.Message;
 import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcPipelineInfo;
 import org.daisy.common.xproc.XProcPortInfo;
+import org.daisy.pipeline.gui.utils.GridDataUtil;
+import org.daisy.pipeline.gui.utils.GridLayoutUtil;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.JobResult;
 import org.daisy.pipeline.job.JobResultSet;

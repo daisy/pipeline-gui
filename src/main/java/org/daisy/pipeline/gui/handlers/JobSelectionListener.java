@@ -1,5 +1,6 @@
-package org.daisy.pipeline.gui;
+package org.daisy.pipeline.gui.handlers;
 
+import org.daisy.pipeline.gui.GuiController;
 import org.daisy.pipeline.job.Job;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;

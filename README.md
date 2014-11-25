@@ -15,8 +15,7 @@ Build the GUI:
     cd pipeline-gui
     mvn clean install
 
-Use this launcher/ subdir from this branch in pipeline-framework master:
-https://github.com/daisy/pipeline-framework/tree/launcher
+Use the master branch of the pipeline-framework
 
 Get the gui-august branch of the assembly
 

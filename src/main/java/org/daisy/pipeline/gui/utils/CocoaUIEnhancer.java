@@ -1,5 +1,6 @@
 package org.daisy.pipeline.gui.utils;
 
+
 // from http://www.transparentech.com/opensource/cocoauienhancer
 
 import java.lang.reflect.InvocationTargetException;

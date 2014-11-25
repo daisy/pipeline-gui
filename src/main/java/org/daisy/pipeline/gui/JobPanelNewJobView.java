@@ -13,10 +13,12 @@ import org.daisy.pipeline.script.XProcOptionMetadata;
 import org.daisy.pipeline.script.XProcPortMetadata;
 import org.daisy.pipeline.script.XProcScript;
 import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -109,7 +111,7 @@ public class JobPanelNewJobView extends Composite{
 			}
 			else { // treat all other types as strings
 				Text text = addText(option.getName().toString(), meta.getNiceName(), meta.getDescription(),
-						option.isRequired());
+						option.isRequired(), meta.isSequence(), meta.getSeparator());
 				optionArguments.add(text);
 				if (option.isRequired()) {
 					getRequiredArguments().add(text);
@@ -160,7 +162,8 @@ public class JobPanelNewJobView extends Composite{
 		return cb;
 	}
 	
-	private Text addText(String name, String nicename, String description, boolean isRequired) {
+	private Text addText(String name, String nicename, String description, boolean isRequired, 
+			boolean isSequence, String separator) {
 		Label label = new Label(this, 0);
 		if (isRequired) {
 			label.setText("* " + nicename);
@@ -180,6 +183,13 @@ public class JobPanelNewJobView extends Composite{
 		descLabel.setText(description);
 		descLabel.setFont(makeItalicFont(descLabel));
 		GridDataUtil.applyGridData(descLabel).horizontalSpan(3).verticalIndent(VINDENT_GROUP);
+		
+		if (isSequence) {
+			Label sequenceLabel = new Label(this, 0);
+			sequenceLabel.setText("Separate multiple values with " + separator);
+			sequenceLabel.setFont(makeItalicFont(sequenceLabel));
+			GridDataUtil.applyGridData(sequenceLabel).horizontalSpan(3).verticalIndent(VINDENT_GROUP);
+		}
 		
 		return text;
 	}
@@ -241,6 +251,9 @@ public class JobPanelNewJobView extends Composite{
 		return fileName;
 	}
 	
+	private ListViewer addFileSequence(String name, String nicename, String description, boolean isDir, boolean isRequired) {
+		return null;
+	}
 	
 	private Font makeBoldFont(Label label) {
 		FontDescriptor boldDescriptor = FontDescriptor.createFrom(label.getFont()).setStyle(SWT.BOLD);

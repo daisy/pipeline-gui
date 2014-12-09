@@ -22,10 +22,14 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Decorations;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.launch.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +108,20 @@ public class GuiController {
         preferencesAction.setEnabled(false);
         
         buildMenus();
+        
+        final MainWindow window_ = window; 
+        window_.getShell().addListener(SWT.Close, new Listener() {
+		      public void handleEvent(Event event) {
+		    	  try {
+					window_.exit();
+				} catch (BundleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    	  event.doit = false;
+		      }
+		    });
+		
         
         getJobTable().refreshJobs();
 	}

@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -33,12 +34,12 @@ import org.eclipse.swt.widgets.Widget;
 public class JobPanelNewJobView extends Composite{
 
 	XProcScript script;
-	ArrayList<Text> inputArguments;
+	ArrayList<Widget> inputArguments;
 	ArrayList<Widget> optionArguments;
 	ArrayList<Text> outputArguments;
 	GuiController guiController;
 	
-	private ArrayList<Text> requiredArguments; // the required arguments; used later in validation
+	private ArrayList<Widget> requiredArguments; // the required arguments; used later in validation
 	
 	// standard vertical indents
 	static int VINDENT = 8; 
@@ -51,10 +52,10 @@ public class JobPanelNewJobView extends Composite{
 		super(parent, SWT.NONE);
 		this.script = script;
 		this.guiController = guiController;
-		inputArguments = new ArrayList<Text>();
+		inputArguments = new ArrayList<Widget>();
 		optionArguments = new ArrayList<Widget>();
 		outputArguments = new ArrayList<Text>();
-		setRequiredArguments(new ArrayList<Text>());
+		requiredArguments = new ArrayList<Widget>();
 		
 		GridLayoutUtil.applyGridLayout(this).numColumns(3);
 		
@@ -75,8 +76,14 @@ public class JobPanelNewJobView extends Composite{
 		
 		for (XProcPortInfo input : inputPorts) {
 			XProcPortMetadata meta = script.getPortMetadata(input.getName());
-			Text fileName = addFilePicker(input.getName(), meta.getNiceName(), meta.getDescription(), false, 
-					meta.isRequired());
+			Widget fileName = null;
+			if (input.isSequence()) {
+				 fileName = addFileSequence(input.getName(), meta.getNiceName(), meta.getDescription(), 
+						 false, meta.isRequired());
+			}
+			else {
+				fileName = addFilePicker(input.getName(), meta.getNiceName(), meta.getDescription(), false, meta.isRequired());
+			}
 			inputArguments.add(fileName);
 			if (meta.isRequired()) {
 				getRequiredArguments().add(fileName);
@@ -87,7 +94,7 @@ public class JobPanelNewJobView extends Composite{
 			XProcOptionMetadata meta = script.getOptionMetadata(option.getName());
 			String type = meta.getType();
 			
-			if (type.equals("anyURI")) {
+			if (type.equals("anyURI") || type.equals("anyFileURI")) {
 				Text fileName = addFilePicker(option.getName().toString(), 
 						meta.getNiceName(), meta.getDescription(), false, option.isRequired());
 				optionArguments.add(fileName);
@@ -186,7 +193,7 @@ public class JobPanelNewJobView extends Composite{
 		
 		if (isSequence) {
 			Label sequenceLabel = new Label(this, 0);
-			sequenceLabel.setText("Separate multiple values with " + separator);
+			sequenceLabel.setText("Separate multiple values with \"" + separator + "\"");
 			sequenceLabel.setFont(makeItalicFont(sequenceLabel));
 			GridDataUtil.applyGridData(sequenceLabel).horizontalSpan(3).verticalIndent(VINDENT_GROUP);
 		}
@@ -203,9 +210,10 @@ public class JobPanelNewJobView extends Composite{
 		else {
 			label.setText(nicename);
 		}
+		final boolean _isDir = isDir;
 		GridDataUtil.applyGridData(label).horizontalSpan(1).verticalIndent(5);
 		
-		Text fileName = new Text(this, 0);
+		final Text fileName = new Text(this, 0);
 		fileName.setData(name);
 		fileName.setToolTipText(description);
 		GridDataUtil.applyGridData(fileName).horizontalSpan(1).
@@ -213,35 +221,29 @@ public class JobPanelNewJobView extends Composite{
 		
 		Button filePicker = new Button(this, 0);
 		filePicker.setText("...");
-		filePicker.setData(fileName);
 		GridDataUtil.applyGridData(filePicker).horizontalSpan(1).horizontalAlignment(SWT.LEFT).verticalIndent(VINDENT);
 		
-		// show a directory dialog
-		if (isDir) {
-			filePicker.addSelectionListener(new SelectionAdapter() {
-			      public void widgetSelected(SelectionEvent e) {
+		filePicker.addSelectionListener(new SelectionAdapter() {
+		      public void widgetSelected(SelectionEvent e) {
+		    	  if (_isDir) {
+		    		  // show a directory dialog
 			    	  DirectoryDialog dialog = new DirectoryDialog(guiController.getWindow().getShell(), SWT.NULL);
 			    	  String selectedFile = dialog.open();
 			          if (selectedFile != null) {
-			        	  ((Text)e.widget.getData()).setText(selectedFile);
+			        	  fileName.setText(selectedFile);
 			          }
-			      }
-			});
-			
-		}
-		// show a file dialog
-		else {
-			filePicker.addSelectionListener(new SelectionAdapter() {
-			      public void widgetSelected(SelectionEvent e) {
-			    	  FileDialog dialog = new FileDialog(guiController.getWindow().getShell(), SWT.NULL);
+		    	  }
+		    	  // show a file dialog
+		    	  else {
+		    		  FileDialog dialog = new FileDialog(guiController.getWindow().getShell(), SWT.NULL);
 			    	  String selectedFile = dialog.open();
 			          if (selectedFile != null) {
-			        	  ((Text)e.widget.getData()).setText(selectedFile);
+			        	  fileName.setText(selectedFile);
 			          }
-			      }
-			});
-			
-		}
+		    	  }
+		      }
+		});
+		
 		
 		Label descLabel = new Label(this, 0);
 		descLabel.setText(description);
@@ -251,8 +253,101 @@ public class JobPanelNewJobView extends Composite{
 		return fileName;
 	}
 	
-	private ListViewer addFileSequence(String name, String nicename, String description, boolean isDir, boolean isRequired) {
-		return null;
+	private org.eclipse.swt.widgets.List addFileSequence(String name, String nicename, String description, 
+			boolean isDir, boolean isRequired) {
+		
+		Composite composite = new Composite(this, SWT.NONE);
+		composite.setLayout(new FillLayout(SWT.VERTICAL));
+		//RowLayout rowLayout = new RowLayout();
+		//rowLayout.
+		//composite.setLayout(new RowLayout())
+		GridDataUtil.applyGridData(composite).horizontalSpan(3).verticalIndent(VINDENT_GROUP);
+		
+		Label label = new Label(composite, 0);
+		if (isRequired) {
+			label.setText("* " + nicename);
+		}
+		else {
+			label.setText(nicename);
+		}
+		
+		Label descLabel = new Label(composite, 0);
+		descLabel.setText(description);
+		descLabel.setFont(makeItalicFont(descLabel));
+		
+		final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(composite, SWT.SINGLE);
+		list.setSize(TEXTBOX_MIN_WIDTH, TEXTBOX_MIN_WIDTH-50);
+		list.setData(name);
+		
+		Composite buttonsComposite = new Composite(composite, SWT.NONE);
+		buttonsComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		final Button addFileButton = new Button(buttonsComposite, SWT.NONE);
+		addFileButton.setText("Add");
+		addFileButton.setSize(50, 50);
+
+		final Button removeFileButton = new Button(buttonsComposite, SWT.NONE);
+		removeFileButton.setText("Remove");
+		removeFileButton.setEnabled(false);
+		removeFileButton.setSize(50, 50);
+
+//		final Button moveUpFileButton = new Button(buttonsComposite, SWT.NONE);
+//		moveUpFileButton.setText("Move up");
+//		moveUpFileButton.setEnabled(false);
+//
+//		final Button moveDownFileButton = new Button(buttonsComposite, SWT.NONE);
+//		moveDownFileButton.setText("Move down");
+//		moveDownFileButton.setEnabled(false);
+
+		
+		final boolean _isDir = isDir;
+		addFileButton.addSelectionListener(new SelectionAdapter() {
+			 public void widgetSelected(SelectionEvent e) {
+				  if (_isDir) {
+					  DirectoryDialog dialog = new DirectoryDialog(guiController.getWindow().getShell(), SWT.NULL);
+			    	  String selectedFile = dialog.open();
+			          if (selectedFile != null) {
+			        	  list.add(selectedFile);
+			          }
+				  }
+				  else {
+					  FileDialog dialog = new FileDialog(guiController.getWindow().getShell(), SWT.NULL);
+			    	  String selectedFile = dialog.open();
+			          if (selectedFile != null) {
+			        	  list.add(selectedFile);
+			          }
+				  }
+		      }
+		});
+		
+		list.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (list.getSelectionCount() > 0) {
+					removeFileButton.setEnabled(true);
+//					if (list.getItemCount() > 1) {
+//						moveUpFileButton.setEnabled(true);
+//						moveDownFileButton.setEnabled(true);
+//					}
+					
+				}
+			}
+		});
+		
+		removeFileButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (list.getSelectionCount() > 0) {
+					int idx = list.getSelectionIndex();
+					list.remove(idx);
+					removeFileButton.setEnabled(false);
+//					moveUpFileButton.setEnabled(false);
+//					moveDownFileButton.setEnabled(false);
+				}
+			}
+		});
+		
+		composite.layout();
+		return list;
+		
 	}
 	
 	private Font makeBoldFont(Label label) {
@@ -267,13 +362,10 @@ public class JobPanelNewJobView extends Composite{
 		return italicFont;
 	}
 
-	public ArrayList<Text> getRequiredArguments() {
+	public ArrayList<Widget> getRequiredArguments() {
 		return requiredArguments;
 	}
 
-	public void setRequiredArguments(ArrayList<Text> requiredArguments) {
-		this.requiredArguments = requiredArguments;
-	}
 	
 	
 }

@@ -92,7 +92,11 @@ public class JobPanelDetailView extends Composite{
 			
 			if (messages != null) {
 				for (Message message : messages) {
-					jobMessagesList.add(message.getText());
+					String messageText = message.getLevel().toString() + " " + 
+										 message.getText() + 
+										 " (" + message.getFile() + 
+										 " line " + message.getLine() + ") ";
+					jobMessagesList.add(messageText);
 				}		
 			}
 			
@@ -121,6 +125,8 @@ public class JobPanelDetailView extends Composite{
 				resultsLabel.setText("Not available");
 			}
 			
+			this.getParent().layout();
+			this.layout();
 			this.getParent().pack();
 			
 		}

@@ -9,6 +9,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 
 public class RunNewJobListener extends SelectionAdapter {
@@ -38,9 +39,16 @@ public class RunNewJobListener extends SelectionAdapter {
 	}
 	
 	private boolean isValid(JobPanelNewJobView panel) {
-		for (Text text : panel.getRequiredArguments()) {
-			if (text.getText().isEmpty()) {
-				return false;
+		for (Widget widget : panel.getRequiredArguments()) {
+			if (widget instanceof Text) {
+				if (((Text)widget).getText().isEmpty()) {
+					return false;
+				}
+			}
+			else if (widget instanceof org.eclipse.swt.widgets.List) {
+				if (((org.eclipse.swt.widgets.List)widget).getItemCount() == 0) {
+					return false;
+				}
 			}
 		}
 		return true;

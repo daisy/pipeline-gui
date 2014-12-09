@@ -48,15 +48,28 @@ public class JobExecutor {
         while (itInput.hasNext()) {
             XProcPortInfo input = itInput.next();
             String inputName = input.getName();
-            Iterator<Text> itWidget = panel.inputArguments.iterator();
+            Iterator<Widget> itWidget = panel.inputArguments.iterator();
             while (itWidget.hasNext()) {
-            	Text widget = itWidget.next();
-            	String name = (String)widget.getData();
-            	if (name.equals(inputName)) {
-            		String src = widget.getText();
-            		LazySaxSourceProvider prov= new LazySaxSourceProvider(src);
-                    inBuilder.withInput(inputName, prov);
+            	Widget widget = itWidget.next();
+	            if (widget instanceof Text) {
+	            	Text text = (Text)itWidget.next();
+	            	String name = (String)text.getData();
+	            	if (name.equals(inputName)) {
+	            		String src = text.getText();
+	            		LazySaxSourceProvider prov = new LazySaxSourceProvider(src);
+	                    inBuilder.withInput(inputName, prov);
+	            	}
             	}
+	            else if (widget instanceof org.eclipse.swt.widgets.List) {
+	            	org.eclipse.swt.widgets.List list = (org.eclipse.swt.widgets.List)widget;
+	            	int itemCount = list.getItemCount();
+	            	for (int i = 0; i<itemCount; i++) {
+	            		String src = list.getItem(i);
+	            		System.out.println("GUI INPUT SEQUENCE: " + src);
+	            		LazySaxSourceProvider prov = new LazySaxSourceProvider(src);
+	            		inBuilder.withInput(inputName, prov);
+	            	}
+	            }
             }
         }
         
@@ -71,6 +84,8 @@ public class JobExecutor {
         	Iterator<Widget> itWidget = panel.optionArguments.iterator();
         	while (itWidget.hasNext()) {
         		Widget widget = itWidget.next();
+        		System.out.println("WIDGET: " + widget.getClass().toString());
+        		
         		String name = (String)widget.getData();
         		if (name.equals(optionName)) {
         			XProcOptionMetadata metadata = panel.script.getOptionMetadata(new QName(optionName));

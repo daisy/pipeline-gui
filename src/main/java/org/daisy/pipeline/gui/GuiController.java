@@ -183,10 +183,10 @@ public class GuiController {
 		fileMenu.add(new RefreshJobsAction(this));
 		fileMenu.add(deleteJobAction);
 		
-		// macs get their own "quit" action automatically
-		if (!PlatformUtils.isMac()) {
-			fileMenu.add(new ExitAction(this));
-		}
+//		// macs get their own "quit" action automatically
+//		if (!PlatformUtils.isMac()) {
+//			fileMenu.add(new ExitAction(this));
+//		}
 		
 		// add scripts to the "new job" menu
 		ScriptRegistry scriptRegistry = window.getScriptRegistry();

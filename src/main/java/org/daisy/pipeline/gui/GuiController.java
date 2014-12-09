@@ -22,6 +22,7 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Decorations;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -201,10 +202,6 @@ public class GuiController {
 		fileMenu.add(new RefreshJobsAction(this));
 		fileMenu.add(deleteJobAction);
 		
-//		// macs get their own "quit" action automatically
-//		if (!PlatformUtils.isMac()) {
-//			fileMenu.add(new ExitAction(this));
-//		}
 		
 		// add scripts to the "new job" menu
 		ScriptRegistry scriptRegistry = window.getScriptRegistry();
@@ -244,7 +241,8 @@ public class GuiController {
 		
 		// update the view if we are looking at this job currently
 		if (msg.getJobId().equals(job.getId().toString())) {
-			jobPanelDetailView.refreshData(theJob);
+			//jobPanelDetailView.refreshData(theJob);
+			refreshDataThreadSafe(theJob);
 		}
 	}
 	
@@ -253,10 +251,24 @@ public class GuiController {
 		Job theJob = window.getJobManager().getJob(job.getId()).get();
 		// update the view if we are looking at this job currently
 		if (msg.getJobId().equals(job.getId().toString())) {
-			jobPanelDetailView.refreshData(theJob);
+			//jobPanelDetailView.refreshData(theJob);
+			refreshDataThreadSafe(theJob);
 		}
 	}
 
+	private void refreshDataThreadSafe(Job job) {
+		final Job job_ = job;
+		Display display = window.getShell().getDisplay();
+		if (!(display==null || display.isDisposed())) {
+			display.asyncExec(new Runnable () {
+				public void run() {
+					jobPanelDetailView.refreshData(job_);
+					getJobTable().refreshJobs();
+				}
+			});
+		}
+	}
+	
 	public JobTable getJobTable() {
 		return jobTable;
 	}

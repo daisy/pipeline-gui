@@ -107,7 +107,9 @@ public class JobPanelDetailView extends Composite{
 			}
 			
 			JobResultSet results = job.getContext().getResults();
-			if (results != null && job.getStatus() == Job.Status.DONE) {
+			if (results != null && 
+					(job.getStatus() == Job.Status.DONE || job.getStatus() == Job.Status.ERROR ||
+					job.getStatus() == Job.Status.VALIDATION_FAIL)) {
 			
 				for (String port : this.job.getContext().getResults().getPorts()) {
 	                String nicename = job.getContext().getScript().getPortMetadata(port).getNiceName();

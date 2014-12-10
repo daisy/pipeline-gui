@@ -11,6 +11,8 @@ import org.daisy.pipeline.gui.handlers.RefreshJobsAction;
 import org.daisy.pipeline.gui.utils.CocoaUIEnhancer;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job;
+import org.daisy.pipeline.job.JobId;
+import org.daisy.pipeline.job.JobUUIDGenerator;
 import org.daisy.pipeline.job.StatusMessage;
 import org.daisy.pipeline.script.ScriptRegistry;
 import org.daisy.pipeline.script.XProcScript;
@@ -233,27 +235,21 @@ public class GuiController {
 	}
     
     
-	// these two methods come from the event bus and cause an 'invalid thread access' error
 	public void statusUpdate(StatusMessage msg) {
-		Job job = jobPanelDetailView.getJob();
-		Job theJob = window.getJobManager().getJob(job.getId()).get();
-		getJobTable().refreshJobs();
+		Job job = window.getJobManager().getJob(msg.getJobId()).get();
+		System.out.println("+GUI STATUS CHANGE to " + job.getStatus().toString() + "(" + job.getId().toString() + ")");
+		// just for testing: see if DONE updates are coming through
+		if (job.getStatus() == Job.Status.DONE) {
 		
-		// update the view if we are looking at this job currently
-		if (msg.getJobId().equals(job.getId().toString())) {
-			//jobPanelDetailView.refreshData(theJob);
-			refreshDataThreadSafe(theJob);
+			refreshDataThreadSafe(job);
 		}
 	}
 	
 	public void messageUpdate(Message msg) {
-		Job job = jobPanelDetailView.getJob();
-		Job theJob = window.getJobManager().getJob(job.getId()).get();
-		// update the view if we are looking at this job currently
-		if (msg.getJobId().equals(job.getId().toString())) {
-			//jobPanelDetailView.refreshData(theJob);
-			refreshDataThreadSafe(theJob);
-		}
+//		JobUUIDGenerator gen = new JobUUIDGenerator();
+//		JobId jobId = gen.generateIdFromString(msg.getJobId());
+//		Job job = window.getJobManager().getJob(jobId).get();
+//		refreshDataThreadSafe(job);
 	}
 
 	private void refreshDataThreadSafe(Job job) {
@@ -262,8 +258,15 @@ public class GuiController {
 		if (!(display==null || display.isDisposed())) {
 			display.asyncExec(new Runnable () {
 				public void run() {
-					jobPanelDetailView.refreshData(job_);
+					// refresh the sidebar
 					getJobTable().refreshJobs();
+					
+					// refresh the detail view if we are looking at the job that the update is concerning
+					Job currentJob = jobPanelDetailView.getJob();
+					if (currentJob.getId().toString().equals(job_.getId().toString())) {
+						jobPanelDetailView.refreshData(job_);
+					}
+					
 				}
 			});
 		}

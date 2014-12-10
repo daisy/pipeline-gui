@@ -43,11 +43,6 @@ public class EventBusListener {
 	
 	@Subscribe
     public synchronized void handleMessage(Message msg) {
-    	JobUUIDGenerator gen = new JobUUIDGenerator();
-    	JobId jobId = gen.generateIdFromString(msg.getJobId());
-    	synchronized(this.messages){
-    		messages.addMessage(jobId, msg);
-    	}
     	guiController.messageUpdate(msg);
 		
     }

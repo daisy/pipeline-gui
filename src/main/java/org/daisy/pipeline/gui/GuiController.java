@@ -239,10 +239,10 @@ public class GuiController {
 		Job job = window.getJobManager().getJob(msg.getJobId()).get();
 		System.out.println("+GUI STATUS CHANGE to " + job.getStatus().toString() + "(" + job.getId().toString() + ")");
 		// just for testing: see if DONE updates are coming through
-		if (job.getStatus() == Job.Status.DONE) {
-		
+                        //Job job = jobPanelDetailView.getJob();
+                        //Job theJob = window.getJobManager().getJob(job.getId()).get();
+                        //getJobTable().refreshJobs();
 			refreshDataThreadSafe(job);
-		}
 	}
 	
 	public void messageUpdate(Message msg) {

@@ -49,6 +49,8 @@ public class EventBusListener {
 
     @Subscribe
     public void handleStatus(StatusMessage message) {
+        System.out.println(String.format("+++++++Getting status %s %s",message.getJobId(),message.getStatus()));
+        System.out.println("I'M HEREEEEEEEEEEEEe--------========================================");
     	guiController.statusUpdate(message);
 //    	StatusHolder holder= new StatusHolder();
 //    	holder.status=message.getStatus();

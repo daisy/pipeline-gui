@@ -1,5 +1,6 @@
 package org.daisy.pipeline.gui;
 
+import org.daisy.pipeline.clients.Client;
 import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.job.impl.DefaultJobExecutionService;
@@ -21,14 +22,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
 import javafx.application.Application;
 
 public class Activator extends Application implements BundleActivator,Runnable
 {
-        Stage stage;
-        
+        private Stage stage;
+        private MainWindow mainWindow = null;
         private ScriptRegistry scriptRegistry = null;
         private JobManagerFactory jobManagerFactory = null;
         private EventBusProvider eventBusProvider = null;
@@ -48,12 +51,49 @@ public class Activator extends Application implements BundleActivator,Runnable
                                         @Override
                                         public void run()
                 {
-                        Activator.this.stage = stage;
-                        BorderPane pane = new BorderPane();
-                        Scene scene = new Scene(pane, 400, 200);
-                        pane.setCenter(new Label("This is a JavaFX Scene in a Stage"));
-                        stage.setScene(scene);
-                        stage.show();
+                        //try {
+                        	// this causes things not to work at all
+	                        //monitor.enterWhen(pipelineServicesAvailable);
+	                        Activator.this.stage = stage;
+	                        System.out.println("Gui run");
+	                        // the real GUI
+//	                        Client client = webserviceStorage.getClientStorage().defaultClient();
+//	                        System.out.println("HELLO");
+//	                        mainWindow = new MainWindow(scriptRegistry, jobManagerFactory,
+//	                        		client, 
+//	                        		eventBusProvider, bundleContext);
+//	                        
+//	                        stage.setScene(mainWindow.getScene());
+//	                		stage.setTitle("DAISY Pipeline 2");
+//	                		stage.show();
+	                		
+	                        // the test GUI
+	                        // first check if the services are available
+	                        if (scriptRegistry == null) {
+	                        	System.out.println("!!!!!!!!!!!!!!!!!SCRIPT REG IS NULL!");
+	                        }
+	                        if (jobManagerFactory == null) {
+	                        	System.out.println("!!!!!!!!!!!!!!!!!JOB MAN FACTORY IS NULL");
+	                        }
+	                        if (webserviceStorage == null) {
+	                        	System.out.println("!!!!!!!!!!!!!!!!! WEB SERV STORAGE IS NULL");
+	                        }
+	                        if (eventBusProvider == null) {
+	                        	System.out.println("!!!!!!!!!!!!!!!!! EVENT BUS PROVIDER IS NULL");
+	                        }
+	                        BorderPane pane = new BorderPane();
+	                        Scene scene = new Scene(pane, 400, 200);
+	                        pane.setCenter(new Label("This is a JavaFX Scene in a Stage"));
+	                        stage.setScene(scene);
+	                        stage.show();
+//                        }
+//                        catch (InterruptedException e) {
+//                        	e.printStackTrace();
+//                        }
+//                        finally {
+//                        	monitor.leave();
+//                        }
+                        
                 }
                 });
         }
@@ -174,7 +214,7 @@ public class Activator extends Application implements BundleActivator,Runnable
 
                                         @Override
                                         public EventBusProvider addingService(ServiceReference<EventBusProvider> reference) {
-                                                logger.debug("Setting web service storage");
+                                                logger.debug("Setting event bus provider");
                                                 monitor.enter();
                                                 try {
                                                         eventBusProvider  = context.getService(reference);

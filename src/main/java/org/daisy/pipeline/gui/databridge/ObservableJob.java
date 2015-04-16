@@ -1,0 +1,67 @@
+package org.daisy.pipeline.gui.databridge;
+
+import org.daisy.common.messaging.Message.Level;
+import org.daisy.pipeline.job.Job;
+import org.daisy.pipeline.job.Job.Status;
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+// translate the Pipeline2 Job object into GUI-friendly Strings and StringProperty objects
+public class ObservableJob extends SimpleObjectProperty {
+
+	private StringProperty status;
+	private ObservableList<String> messages;
+	private Job job;
+	
+	public ObservableJob(Job job) {
+		status = new SimpleStringProperty();
+		this.job = job;
+		this.setStatus(job.getStatus());
+		messages = FXCollections.observableArrayList();
+	}
+	
+	public String getStatus() {
+		return status.get();
+	}
+	public void setStatus(Status status) {
+		this.status.set(statusToString(status));
+	}
+	public StringProperty statusProperty() {
+		return this.status;
+	}
+	public ObservableList<String> getMessages() {
+		return this.messages;
+	}
+	public void addMessage(String message, Level level) {
+		this.messages.add(formatMessage(message, level));
+	}
+	public Job getJob() {
+		return job;
+	}
+	private static String statusToString(Status status) {
+		if (status == Status.DONE) {
+			return "Done";
+		}
+		if (status == Status.ERROR) {
+			return "Error";
+		}
+		if (status == Status.IDLE) {
+			return "Idle";
+		}
+		if (status == Status.RUNNING) {
+			return "Running";
+		}
+		if (status == Status.VALIDATION_FAIL) {
+			return "Validation fail";
+		}
+		return "";
+	}
+	private static String formatMessage(String message, Level level) {
+		return level.toString() + ": " + message;
+	}
+	
+}

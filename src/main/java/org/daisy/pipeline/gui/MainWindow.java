@@ -2,55 +2,66 @@ package org.daisy.pipeline.gui;
 
 import org.daisy.pipeline.clients.Client;
 import org.daisy.pipeline.event.EventBusProvider;
+import org.daisy.pipeline.gui.databridge.DataManager;
+import org.daisy.pipeline.gui.databridge.EventBusListener;
+import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.job.JobManager;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
-import org.eclipse.jface.window.ApplicationWindow;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
+import org.daisy.pipeline.script.XProcScript;
+import org.daisy.pipeline.script.XProcScriptService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.launch.Framework;
- 
 
-public class MainWindow extends ApplicationWindow {
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
-	
-    private JobManager jobManager = null;
-    private ScriptRegistry scriptRegistry = null;    
-    private Client client = null;
-    private EventBusListener eventBusListener = null;
-    private GuiController guiController;
-    private BundleContext bundleContext;
-	
+public class MainWindow extends BorderPane {
     
-	public MainWindow(Shell parentShell, ScriptRegistry scriptRegistry, 
+
+	private JobManager jobManager;
+    private ScriptRegistry scriptRegistry;    
+    private EventBusListener eventBusListener;
+    private BundleContext bundleContext;
+    private EventBusProvider eventBusProvider;
+    private DataManager dataManager;
+    private ObservableList<ObservableJob> jobData;
+    	
+	private Sidebar sidebar;
+	private DetailsPane detailsPane;
+	private MessagesPane messagesPane;
+	private AppMenu menubar;
+	private NewJobPane newJobPane;
+	private Scene scene;
+	
+    public MainWindow(ScriptRegistry scriptRegistry, 
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
 			BundleContext context) {
-		super(parentShell);
+		super();
+		buildWindow();	
+		
+		
+		
+		this.eventBusProvider = eventBusProvider;
 		this.bundleContext = context;
-		Display.setAppName("DAISY Pipeline 2");
 		this.scriptRegistry = scriptRegistry;
 		this.jobManager = jobManagerFactory.createFor(client);
-		this.client = client; 
-		guiController = new GuiController();
-		eventBusListener = new EventBusListener(eventBusProvider, guiController, getJobManager());
-				
-	}
+		
+		jobData = FXCollections.observableArrayList();
+		dataManager = new DataManager(jobData);
+		this.eventBusListener = new EventBusListener(this);	
+		eventBusProvider.get().register(eventBusListener);
+    }
+    	
 	
-	protected Control createContents(Composite parent) {
-		guiController.buildGui(this);
-        this.getShell().pack();
-	    return parent;
-	}
-    
+	
     public JobManager getJobManager() {
     	return jobManager;
     }
@@ -58,15 +69,62 @@ public class MainWindow extends ApplicationWindow {
     public ScriptRegistry getScriptRegistry() {
     	return scriptRegistry;
     }
-    
-    public GuiController getGuiController() {
-    	return guiController;
-    }
 
-	public void exit() throws BundleException {
-		this.close();
-		((Framework)bundleContext.getBundle(0)).stop();
+    public EventBusProvider getEventBusProvider() {
+    	return eventBusProvider;
+    }
+    
+    public BundleContext getBundleContext() {
+    	return bundleContext;
+    }
+	public DataManager getDataManager() {
+		return dataManager;
+	}
+	public ObservableList<ObservableJob> getJobData() {
+		return jobData;
+	}
+	public NewJobPane getNewJobPane() {
+		return newJobPane;
+	}
+    private void buildWindow() {
+    	scene = new Scene(this ,1024, 768);
+		//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			
+		sidebar = new Sidebar(this);
+		this.setLeft(sidebar);
 		
+		menubar = new AppMenu(this);
+		this.getChildren().addAll(menubar);
+		
+		detailsPane = new DetailsPane(this);
+		this.setCenter(detailsPane);
+		
+		newJobPane = new NewJobPane(this);
+		
+		messagesPane = new MessagesPane(this);
+		this.setBottom(messagesPane);
+		
+		messagesPane.setPrefHeight(150);
+		
+    }
+    
+    /* GUI EVENTS */
+    public void notifySidebarSelectChange(ObservableJob job) {
+		if (this.getCenter() != detailsPane) {
+			this.setCenter(detailsPane);
+		}
+		detailsPane.setJob(job);
+		messagesPane.setJob(job);
+	}
+	
+	public ObservableList<XProcScript> getScripts() {
+		ObservableList<XProcScript> scriptData = FXCollections.observableArrayList();
+		Iterable<XProcScriptService> scripts = scriptRegistry.getScripts();
+        for (XProcScriptService scriptServ : scripts) {
+        	XProcScript script = scriptServ.load();
+        	scriptData.add(script);
+        }
+        return scriptData;
 	}
         	
 }

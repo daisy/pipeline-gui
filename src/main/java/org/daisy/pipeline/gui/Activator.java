@@ -32,15 +32,20 @@ public class Activator extends Application implements BundleActivator,Runnable
 {
         private Stage stage;
         private MainWindow mainWindow = null;
-        private ScriptRegistry scriptRegistry = null;
-        private JobManagerFactory jobManagerFactory = null;
-        private EventBusProvider eventBusProvider = null;
-        private WebserviceStorage webserviceStorage = null;
+        private static ScriptRegistry scriptRegistry = null;
+        private static JobManagerFactory jobManagerFactory = null;
+        private static EventBusProvider eventBusProvider = null;
+        private static WebserviceStorage webserviceStorage = null;
         private BundleContext bundleContext = null;
         private static final Logger logger = LoggerFactory.getLogger(Activator.class);
-        private final Monitor monitor = new Monitor();
+        private static final Monitor monitor = new Monitor();
         private final Monitor.Guard pipelineServicesAvailable = new Monitor.Guard(monitor) {
                 public boolean isSatisfied() {
+                        System.out.println("Checking satisfied!");
+                        System.out.println(scriptRegistry);
+                        System.out.println(jobManagerFactory);
+                        System.out.println(webserviceStorage);
+                        System.out.println(eventBusProvider);
                         return scriptRegistry != null && jobManagerFactory != null
                                 && webserviceStorage != null && eventBusProvider != null;
                 }
@@ -51,9 +56,9 @@ public class Activator extends Application implements BundleActivator,Runnable
                                         @Override
                                         public void run()
                 {
-                        //try {
+                        try {
                         	// this causes things not to work at all
-	                        //monitor.enterWhen(pipelineServicesAvailable);
+	                        monitor.enterWhen(pipelineServicesAvailable);
 	                        Activator.this.stage = stage;
 	                        System.out.println("Gui run");
 	                        // the real GUI
@@ -86,13 +91,13 @@ public class Activator extends Application implements BundleActivator,Runnable
 	                        pane.setCenter(new Label("This is a JavaFX Scene in a Stage"));
 	                        stage.setScene(scene);
 	                        stage.show();
-//                        }
-//                        catch (InterruptedException e) {
-//                        	e.printStackTrace();
-//                        }
-//                        finally {
-//                        	monitor.leave();
-//                        }
+                        }
+                        catch (InterruptedException e) {
+                                e.printStackTrace();
+                        }
+                        finally {
+                                monitor.leave();
+                        }
                         
                 }
                 });
@@ -112,17 +117,20 @@ public class Activator extends Application implements BundleActivator,Runnable
                 bundleContext = context;
                 context.registerService(Runnable.class.getName(), this, null);
 
+                logger.debug("+++++++++++++++++++ in start");
                 ServiceTracker<ScriptRegistry, ScriptRegistry> scriptRegistryTracker = new ServiceTracker<ScriptRegistry, ScriptRegistry>(
                                 context, ScriptRegistry.class,
                                 new ServiceTrackerCustomizer<ScriptRegistry, ScriptRegistry>() {
 
                                         @Override
                                         public ScriptRegistry addingService(ServiceReference<ScriptRegistry> reference) {
-                                                logger.debug("Setting script registry");
+                                                logger.debug("++++++++++++++++++++++++++++++Setting script registry");
                                                 monitor.enter();
                                                 try {
                                                         scriptRegistry = context.getService(reference);
-                                                } 
+                                                }catch(Exception e){
+                                                        logger.error("Error setting service"+e.getMessage());
+                                                }
                                                 finally {
                                                         monitor.leave();
                                                 }
@@ -150,11 +158,14 @@ public class Activator extends Application implements BundleActivator,Runnable
 
                                         @Override
                                         public JobManagerFactory addingService(ServiceReference<JobManagerFactory> reference) {
-                                                logger.debug("Setting job manager factory");
+                                                logger.debug("+++++Setting job manager factory");
                                                 monitor.enter();
                                                 try {
-                                                        jobManagerFactory  = context.getService(reference);
-                                                } 
+                                                       jobManagerFactory  = context.getService(reference);
+                                                       System.out.println("JOB MANAGER: "+jobManagerFactory);
+                                                }catch(Exception e){
+                                                        logger.error("Error setting service"+e.getMessage());
+                                                }
                                                 finally {
                                                         monitor.leave();
                                                 }
@@ -182,11 +193,13 @@ public class Activator extends Application implements BundleActivator,Runnable
 
                                         @Override
                                         public WebserviceStorage addingService(ServiceReference<WebserviceStorage> reference) {
-                                                logger.debug("Setting web service storage");
+                                                logger.debug("++++ Setting web service storage");
                                                 monitor.enter();
                                                 try {
                                                         webserviceStorage  = context.getService(reference);
-                                                } 
+                                                }catch(Exception e){
+                                                        logger.error("Error setting service"+e.getMessage());
+                                                }
                                                 finally {
                                                         monitor.leave();
                                                 }
@@ -214,7 +227,7 @@ public class Activator extends Application implements BundleActivator,Runnable
 
                                         @Override
                                         public EventBusProvider addingService(ServiceReference<EventBusProvider> reference) {
-                                                logger.debug("Setting event bus provider");
+                                                logger.debug("+++Setting event bus provider");
                                                 monitor.enter();
                                                 try {
                                                         eventBusProvider  = context.getService(reference);

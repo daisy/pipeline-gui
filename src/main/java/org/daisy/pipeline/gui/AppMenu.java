@@ -13,7 +13,9 @@ import javafx.scene.input.KeyCombination;
 
 public class AppMenu extends MenuBar {
 
-	MainWindow main;
+	private MainWindow main;
+	private MenuItem deleteJob;
+	
 	public AppMenu(MainWindow main) {
 		super();
 		this.main = main;
@@ -22,18 +24,15 @@ public class AppMenu extends MenuBar {
 	
 	private void initControls() {
 		Menu menuFile = new Menu("File");
-        Menu menuTests = new Menu("Tests");
- 
         
-        this.getMenus().addAll(menuFile, menuTests);
+        this.getMenus().addAll(menuFile);
  
         MenuItem newjob = new MenuItem("New job");
         newjob.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
         menuFile.getItems().addAll(newjob);
         newjob.setOnAction(new EventHandler<ActionEvent>() {
         	public void handle(ActionEvent t) {
-        		// TODO handle action 
-        		// main.newJob();
+        		main.newJob();
         	}
         });
         
@@ -52,9 +51,18 @@ public class AppMenu extends MenuBar {
         	menuFile.getItems().add(exit);
         }
         
-        MenuItem deleteJob = new MenuItem("Delete job");
+        deleteJob = new MenuItem("Delete job");
+        deleteJob.setOnAction(new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent t) {
+        		main.deleteSelectedJob();
+        	}
+        });
         menuFile.getItems().add(deleteJob);
         deleteJob.setDisable(true);
         
+	}
+	
+	public void enableDeleteJob(boolean value) {
+		deleteJob.setDisable(!value);
 	}
 }

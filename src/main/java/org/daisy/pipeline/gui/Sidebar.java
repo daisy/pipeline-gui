@@ -35,6 +35,10 @@ public class Sidebar extends VBox {
 		initControls();
 	}
 	
+	public ObservableJob getSelectedJob() {
+		return table.getSelectionModel().getSelectedItem();
+	}
+	
 	private void initControls() {
 		table = new TableView<ObservableJob>();
 		this.setPadding(new Insets(10));

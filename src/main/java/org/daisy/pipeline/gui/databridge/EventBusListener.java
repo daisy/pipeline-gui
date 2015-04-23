@@ -37,6 +37,7 @@ public class EventBusListener {
 	
 	@Subscribe
     public synchronized void handleMessage(Message msg) {
+		System.out.println("##################### GUI EVENT BUS MSG");
     	String jobId = msg.getJobId();
     	Job job = jobManager.getJob(JobIdFactory.newIdFromString(jobId)).get();
     	dataManager.addMessage(job, msg.getText(), msg.getLevel());
@@ -44,6 +45,7 @@ public class EventBusListener {
 
     @Subscribe
     public void handleStatus(StatusMessage message) {
+    	System.out.println("##################### GUI EVENT BUS STATUS");
     	JobId jobId =  message.getJobId();
     	Job job = jobManager.getJob(jobId).get();
     	dataManager.updateStatus(job, message.getStatus());

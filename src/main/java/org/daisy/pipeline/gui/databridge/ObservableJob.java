@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 // translate the Pipeline2 Job object into GUI-friendly Strings and StringProperty objects
-public class ObservableJob extends SimpleObjectProperty {
+public class ObservableJob { //extends SimpleObjectProperty {
 
 	private StringProperty status;
 	private ObservableList<String> messages;

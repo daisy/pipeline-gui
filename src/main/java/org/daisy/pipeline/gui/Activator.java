@@ -41,11 +41,11 @@ public class Activator extends Application implements BundleActivator,Runnable
         private static final Monitor monitor = new Monitor();
         private final Monitor.Guard pipelineServicesAvailable = new Monitor.Guard(monitor) {
                 public boolean isSatisfied() {
-                        System.out.println("Checking satisfied!");
-                        System.out.println(scriptRegistry);
-                        System.out.println(jobManagerFactory);
-                        System.out.println(webserviceStorage);
-                        System.out.println(eventBusProvider);
+//                        System.out.println("Checking satisfied!");
+//                        System.out.println(scriptRegistry);
+//                        System.out.println(jobManagerFactory);
+//                        System.out.println(webserviceStorage);
+//                        System.out.println(eventBusProvider);
                         return scriptRegistry != null && jobManagerFactory != null
                                 && webserviceStorage != null && eventBusProvider != null;
                 }
@@ -57,40 +57,26 @@ public class Activator extends Application implements BundleActivator,Runnable
                                         public void run()
                 {
                         try {
-                        	// this causes things not to work at all
-	                        monitor.enterWhen(pipelineServicesAvailable);
+                        	monitor.enterWhen(pipelineServicesAvailable);
+	                         
 	                        Activator.this.stage = stage;
 	                        System.out.println("Gui run");
-	                        // the real GUI
-//	                        Client client = webserviceStorage.getClientStorage().defaultClient();
-//	                        System.out.println("HELLO");
-//	                        mainWindow = new MainWindow(scriptRegistry, jobManagerFactory,
-//	                        		client, 
-//	                        		eventBusProvider, bundleContext);
-//	                        
-//	                        stage.setScene(mainWindow.getScene());
-//	                		stage.setTitle("DAISY Pipeline 2");
-//	                		stage.show();
+	                        Client client = webserviceStorage.getClientStorage().defaultClient();
+	                        System.out.println("HELLO");
+	                        mainWindow = new MainWindow(scriptRegistry, jobManagerFactory,
+	                        		client, 
+	                        		eventBusProvider, bundleContext);
+	                        
+	                        stage.setScene(mainWindow.getScene());
+	                		stage.setTitle("DAISY Pipeline 2");
+	                		stage.show();
 	                		
 	                        // the test GUI
-	                        // first check if the services are available
-	                        if (scriptRegistry == null) {
-	                        	System.out.println("!!!!!!!!!!!!!!!!!SCRIPT REG IS NULL!");
-	                        }
-	                        if (jobManagerFactory == null) {
-	                        	System.out.println("!!!!!!!!!!!!!!!!!JOB MAN FACTORY IS NULL");
-	                        }
-	                        if (webserviceStorage == null) {
-	                        	System.out.println("!!!!!!!!!!!!!!!!! WEB SERV STORAGE IS NULL");
-	                        }
-	                        if (eventBusProvider == null) {
-	                        	System.out.println("!!!!!!!!!!!!!!!!! EVENT BUS PROVIDER IS NULL");
-	                        }
-	                        BorderPane pane = new BorderPane();
-	                        Scene scene = new Scene(pane, 400, 200);
-	                        pane.setCenter(new Label("This is a JavaFX Scene in a Stage"));
-	                        stage.setScene(scene);
-	                        stage.show();
+//	                        BorderPane pane = new BorderPane();
+//	                        Scene scene = new Scene(pane, 400, 200);
+//	                        pane.setCenter(new Label("This is a JavaFX Scene in a Stage"));
+//	                        stage.setScene(scene);
+//	                        stage.show();
                         }
                         catch (InterruptedException e) {
                                 e.printStackTrace();

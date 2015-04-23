@@ -5,6 +5,7 @@ import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.gui.databridge.DataManager;
 import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
+import org.daisy.pipeline.gui.databridge.Script;
 import org.daisy.pipeline.job.JobManager;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
@@ -33,6 +34,7 @@ public class MainWindow extends BorderPane {
     private EventBusProvider eventBusProvider;
     private DataManager dataManager;
     private ObservableList<ObservableJob> jobData;
+    private ObservableList<Script> scriptData;
     	
 	private Sidebar sidebar;
 	private DetailsPane detailsPane;
@@ -45,19 +47,22 @@ public class MainWindow extends BorderPane {
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
 			BundleContext context) {
 		super();
-		buildWindow();	
-		
-		
 		
 		this.eventBusProvider = eventBusProvider;
 		this.bundleContext = context;
 		this.scriptRegistry = scriptRegistry;
 		this.jobManager = jobManagerFactory.createFor(client);
 		
+		
+		
+		
 		jobData = FXCollections.observableArrayList();
-		dataManager = new DataManager(jobData);
+		scriptData = FXCollections.observableArrayList();
+		dataManager = new DataManager(this);
 		this.eventBusListener = new EventBusListener(this);	
 		eventBusProvider.get().register(eventBusListener);
+		
+		buildWindow();	
     }
     	
 	
@@ -82,6 +87,9 @@ public class MainWindow extends BorderPane {
 	}
 	public ObservableList<ObservableJob> getJobData() {
 		return jobData;
+	}
+	public ObservableList<Script> getScriptData() {
+		return scriptData;
 	}
 	public NewJobPane getNewJobPane() {
 		return newJobPane;
@@ -110,21 +118,28 @@ public class MainWindow extends BorderPane {
     
     /* GUI EVENTS */
     public void notifySidebarSelectChange(ObservableJob job) {
+    	if (job == null) {
+    		menubar.enableDeleteJob(false);
+    		return;
+    	}
 		if (this.getCenter() != detailsPane) {
 			this.setCenter(detailsPane);
 		}
 		detailsPane.setJob(job);
 		messagesPane.setJob(job);
+		menubar.enableDeleteJob(true);
 	}
 	
-	public ObservableList<XProcScript> getScripts() {
-		ObservableList<XProcScript> scriptData = FXCollections.observableArrayList();
-		Iterable<XProcScriptService> scripts = scriptRegistry.getScripts();
-        for (XProcScriptService scriptServ : scripts) {
-        	XProcScript script = scriptServ.load();
-        	scriptData.add(script);
-        }
-        return scriptData;
+	public void newJob() {
+		this.setCenter(newJobPane);
 	}
-        	
+    public void deleteSelectedJob() {
+    	ObservableJob job = sidebar.getSelectedJob();
+    	if (job == null) {
+    		return;
+    	}
+    	
+    	jobManager.deleteJob(job.getJob().getId());
+    	jobData.remove(job);
+    }
 }

@@ -15,7 +15,7 @@ public class ScriptFieldAnswer {
 	private ScriptField field;
 	
 	public ScriptFieldAnswer(ScriptField field) {
-		stringAnswer = new SimpleStringProperty();
+		stringAnswer = new SimpleStringProperty("");
 		booleanAnswer = new SimpleBooleanProperty();
 		this.field = field;
 	}
@@ -44,8 +44,6 @@ public class ScriptFieldAnswer {
 	public SimpleBooleanProperty booleanAnswerProperty() {
 		return booleanAnswer;
 	}
-	public boolean validate() {
-		return ScriptFieldValidator.validate(this);
-	}
+
 }
 

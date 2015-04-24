@@ -18,11 +18,11 @@ public class ScriptField {
 	public static HashMap<String, DataType> dataTypeMap;
 	static {
         dataTypeMap = new HashMap<String, DataType>();
-        dataTypeMap.put("anyURI", DataType.FILE);
+        dataTypeMap.put("anyFileURI", DataType.FILE);
         dataTypeMap.put("anyDirURI", DataType.DIRECTORY);
-        dataTypeMap.put("xs:boolean", DataType.BOOLEAN);
-        dataTypeMap.put("xs:string", DataType.STRING);
-        dataTypeMap.put("xs:integer", DataType.INTEGER);
+        dataTypeMap.put("boolean", DataType.BOOLEAN);
+        dataTypeMap.put("string", DataType.STRING);
+        dataTypeMap.put("integer", DataType.INTEGER);
     }
 	
 	private String name;
@@ -54,7 +54,7 @@ public class ScriptField {
 		description = metadata.getDescription();
 		niceName = metadata.getNiceName();
 		isSequence = metadata.isSequence();
-		dataType = getDataType(metadata.getMediaType());
+		dataType = getDataType(metadata.getType());
 		mediaType = metadata.getMediaType();
 		fieldType = FieldType.OPTION;
 		isRequired = optionInfo.isRequired();
@@ -94,6 +94,9 @@ public class ScriptField {
 	private DataType getDataType(String dataType) {
 		if (dataTypeMap.containsKey(dataType)) {
 			return dataTypeMap.get(dataType);
+		}
+		else {
+			System.out.println("############################DATA TYPE not found: " + dataType);
 		}
 		return DataType.STRING; // default to string
 	}

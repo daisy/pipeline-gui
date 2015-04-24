@@ -1,6 +1,8 @@
 package org.daisy.pipeline.gui;
 
+import org.daisy.pipeline.gui.databridge.BoundScript;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
+import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.job.Job.Status;
 
 import javafx.geometry.Insets;
@@ -15,12 +17,12 @@ import javafx.scene.text.Text;
 public class DetailsPane extends GridPane {
 
 	private ObservableJob job;
-	private Text script;
-	private Text desc;
-	private Hyperlink loglink;
-	private Hyperlink resultslink;
-	private ListView<String> params;	
 	private MainWindow main;
+	int rowcount;
+	// these style settings could move to CSS or some shared class
+	private Font h1 = Font.font("Arial", FontWeight.BOLD, 25);
+	private Font h2 = Font.font("Arial", FontWeight.BOLD, 15);
+	private Font h3 = Font.font("Arial", FontWeight.BOLD, 12);
 	
 	public DetailsPane(MainWindow main) {
 		this.main = main;
@@ -32,46 +34,72 @@ public class DetailsPane extends GridPane {
 		displayJobInfo();
 	}
 	
-	// clear job-specific data
 	private void clearControls() {
-		if (loglink != null) {
-			this.getChildren().remove(loglink);
+		int sz = getChildren().size();
+		if (sz > 0) {
+			getChildren().remove(0, sz - 1);
 		}
-		if (resultslink != null) {
-			this.getChildren().remove(resultslink);
-		}
-		if (params != null) {
-			this.getChildren().remove(params);
-		}
-//		int sz = params.getItems().size();
-//		if (sz > 0) {
-//			params.getItems().remove(0, sz-1);
-//		}
-//		
-		script.setText("");
-		desc.setText("");
 	}
 	
 	// fill in the blanks with job-specific info
 	private void displayJobInfo() {
-		params = new ListView<String>();
-		this.add(params, 0, 3);
-		script.setText(job.getJob().getContext().getScript().getName());
-		desc.setText("Description goes here");
+		BoundScript boundScript = job.getBoundScript();
+		Text script = new Text(boundScript.getScript().getName());
+		script.setFont(h2);
+		Text desc = new Text(boundScript.getScript().getDescription());
+		rowcount = 1;
+		this.add(script, 0, rowcount);
+		rowcount++;
+		this.add(desc, 0, rowcount);
+		rowcount++;
+		
+		Text statusLabel = new Text("Status:");
+		statusLabel.setFont(h2);
+		Text statusValue = new Text();
+		statusValue.setFont(h2);
+		// binding this causes a thread error
+		//statusValue.textProperty().bind(job.statusProperty());
+		this.add(statusLabel, 0, rowcount);
+		this.add(statusValue, 1, rowcount);
+		rowcount++;
+		
+		Text settingsLabel = new Text("Settings:");
+		settingsLabel.setFont(h2);
+		this.add(settingsLabel, 0, rowcount);
+		rowcount++;
+		
+		addNameValuePair("ID", job.getJob().getId().toString());
+		
+
+		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
+			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+		}
+		
+		for (ScriptFieldAnswer answer : boundScript.getOptionFields()) {
+			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+		}
+		
+		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
+			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+		}
+		
+		
 		
 		if (job.getJob().getStatus() == Status.DONE) {
-			loglink = new Hyperlink();
-		    resultslink = new Hyperlink();
+			Hyperlink loglink = new Hyperlink();
+		    Hyperlink resultslink = new Hyperlink();
 	    	
 		    loglink.setText("Log file");
 	    	resultslink.setText("Results");
+	    	
+	    	// TODO link these links
 		    
-	    	this.add(loglink, 0, 4);
-		    this.add(resultslink, 0, 5);
+	    	this.add(loglink, 0, rowcount);
+	    	rowcount++;
+		    this.add(resultslink, 0, rowcount);
 	    }
 		
-		// TODO translate params
-		//params.setItems(job.getParamsAsStrings());
+		
 	}
 	
 	// leave blanks in the form
@@ -82,19 +110,19 @@ public class DetailsPane extends GridPane {
 	    this.setVgap(10);
 		
 		Text title = new Text("Job details");
-		title.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+		title.setFont(h1);
 		
-	    script = new Text();
-	    script.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
-	    
-	    desc = new Text();
-	    desc.setFont(Font.font("Arial", FontPosture.ITALIC, 15));
-	    
 	    this.add(title, 0, 0);
-	    this.add(script, 0, 1);
-	    this.add(desc, 0, 2);
 	    
 	     
+	}
+	
+	private void addNameValuePair(String name, String value) {
+		Text nameTxt = new Text(name + ":");
+		Text valueTxt = new Text(value);
+		this.add(nameTxt, 0, rowcount);
+		this.add(valueTxt, 1, rowcount);
+		rowcount++;
 	}
     
 }

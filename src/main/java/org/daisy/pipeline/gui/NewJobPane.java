@@ -26,19 +26,22 @@ import javafx.util.StringConverter;
 
 import org.daisy.pipeline.gui.databridge.BoundScript;
 import org.daisy.pipeline.gui.databridge.JobExecutor;
+import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
 import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.daisy.pipeline.gui.databridge.ScriptValidator;
 import org.daisy.pipeline.job.Job;
 
 
 public class NewJobPane extends GridPane {
 	
-	private GridPane subGrid;
+	private GridPane scriptDetailsGrid;
 	private MainWindow main;
 	private ObservableList<Script> scripts;
 	private BoundScript boundScript;
 	private int subgridRowCount;
+	private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
 	
 	public NewJobPane(MainWindow main) {
 		this.main = main;
@@ -51,15 +54,23 @@ public class NewJobPane extends GridPane {
 		return boundScript;
 	}
 	
+	// reset the combo selection and clear the script details grid
+	public void clearScriptDetails() {
+		scriptsCombo.getSelectionModel().clearSelection();
+		clearScriptDetailsGrid();
+	}
+	
 	private void initControls() {
 		this.setPadding(new Insets(10));
 		this.setHgap(10);
 	    this.setVgap(10);
+	    GridPane topGrid = new GridPane();
+	    this.add(topGrid, 0, 0);
 	    
 		Text title = new Text("Choose a script:");
-		this.add(title,  0,  0);
+		topGrid.add(title,  0,  0);
 		
-		final ComboBox<Script> scriptsCombo = new ComboBox<Script>(scripts);
+		scriptsCombo.setItems(scripts);
 		scriptsCombo.setCellFactory(new Callback<ListView<Script>,ListCell<Script>>(){
 			 
             public ListCell<Script> call(ListView<Script> p) {
@@ -98,7 +109,9 @@ public class NewJobPane extends GridPane {
 
           
       });
-		this.add(scriptsCombo, 1, 0);
+		
+		topGrid.add(scriptsCombo, 1, 0);
+		
 		
 		scriptsCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Script>() {
 
@@ -109,27 +122,38 @@ public class NewJobPane extends GridPane {
 			}
 		});
 		
-		subGrid = new GridPane();
-		this.add(subGrid, 0, 1);
+		scriptDetailsGrid = new GridPane();
+		this.add(scriptDetailsGrid, 0, 1);
 		
 	}
 	
 	private void newScriptSelected(Script script) {
-		clearSubGrid();
-		boundScript = new BoundScript(script);
-		populateSubGrid();
-	}
-	
-	private void clearSubGrid() {
-		int sz = subGrid.getChildren().size();
-		if (sz > 0) {
-			subGrid.getChildren().remove(0, sz - 1);
+		if (script == null) {
+			return;
 		}
+		clearScriptDetailsGrid();
+		boundScript = new BoundScript(script);
+		populateScriptDetailsGrid();
 	}
 	
-	private void populateSubGrid() {
+	// clear the script details grid (not including the combo)
+	private void clearScriptDetailsGrid() {
+		int sz = scriptDetailsGrid.getChildren().size();
+		if (sz > 0) {
+			scriptDetailsGrid.getChildren().remove(0, sz - 1);
+		}
+		
+	}
+	
+	private void populateScriptDetailsGrid() {
 		
 		subgridRowCount = 1;
+		
+		Text label = new Text();
+		label.setText(boundScript.getScript().getDescription());
+		scriptDetailsGrid.add(label, 0, subgridRowCount);
+		subgridRowCount++;
+		
 		for (ScriptFieldAnswer input : boundScript.getInputFields()) {
 			addInputField(input);
 		}
@@ -171,12 +195,12 @@ public class NewJobPane extends GridPane {
 	private void addFileDirPicker(ScriptFieldAnswer answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
-		subGrid.add(label, 0, subgridRowCount);
+		scriptDetailsGrid.add(label, 0, subgridRowCount);
 		final TextField inputFileText = new TextField();
 		inputFileText.textProperty().bindBidirectional(answer.answerProperty());
-		subGrid.add(inputFileText, 1, subgridRowCount);
+		scriptDetailsGrid.add(inputFileText, 1, subgridRowCount);
 		Button inputFileButton = new Button("Browse");
-		subGrid.add(inputFileButton, 2, subgridRowCount);
+		scriptDetailsGrid.add(inputFileButton, 2, subgridRowCount);
 		subgridRowCount++;
 		
 		final ScriptFieldAnswer answer_ = answer;
@@ -203,34 +227,42 @@ public class NewJobPane extends GridPane {
 	private void addCheckbox(ScriptFieldAnswer answer) {
 		CheckBox cb = new CheckBox(answer.getField().getNiceName());
 		cb.selectedProperty().bindBidirectional(answer.booleanAnswerProperty());
-		subGrid.add(cb, 0, subgridRowCount);
+		scriptDetailsGrid.add(cb, 0, subgridRowCount);
 		subgridRowCount++;
 		
 	}
 	private void addTextField(ScriptFieldAnswer answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
-		subGrid.add(label, 0, subgridRowCount);
+		scriptDetailsGrid.add(label, 0, subgridRowCount);
 		final TextField textField = new TextField();
 		textField.textProperty().bindBidirectional(answer.answerProperty());
-		subGrid.add(textField, 1, subgridRowCount);
+		scriptDetailsGrid.add(textField, 1, subgridRowCount);
 		subgridRowCount++;
 	}
 	private void addStandardButtons() {
-		Button cancel = new Button("Cancel");
-		subGrid.add(cancel, 0, subgridRowCount);
 		Button run = new Button("Run");
-		subGrid.add(run, 1, subgridRowCount);
+		
+		scriptDetailsGrid.add(run, 1, subgridRowCount);
 		subgridRowCount++; // no controls are added after these buttons but we'll increment anyway for good measure
 		
 		run.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				Job newJob = JobExecutor.runJob(main, boundScript);
-				if (newJob != null) {
-					main.getDataManager().addJob(newJob);
+				ScriptValidator validator = new ScriptValidator(boundScript);
+				if (!validator.validate()) {
+					ObservableList<String> messages = validator.getMessages();
+					main.addValidationMessages(messages);
 				}
 				else {
-					System.out.println("NEW JOB ERROR");
+					Job newJob = JobExecutor.runJob(main, boundScript);
+					if (newJob != null) {
+						ObservableJob objob = main.getDataManager().addJob(newJob);
+						objob.setBoundScript(boundScript);
+						main.selectJob(objob);
+					}
+					else {
+						System.out.println("NEW JOB ERROR");
+					}
 				}
 			}
 		});

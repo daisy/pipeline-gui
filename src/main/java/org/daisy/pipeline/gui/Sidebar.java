@@ -12,7 +12,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -39,6 +41,10 @@ public class Sidebar extends VBox {
 		return table.getSelectionModel().getSelectedItem();
 	}
 	
+	public void setSelectedJob(ObservableJob job) {
+		table.getSelectionModel().select(job);
+	}
+	
 	private void initControls() {
 		table = new TableView<ObservableJob>();
 		this.setPadding(new Insets(10));
@@ -51,8 +57,15 @@ public class Sidebar extends VBox {
 	    VBox.setVgrow(table, Priority.ALWAYS);
 	    
 	    table.setItems(main.getJobData());
+	    TableColumn<ObservableJob,String> nameCol = new TableColumn<ObservableJob,String>("Name");
 	    TableColumn<ObservableJob,String> idCol = new TableColumn<ObservableJob,String>("ID");
 	    TableColumn<ObservableJob,String> statusCol = new TableColumn<ObservableJob,String>("Status");
+	    
+	    nameCol.setCellValueFactory(new Callback<CellDataFeatures<ObservableJob, String>, ObservableValue<String>>() {
+	        public ObservableValue<String> call(CellDataFeatures<ObservableJob, String> celldata) {
+	            return new ReadOnlyObjectWrapper<String>(celldata.getValue().getBoundScript().getScript().getName());
+	        }
+	     });
 	    
 	    idCol.setCellValueFactory(new Callback<CellDataFeatures<ObservableJob, String>, ObservableValue<String>>() {
 	        public ObservableValue<String> call(CellDataFeatures<ObservableJob, String> celldata) {
@@ -62,7 +75,7 @@ public class Sidebar extends VBox {
 	    
 	    statusCol.setCellValueFactory(new PropertyValueFactory<ObservableJob, String>("status"));
 	    
-	    table.getColumns().setAll(idCol, statusCol);
+	    table.getColumns().setAll(nameCol, statusCol, idCol);
 
 	    table.getSelectionModel().selectedItemProperty().addListener(
             new ChangeListener<ObservableJob>() {

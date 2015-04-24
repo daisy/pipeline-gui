@@ -22,6 +22,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainWindow extends BorderPane {
@@ -42,6 +44,8 @@ public class MainWindow extends BorderPane {
 	private AppMenu menubar;
 	private NewJobPane newJobPane;
 	private Scene scene;
+	private VBox blankPane;
+	
 	
     public MainWindow(ScriptRegistry scriptRegistry, 
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
@@ -105,7 +109,6 @@ public class MainWindow extends BorderPane {
 		this.getChildren().addAll(menubar);
 		
 		detailsPane = new DetailsPane(this);
-		this.setCenter(detailsPane);
 		
 		newJobPane = new NewJobPane(this);
 		
@@ -114,24 +117,25 @@ public class MainWindow extends BorderPane {
 		
 		messagesPane.setPrefHeight(150);
 		
+		blankPane = new VBox();
+		blankPane.getChildren().add(new Text("No job selected"));
+		this.setCenter(blankPane);
+		
     }
     
     /* GUI EVENTS */
     public void notifySidebarSelectChange(ObservableJob job) {
     	if (job == null) {
-    		menubar.enableDeleteJob(false);
-    		return;
+    		showBlank();
     	}
-		if (this.getCenter() != detailsPane) {
-			this.setCenter(detailsPane);
-		}
-		detailsPane.setJob(job);
-		messagesPane.setJob(job);
-		menubar.enableDeleteJob(true);
+    	showJob(job);
 	}
 	
 	public void newJob() {
+		newJobPane.clearScriptDetails();
 		this.setCenter(newJobPane);
+		messagesPane.clearMessages();
+		//this.setBottom(null); // remove the messages pane
 	}
     public void deleteSelectedJob() {
     	ObservableJob job = sidebar.getSelectedJob();
@@ -141,5 +145,27 @@ public class MainWindow extends BorderPane {
     	
     	jobManager.deleteJob(job.getJob().getId());
     	jobData.remove(job);
+    }
+    public void selectJob(ObservableJob job) {
+    	sidebar.setSelectedJob(job);
+    }
+    private void showJob(ObservableJob job) {
+    	if (job == null) {
+    		menubar.enableDeleteJob(false);
+    		return;
+    	}
+		if (this.getCenter() != detailsPane) {
+			this.setCenter(detailsPane);
+		}
+		this.setBottom(messagesPane);
+		detailsPane.setJob(job);
+		messagesPane.setJob(job);
+		menubar.enableDeleteJob(true);
+    }
+    public void addValidationMessages(ObservableList<String> messages) {
+    	messagesPane.addMessages(messages);
+    }
+    private void showBlank() {
+    	this.setCenter(blankPane);
     }
 }

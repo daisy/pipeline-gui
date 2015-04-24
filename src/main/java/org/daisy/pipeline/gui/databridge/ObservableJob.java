@@ -1,5 +1,6 @@
 package org.daisy.pipeline.gui.databridge;
 
+import org.daisy.common.messaging.Message;
 import org.daisy.common.messaging.Message.Level;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.Job.Status;
@@ -16,12 +17,14 @@ public class ObservableJob { //extends SimpleObjectProperty {
 	private StringProperty status;
 	private ObservableList<String> messages;
 	private Job job;
+	BoundScript boundScript; // store the job parameters here for display later
 	
 	public ObservableJob(Job job) {
 		status = new SimpleStringProperty();
 		this.job = job;
 		this.setStatus(job.getStatus());
 		messages = FXCollections.observableArrayList();
+		addInitialMessages();
 	}
 	
 	public String getStatus() {
@@ -41,6 +44,18 @@ public class ObservableJob { //extends SimpleObjectProperty {
 	}
 	public Job getJob() {
 		return job;
+	}
+	public void setBoundScript(BoundScript boundScript) {
+		this.boundScript = boundScript;
+	}
+	public BoundScript getBoundScript() {
+		return boundScript;
+	}
+	private void addInitialMessages() {
+		Iterable<Message> messages = job.getContext().getMonitor().getMessageAccessor().getAll();
+		for (Message message : messages) {
+			addMessage(message.getText(), message.getLevel());
+		}
 	}
 	private static String statusToString(Status status) {
 		if (status == Status.DONE) {

@@ -1,6 +1,7 @@
 package org.daisy.pipeline.gui.databridge;
 
 import org.daisy.common.messaging.Message.Level;
+import org.daisy.common.xproc.XProcInput;
 import org.daisy.pipeline.gui.MainWindow;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.Job.Status;
@@ -38,9 +39,10 @@ public class DataManager {
 		main.getJobData().get(i).addMessage(message, level);
 	}
 	
-	public void addJob(Job job) {
+	public ObservableJob addJob(Job job) {
 		ObservableJob objob = new ObservableJob(job);
 		main.getJobData().add(objob);
+		return objob;
 	}
 	
 	public void removeJob(Job job) {
@@ -54,6 +56,7 @@ public class DataManager {
 	public int findJob(Job job) {
 		ObservableList<ObservableJob> jobData = main.getJobData();
 		for (ObservableJob objob : jobData) {
+			// for some reason, comparing the job objects directly doesn't work
 			if (objob.getJob().getId().toString().equals(job.getId().toString())) {
 				return jobData.indexOf(objob);
 			}
@@ -70,15 +73,30 @@ public class DataManager {
 	// put any jobs already in the pipeline into the list
 	// read the list of scripts
 	private void initData() {
-		for (Job job : main.getJobManager().getJobs()) {
-			addJob(job);
-		}
 		for (XProcScriptService scriptService : main.getScriptRegistry().getScripts()) {
 			XProcScript xprocScript = scriptService.load();
 			addScript(xprocScript);
 		}
 		
+		// these jobs are already in the pipeline so we need to create a BoundScript representation
+		for (Job job : main.getJobManager().getJobs()) {
+			ObservableJob objob = addJob(job);
+			for (Script script : main.getScriptData()) {
+				if (script.getName().equals(job.getContext().getScript().getName())) {
+					createBoundScriptForExistingJob(script, objob);
+				}
+			}
+		}
+		
+		
 	}
 	
+	private void createBoundScriptForExistingJob(Script script, ObservableJob objob) {
+		BoundScript boundScript = new BoundScript(script);
+		Job job = objob.getJob();
+		
+		// TODO fill in the bound script parameters (input URIs etc)
+		objob.setBoundScript(boundScript);
+	}
 	
 }

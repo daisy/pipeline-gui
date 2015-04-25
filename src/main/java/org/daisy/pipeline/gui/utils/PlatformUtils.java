@@ -11,5 +11,16 @@ public class PlatformUtils {
 	public static boolean isUnix() {
 		return System.getProperty("os.name").toLowerCase().contains("nix");
 	}
-
+	public static String getFileBrowserCommand() {
+		if (isMac()) {
+			return "open";
+		}
+		if (isWin()) {
+			return "explorer";
+		}
+		if (isUnix()) {
+			return "nautilus"; // TODO is this right?
+		}
+		return "";
+	}
 }

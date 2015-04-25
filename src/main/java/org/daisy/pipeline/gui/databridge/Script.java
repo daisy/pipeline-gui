@@ -1,7 +1,6 @@
 package org.daisy.pipeline.gui.databridge;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcPipelineInfo;
@@ -9,7 +8,6 @@ import org.daisy.common.xproc.XProcPortInfo;
 import org.daisy.pipeline.script.XProcOptionMetadata;
 import org.daisy.pipeline.script.XProcPortMetadata;
 import org.daisy.pipeline.script.XProcScript;
-import org.daisy.pipeline.script.XProcOptionMetadata.Output;
 
 // representation of a pipeline script in a GUI-friendly way
 public class Script {

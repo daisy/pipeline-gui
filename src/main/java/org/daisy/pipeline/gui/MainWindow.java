@@ -1,30 +1,24 @@
 package org.daisy.pipeline.gui;
 
-import org.daisy.pipeline.clients.Client;
-import org.daisy.pipeline.event.EventBusProvider;
-import org.daisy.pipeline.gui.databridge.DataManager;
-import org.daisy.pipeline.gui.databridge.EventBusListener;
-import org.daisy.pipeline.gui.databridge.ObservableJob;
-import org.daisy.pipeline.gui.databridge.Script;
-import org.daisy.pipeline.job.JobManager;
-import org.daisy.pipeline.job.JobManagerFactory;
-import org.daisy.pipeline.script.ScriptRegistry;
-import org.daisy.pipeline.script.XProcScript;
-import org.daisy.pipeline.script.XProcScriptService;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.launch.Framework;
-
-import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
+
+import org.daisy.pipeline.clients.Client;
+import org.daisy.pipeline.event.EventBusProvider;
+import org.daisy.pipeline.gui.databridge.DataManager;
+import org.daisy.pipeline.gui.databridge.EventBusListener;
+import org.daisy.pipeline.gui.databridge.ObservableJob;
+import org.daisy.pipeline.gui.databridge.Script;
+import org.daisy.pipeline.job.Job.Status;
+import org.daisy.pipeline.job.JobManager;
+import org.daisy.pipeline.job.JobManagerFactory;
+import org.daisy.pipeline.script.ScriptRegistry;
+import org.osgi.framework.BundleContext;
 
 public class MainWindow extends BorderPane {
     
@@ -34,6 +28,7 @@ public class MainWindow extends BorderPane {
     private EventBusListener eventBusListener;
     private BundleContext bundleContext;
     private EventBusProvider eventBusProvider;
+    private HostServices hostServices;
     private DataManager dataManager;
     private ObservableList<ObservableJob> jobData;
     private ObservableList<Script> scriptData;
@@ -49,14 +44,14 @@ public class MainWindow extends BorderPane {
 	
     public MainWindow(ScriptRegistry scriptRegistry, 
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
-			BundleContext context) {
+			BundleContext context, HostServices hostServices) {
 		super();
 		
 		this.eventBusProvider = eventBusProvider;
 		this.bundleContext = context;
 		this.scriptRegistry = scriptRegistry;
 		this.jobManager = jobManagerFactory.createFor(client);
-		
+		this.hostServices = hostServices;
 		
 		
 		
@@ -98,6 +93,9 @@ public class MainWindow extends BorderPane {
 	public NewJobPane getNewJobPane() {
 		return newJobPane;
 	}
+	public HostServices getHostServices() {
+		return hostServices;
+	}
     private void buildWindow() {
     	scene = new Scene(this ,1024, 768);
 		//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -132,9 +130,11 @@ public class MainWindow extends BorderPane {
 	}
 	
 	public void newJob() {
+		sidebar.clearSelection();
 		newJobPane.clearScriptDetails();
-		this.setCenter(newJobPane);
 		messagesPane.clearMessages();
+		this.setCenter(newJobPane);
+		
 		//this.setBottom(null); // remove the messages pane
 	}
     public void deleteSelectedJob() {
@@ -160,7 +160,10 @@ public class MainWindow extends BorderPane {
 		this.setBottom(messagesPane);
 		detailsPane.setJob(job);
 		messagesPane.setJob(job);
-		menubar.enableDeleteJob(true);
+		Status status = job.getJob().getStatus();
+		if (status == Status.DONE || status == Status.ERROR || status == Status.VALIDATION_FAIL) {
+			menubar.enableDeleteJob(true);
+		}
     }
     public void addValidationMessages(ObservableList<String> messages) {
     	messagesPane.addMessages(messages);

@@ -1,15 +1,14 @@
 package org.daisy.pipeline.gui.databridge;
 
-import org.daisy.common.messaging.Message;
-import org.daisy.common.messaging.Message.Level;
-import org.daisy.pipeline.job.Job;
-import org.daisy.pipeline.job.Job.Status;
-
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.daisy.common.messaging.Message;
+import org.daisy.common.messaging.Message.Level;
+import org.daisy.pipeline.job.Job;
+import org.daisy.pipeline.job.Job.Status;
 
 // translate the Pipeline2 Job object into GUI-friendly Strings and StringProperty objects
 public class ObservableJob { //extends SimpleObjectProperty {

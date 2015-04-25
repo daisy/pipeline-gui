@@ -1,27 +1,13 @@
 package org.daisy.pipeline.gui.databridge;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.daisy.common.messaging.Message;
-import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.gui.MainWindow;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.JobId;
 import org.daisy.pipeline.job.JobIdFactory;
-import org.daisy.pipeline.job.JobIdGenerator;
 import org.daisy.pipeline.job.JobManager;
-import org.daisy.pipeline.job.JobUUIDGenerator;
 import org.daisy.pipeline.job.StatusMessage;
-import org.daisy.pipeline.job.Job.Status;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 // listen to changes coming from the pipeline framework

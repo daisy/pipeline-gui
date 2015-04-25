@@ -1,7 +1,6 @@
 package org.daisy.pipeline.gui.databridge;
 
 import org.daisy.common.messaging.Message.Level;
-import org.daisy.common.xproc.XProcInput;
 import org.daisy.pipeline.gui.MainWindow;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.Job.Status;

@@ -2,9 +2,6 @@ package org.daisy.pipeline.gui.databridge;
 
 import java.util.HashMap;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-
 import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcPortInfo;
 import org.daisy.pipeline.script.XProcOptionMetadata;
@@ -23,6 +20,9 @@ public class ScriptField {
         dataTypeMap.put("boolean", DataType.BOOLEAN);
         dataTypeMap.put("string", DataType.STRING);
         dataTypeMap.put("integer", DataType.INTEGER);
+        dataTypeMap.put("xs:boolean", DataType.BOOLEAN);
+        dataTypeMap.put("xs:string", DataType.STRING);
+        dataTypeMap.put("xs:integer", DataType.INTEGER);
     }
 	
 	private String name;

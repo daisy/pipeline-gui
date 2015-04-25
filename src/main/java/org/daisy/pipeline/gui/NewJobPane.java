@@ -2,7 +2,6 @@
 package org.daisy.pipeline.gui;
 
 import java.io.File;
-import java.util.HashMap;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,11 +12,13 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -40,8 +41,9 @@ public class NewJobPane extends GridPane {
 	private MainWindow main;
 	private ObservableList<Script> scripts;
 	private BoundScript boundScript;
-	private int subgridRowCount;
+	private int rowcount;
 	private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
+	private Font helpFont = Font.font("Arial", FontPosture.ITALIC, 10);
 	
 	public NewJobPane(MainWindow main) {
 		this.main = main;
@@ -147,12 +149,22 @@ public class NewJobPane extends GridPane {
 	
 	private void populateScriptDetailsGrid() {
 		
-		subgridRowCount = 1;
+		rowcount = 1;
+		
+		Hyperlink scriptDocumentation = new Hyperlink("Read online documentation");
+		scriptDocumentation.setOnAction(new EventHandler<ActionEvent>() {
+
+            public void handle(ActionEvent t) {
+                main.getHostServices().showDocument(boundScript.getScript().getXProcScript().getHomepage());
+            }
+        });
+		scriptDetailsGrid.add(scriptDocumentation, 0, rowcount);
+		rowcount++;
 		
 		Text label = new Text();
 		label.setText(boundScript.getScript().getDescription());
-		scriptDetailsGrid.add(label, 0, subgridRowCount);
-		subgridRowCount++;
+		scriptDetailsGrid.add(label, 0, rowcount);
+		rowcount++;
 		
 		for (ScriptFieldAnswer input : boundScript.getInputFields()) {
 			addInputField(input);
@@ -195,13 +207,18 @@ public class NewJobPane extends GridPane {
 	private void addFileDirPicker(ScriptFieldAnswer answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
-		scriptDetailsGrid.add(label, 0, subgridRowCount);
+		scriptDetailsGrid.add(label, 0, rowcount);
 		final TextField inputFileText = new TextField();
 		inputFileText.textProperty().bindBidirectional(answer.answerProperty());
-		scriptDetailsGrid.add(inputFileText, 1, subgridRowCount);
+		scriptDetailsGrid.add(inputFileText, 1, rowcount);
 		Button inputFileButton = new Button("Browse");
-		scriptDetailsGrid.add(inputFileButton, 2, subgridRowCount);
-		subgridRowCount++;
+		scriptDetailsGrid.add(inputFileButton, 2, rowcount);
+		rowcount++;
+		Text help = new Text();
+		help.setText(answer.getField().getDescription());
+		help.setFont(helpFont);
+		scriptDetailsGrid.add(help, 0, rowcount);
+		rowcount++;
 		
 		final ScriptFieldAnswer answer_ = answer;
 		inputFileButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -227,24 +244,34 @@ public class NewJobPane extends GridPane {
 	private void addCheckbox(ScriptFieldAnswer answer) {
 		CheckBox cb = new CheckBox(answer.getField().getNiceName());
 		cb.selectedProperty().bindBidirectional(answer.booleanAnswerProperty());
-		scriptDetailsGrid.add(cb, 0, subgridRowCount);
-		subgridRowCount++;
+		scriptDetailsGrid.add(cb, 0, rowcount);
+		rowcount++;
+		Text help = new Text();
+		help.setText(answer.getField().getDescription());
+		help.setFont(helpFont);
+		scriptDetailsGrid.add(help, 0, rowcount);
+		rowcount++;
 		
 	}
 	private void addTextField(ScriptFieldAnswer answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
-		scriptDetailsGrid.add(label, 0, subgridRowCount);
+		scriptDetailsGrid.add(label, 0, rowcount);
 		final TextField textField = new TextField();
 		textField.textProperty().bindBidirectional(answer.answerProperty());
-		scriptDetailsGrid.add(textField, 1, subgridRowCount);
-		subgridRowCount++;
+		scriptDetailsGrid.add(textField, 1, rowcount);
+		rowcount++;
+		Text help = new Text();
+		help.setText(answer.getField().getDescription());
+		help.setFont(helpFont);
+		scriptDetailsGrid.add(help, 0, rowcount);
+		rowcount++;
 	}
 	private void addStandardButtons() {
 		Button run = new Button("Run");
-		
-		scriptDetailsGrid.add(run, 1, subgridRowCount);
-		subgridRowCount++; // no controls are added after these buttons but we'll increment anyway for good measure
+		rowcount++; // put an empty row for good measure
+		scriptDetailsGrid.add(run, 0, rowcount);
+		rowcount++; // no controls are added after these button(s) but we'll increment anyway for good measure
 		
 		run.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {

@@ -1,18 +1,23 @@
 package org.daisy.pipeline.gui;
 
+import java.io.IOException;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+
 import org.daisy.pipeline.gui.databridge.BoundScript;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job.Status;
-
-import javafx.geometry.Insets;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import org.daisy.pipeline.job.JobResult;
 
 public class DetailsPane extends GridPane {
 
@@ -43,15 +48,18 @@ public class DetailsPane extends GridPane {
 	
 	// fill in the blanks with job-specific info
 	private void displayJobInfo() {
-		BoundScript boundScript = job.getBoundScript();
+		final BoundScript boundScript = job.getBoundScript();
+
+		rowcount = 1;
+
 		Text script = new Text(boundScript.getScript().getName());
 		script.setFont(h2);
+		addRow(script);
 		Text desc = new Text(boundScript.getScript().getDescription());
-		rowcount = 1;
-		this.add(script, 0, rowcount);
-		rowcount++;
-		this.add(desc, 0, rowcount);
-		rowcount++;
+		addRow(desc);
+		
+		addWebpageLinkRow("Read online documentation", boundScript.getScript().getXProcScript().getHomepage());
+
 		
 		Text statusLabel = new Text("Status:");
 		statusLabel.setFont(h2);
@@ -59,14 +67,11 @@ public class DetailsPane extends GridPane {
 		statusValue.setFont(h2);
 		// binding this causes a thread error
 		//statusValue.textProperty().bind(job.statusProperty());
-		this.add(statusLabel, 0, rowcount);
-		this.add(statusValue, 1, rowcount);
-		rowcount++;
+		addRow(statusLabel, statusValue);
 		
 		Text settingsLabel = new Text("Settings:");
 		settingsLabel.setFont(h2);
-		this.add(settingsLabel, 0, rowcount);
-		rowcount++;
+		addRow(settingsLabel);
 		
 		addNameValuePair("ID", job.getJob().getId().toString());
 		
@@ -84,19 +89,19 @@ public class DetailsPane extends GridPane {
 		}
 		
 		
-		
-		if (job.getJob().getStatus() == Status.DONE) {
-			Hyperlink loglink = new Hyperlink();
-		    Hyperlink resultslink = new Hyperlink();
+		Status status = job.getJob().getStatus();
+		if (status == Status.DONE || status == Status.ERROR || status == Status.VALIDATION_FAIL) {
+			Text resultsLabel = new Text("Results");
+	    	resultsLabel.setFont(h2);
+	    	addRow(resultsLabel);
 	    	
-		    loglink.setText("Log file");
-	    	resultslink.setText("Results");
+	    	this.addFinderLinkRow("Log file", job.getJob().getContext().getLogFile().toString());
 	    	
-	    	// TODO link these links
-		    
-	    	this.add(loglink, 0, rowcount);
-	    	rowcount++;
-		    this.add(resultslink, 0, rowcount);
+	    	Iterable<JobResult> results = job.getJob().getContext().getResults().getResults();
+	    	for (JobResult result : results) {
+	    		this.addFinderLinkRow(result.getPath().toString(), result.getPath().toString());
+	    	}
+	    	
 	    }
 		
 		
@@ -112,17 +117,59 @@ public class DetailsPane extends GridPane {
 		Text title = new Text("Job details");
 		title.setFont(h1);
 		
-	    this.add(title, 0, 0);
-	    
-	     
+		addRow(title);
+		 
 	}
 	
 	private void addNameValuePair(String name, String value) {
 		Text nameTxt = new Text(name + ":");
 		Text valueTxt = new Text(value);
-		this.add(nameTxt, 0, rowcount);
-		this.add(valueTxt, 1, rowcount);
+		addRow(nameTxt, valueTxt);
+	}
+	
+	private void addRow(Node... nodes) {
+		int colcount = 0;
+		for (Node n : nodes) {
+			add(n, colcount, rowcount);
+			colcount++;
+		}
 		rowcount++;
+	}
+	
+	private void addWebpageLinkRow(String label, final String path) {
+		Hyperlink link = new Hyperlink();
+	    link.setText(label);
+    	link.setOnAction(new EventHandler<ActionEvent>() {
+
+            public void handle(ActionEvent t) {
+            	try {
+					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
+    	
+    	addRow(link);
+	}
+	
+	private void addFinderLinkRow(String label, final String path) {
+		Hyperlink link = new Hyperlink();
+	    link.setText(label);
+    	link.setOnAction(new EventHandler<ActionEvent>() {
+
+            public void handle(ActionEvent t) {
+            	try {
+					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
+    	
+    	addRow(link);
 	}
     
 }

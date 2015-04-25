@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.Monitor;
 
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -36,6 +37,7 @@ public class Activator extends Application implements BundleActivator,Runnable
         private static JobManagerFactory jobManagerFactory = null;
         private static EventBusProvider eventBusProvider = null;
         private static WebserviceStorage webserviceStorage = null;
+        private HostServices hostServices = null;
         private BundleContext bundleContext = null;
         private static final Logger logger = LoggerFactory.getLogger(Activator.class);
         private static final Monitor monitor = new Monitor();
@@ -58,14 +60,15 @@ public class Activator extends Application implements BundleActivator,Runnable
                 {
                         try {
                         	monitor.enterWhen(pipelineServicesAvailable);
-	                         
+	                        hostServices = getHostServices();
 	                        Activator.this.stage = stage;
 	                        System.out.println("Gui run");
 	                        Client client = webserviceStorage.getClientStorage().defaultClient();
 	                        System.out.println("HELLO");
 	                        mainWindow = new MainWindow(scriptRegistry, jobManagerFactory,
 	                        		client, 
-	                        		eventBusProvider, bundleContext);
+	                        		eventBusProvider, bundleContext,
+	                        		hostServices);
 	                        
 	                        stage.setScene(mainWindow.getScene());
 	                		stage.setTitle("DAISY Pipeline 2");

@@ -1,30 +1,21 @@
 package org.daisy.pipeline.gui;
 
-import org.daisy.pipeline.gui.databridge.ObservableJob;
-
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+
+import org.daisy.pipeline.gui.databridge.ObservableJob;
 
 public class Sidebar extends VBox {
 	TableView<ObservableJob> table;
@@ -43,6 +34,10 @@ public class Sidebar extends VBox {
 	
 	public void setSelectedJob(ObservableJob job) {
 		table.getSelectionModel().select(job);
+	}
+	
+	public void clearSelection() {
+		table.getSelectionModel().clearSelection();
 	}
 	
 	private void initControls() {
@@ -77,6 +72,7 @@ public class Sidebar extends VBox {
 	    
 	    table.getColumns().setAll(nameCol, statusCol, idCol);
 
+	    
 	    table.getSelectionModel().selectedItemProperty().addListener(
             new ChangeListener<ObservableJob>() {
                 public void changed(ObservableValue<? extends ObservableJob> ov, 

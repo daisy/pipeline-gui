@@ -42,11 +42,10 @@ public class Sidebar extends VBox {
 	
 	private void initControls() {
 		table = new TableView<ObservableJob>();
-		this.setPadding(new Insets(10));
-	    this.setSpacing(8);
+		this.getStyleClass().add("sidebar");
 	
 	    Text title = new Text("Jobs");
-	    title.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+	    title.getStyleClass().add("title");
 	    this.getChildren().add(title);
 	
 	    VBox.setVgrow(table, Priority.ALWAYS);

@@ -33,8 +33,10 @@ public class MessagesPane extends VBox {
 		messages.setItems(messageList);
 	}
 	private void initControls() {
+		this.getStyleClass().add("messages");
+		
 		Text title = new Text("Messages");
-	    title.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+	    title.getStyleClass().add("subtitle");
 	    
 	    messages = new ListView<String>();
 	    

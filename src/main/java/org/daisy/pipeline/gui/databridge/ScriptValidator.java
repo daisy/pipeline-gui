@@ -100,6 +100,10 @@ public class ScriptValidator {
 			}
 			// for output files: check that the parent directory exists
 			else {
+				if (file.getParentFile() == null) {
+					message = BADPATH + answer.getField().getNiceName();
+					return false;
+				}
 				if (!file.getParentFile().isDirectory()) {
 					message = BADPATH + answer.getField().getNiceName();
 					return false;

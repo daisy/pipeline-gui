@@ -100,4 +100,5 @@ public class ScriptField {
 		}
 		return DataType.STRING; // default to string
 	}
+	
 }

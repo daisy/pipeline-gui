@@ -98,8 +98,9 @@ public class MainWindow extends BorderPane {
 	}
     private void buildWindow() {
     	scene = new Scene(this ,1024, 768);
-		//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			
+    	String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
+		scene.getStylesheets().add(css);
+    		
 		sidebar = new Sidebar(this);
 		this.setLeft(sidebar);
 		
@@ -113,10 +114,9 @@ public class MainWindow extends BorderPane {
 		messagesPane = new MessagesPane(this);
 		this.setBottom(messagesPane);
 		
-		messagesPane.setPrefHeight(150);
-		
 		blankPane = new VBox();
 		blankPane.getChildren().add(new Text("No job selected"));
+		blankPane.getStyleClass().add("blank");
 		this.setCenter(blankPane);
 		
     }

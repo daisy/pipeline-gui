@@ -1,0 +1,57 @@
+.sidebar {
+	-fx-padding: 10;
+	-fx-spacing: 8;
+}
+.title {
+	-fx-font-family: Arial;
+	-fx-font-weight: bold;
+	-fx-font-size: 25;
+}
+
+.subtitle {
+	-fx-font-family: Arial;
+	-fx-font-weight: bold;
+	-fx-font-size: 15;
+}
+
+/* TODO: these three are the same and can be merged */
+.details {
+	-fx-padding: 20;
+	-fx-hgap: 20;
+	-fx-vgap: 20;
+}
+.blank {
+	-fx-padding: 20;
+	-fx-hgap: 20;
+	-fx-vgap: 20;
+}
+.new-job {
+	-fx-padding: 20;
+	-fx-hgap: 20;
+	-fx-vgap: 20;
+	
+}
+
+.messages {
+	-fx-pref-height: 200;
+	-fx-padding: 20 10 20 10; /* Top Right Bottom Left */
+}	
+
+/* hyperlink is a javafx style class */
+.hyperlink {
+	-fx-padding: 0;	/* clear the default inset for links */
+}
+/* control is a javafx style class */
+.control {
+	/* TODO top padding here seems to have no effect */
+	-fx-padding: 50 0 0 0;
+}
+
+
+.help {
+	/* TODO this bottom padding seems to have no effect */
+	-fx-padding: 0 0 70 0 !important;
+	-fx-font-size: smaller;
+	-fx-font-style: italic;
+	-fx-font-family: Arial;
+}

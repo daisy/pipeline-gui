@@ -27,7 +27,6 @@ public class DataManager {
 			return;
 		}
 		main.getJobData().get(i).setStatus(status);
-		
 	}
 	
 	public void addMessage(Job job, String message, Level level) {

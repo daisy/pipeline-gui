@@ -3,41 +3,27 @@ package org.daisy.pipeline.gui;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 
 public class Sidebar extends VBox {
-	TableView<ObservableJob> table;
-	MainWindow main;
-	
+	private TableView<ObservableJob> table;
+	private MainWindow main;
+	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
 	public Sidebar(MainWindow main) {
 		super();
 		this.main = main;
 		initControls();
-	}
-	
-	public ObservableJob getSelectedJob() {
-		return table.getSelectionModel().getSelectedItem();
-	}
-	
-	public void setSelectedJob(ObservableJob job) {
-		table.getSelectionModel().select(job);
-	}
-	
-	public void clearSelection() {
-		table.getSelectionModel().clearSelection();
+		addJobPropertyListeners();
 	}
 	
 	private void initControls() {
@@ -76,7 +62,7 @@ public class Sidebar extends VBox {
             new ChangeListener<ObservableJob>() {
                 public void changed(ObservableValue<? extends ObservableJob> ov, 
                     ObservableJob old_val, ObservableJob new_val) {
-                    main.notifySidebarSelectChange(new_val);
+                    main.getCurrentJobProperty().set(new_val);
             }
         });
     
@@ -84,5 +70,24 @@ public class Sidebar extends VBox {
 	    this.getChildren().add(table);
 	    
 	}
+	
+	private void addJobPropertyListeners() {
+    	currentJobChangeListener = new ChangeListener<ObservableJob>() {
+
+			public void changed(
+					ObservableValue<? extends ObservableJob> observable,
+					ObservableJob oldValue, ObservableJob newValue) {
+				if (newValue == null) {
+					table.getSelectionModel().clearSelection();
+				}
+				else {
+					table.getSelectionModel().select(newValue);
+				}
+				
+			}
+    		
+    	};
+    	main.getCurrentJobProperty().addListener(currentJobChangeListener);
+    }
 	
 }

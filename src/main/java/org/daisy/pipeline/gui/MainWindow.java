@@ -1,6 +1,10 @@
 package org.daisy.pipeline.gui;
 
 import javafx.application.HostServices;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -14,7 +18,6 @@ import org.daisy.pipeline.gui.databridge.DataManager;
 import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
-import org.daisy.pipeline.job.Job.Status;
 import org.daisy.pipeline.job.JobManager;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
@@ -41,8 +44,11 @@ public class MainWindow extends BorderPane {
 	private Scene scene;
 	private VBox blankPane;
 	
+	public SimpleObjectProperty<ObservableJob> currentJobProperty;
+	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
-    public MainWindow(ScriptRegistry scriptRegistry, 
+	
+	public MainWindow(ScriptRegistry scriptRegistry, 
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
 			BundleContext context, HostServices hostServices) {
 		super();
@@ -53,7 +59,8 @@ public class MainWindow extends BorderPane {
 		this.jobManager = jobManagerFactory.createFor(client);
 		this.hostServices = hostServices;
 		
-		
+		currentJobProperty = new SimpleObjectProperty<ObservableJob>();
+		addJobPropertyListeners();
 		
 		jobData = FXCollections.observableArrayList();
 		scriptData = FXCollections.observableArrayList();
@@ -63,10 +70,7 @@ public class MainWindow extends BorderPane {
 		
 		buildWindow();	
     }
-    	
-	
-	
-    public JobManager getJobManager() {
+	public JobManager getJobManager() {
     	return jobManager;
     }
     
@@ -96,6 +100,9 @@ public class MainWindow extends BorderPane {
 	public HostServices getHostServices() {
 		return hostServices;
 	}
+	public SimpleObjectProperty<ObservableJob> getCurrentJobProperty() {
+		return currentJobProperty;
+	}
     private void buildWindow() {
     	scene = new Scene(this ,1024, 768);
     	String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
@@ -121,54 +128,52 @@ public class MainWindow extends BorderPane {
 		
     }
     
+    
+    // convenience function to add validation messages to the messages pane
+    public void addValidationMessages(ObservableList<String> messages) {
+    	messagesPane.addMessages(messages);
+    }
+    public void clearValidationMessages() {
+    	messagesPane.clearMessages();
+    }
     /* GUI EVENTS */
-    public void notifySidebarSelectChange(ObservableJob job) {
-    	if (job == null) {
-    		showBlank();
-    	}
-    	showJob(job);
+    public void newJob() {
+		currentJobProperty.set(null);
+		this.setCenter(newJobPane);
 	}
 	
-	public void newJob() {
-		sidebar.clearSelection();
-		newJobPane.clearScriptDetails();
-		messagesPane.clearMessages();
-		this.setCenter(newJobPane);
-		
-		//this.setBottom(null); // remove the messages pane
-	}
     public void deleteSelectedJob() {
-    	ObservableJob job = sidebar.getSelectedJob();
+    	ObservableJob job = currentJobProperty.get();
     	if (job == null) {
     		return;
     	}
     	
     	jobManager.deleteJob(job.getJob().getId());
     	jobData.remove(job);
+    	currentJobProperty.set(null);
     }
-    public void selectJob(ObservableJob job) {
-    	sidebar.setSelectedJob(job);
-    }
-    private void showJob(ObservableJob job) {
-    	if (job == null) {
-    		menubar.enableDeleteJob(false);
-    		return;
-    	}
-		if (this.getCenter() != detailsPane) {
-			this.setCenter(detailsPane);
-		}
-		this.setBottom(messagesPane);
-		detailsPane.setJob(job);
-		messagesPane.setJob(job);
-		Status status = job.getJob().getStatus();
-		if (status == Status.DONE || status == Status.ERROR || status == Status.VALIDATION_FAIL) {
-			menubar.enableDeleteJob(true);
-		}
-    }
-    public void addValidationMessages(ObservableList<String> messages) {
-    	messagesPane.addMessages(messages);
-    }
-    private void showBlank() {
-    	this.setCenter(blankPane);
+    
+    private void addJobPropertyListeners() {
+    	final MainWindow thiz = this;
+    	currentJobChangeListener = new ChangeListener<ObservableJob>() {
+
+			public void changed(
+					ObservableValue<? extends ObservableJob> observable,
+					ObservableJob oldValue, ObservableJob newValue) {
+				if (newValue == null) {
+					thiz.setCenter(blankPane);
+					return;
+					
+				}
+				else {
+					if (thiz.getCenter() != detailsPane) {
+						thiz.setCenter(detailsPane);
+					}
+				}
+				
+			}
+    		
+    	};
+    	currentJobProperty.addListener(currentJobChangeListener);
     }
 }

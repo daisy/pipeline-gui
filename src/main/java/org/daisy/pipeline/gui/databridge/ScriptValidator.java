@@ -19,11 +19,11 @@ public class ScriptValidator {
 		messages = FXCollections.observableArrayList();
 	}
 	public boolean validate() {
-		boolean isValid = checkFields(boundScript.getInputFields())
-				&& checkFields(boundScript.getOptionFields())
-				&& checkFields(boundScript.getOutputFields());
+		boolean inputsAreValid = checkFields(boundScript.getInputFields());
+		boolean optionsAreValid = checkFields(boundScript.getOptionFields());
+		boolean outputsAreValid = checkFields(boundScript.getOutputFields());
 		
-		return isValid;
+		return inputsAreValid && optionsAreValid && outputsAreValid;
 		
 	}
 	public ObservableList<String> getMessages() {

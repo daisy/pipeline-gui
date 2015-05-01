@@ -1,28 +1,17 @@
 
 package org.daisy.pipeline.gui;
 
-import java.io.File;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -61,6 +50,7 @@ public class NewJobPane extends GridPane {
 	public void clearScriptDetails() {
 		scriptsCombo.getSelectionModel().clearSelection();
 		scriptDetailsGrid.clearControls();
+		main.clearValidationMessages();
 	}
 	
 	private void initControls() {
@@ -131,7 +121,7 @@ public class NewJobPane extends GridPane {
 		if (script == null) {
 			return;
 		}
-		
+		main.clearValidationMessages();
 		scriptDetailsGrid.clearControls();
 		boundScript = new BoundScript(script);
 		populateScriptDetailsGrid();
@@ -207,7 +197,7 @@ public class NewJobPane extends GridPane {
 					if (newJob != null) {
 						ObservableJob objob = main.getDataManager().addJob(newJob);
 						objob.setBoundScript(boundScript);
-						main.selectJob(objob);
+						main.getCurrentJobProperty().set(objob);
 					}
 					else {
 						System.out.println("NEW JOB ERROR");

@@ -19,7 +19,7 @@ public class MessagesPane extends VBox {
 		super();
 		this.main = main;
 		initControls();
-		addJobPropertyListeners();
+		addCurrentJobChangeListener();
 	}
 	
 	
@@ -47,7 +47,7 @@ public class MessagesPane extends VBox {
 	}
 	
 	// listen for when the currently selected job changes
-		private void addJobPropertyListeners() {
+		private void addCurrentJobChangeListener() {
 	    	currentJobChangeListener = new ChangeListener<ObservableJob>() {
 
 				public void changed(

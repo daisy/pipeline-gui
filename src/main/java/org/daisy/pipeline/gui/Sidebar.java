@@ -23,7 +23,7 @@ public class Sidebar extends VBox {
 		super();
 		this.main = main;
 		initControls();
-		addJobPropertyListeners();
+		addCurrentJobChangeListener();
 	}
 	
 	private void initControls() {
@@ -71,7 +71,7 @@ public class Sidebar extends VBox {
 	    
 	}
 	
-	private void addJobPropertyListeners() {
+	private void addCurrentJobChangeListener() {
     	currentJobChangeListener = new ChangeListener<ObservableJob>() {
 
 			public void changed(

@@ -2,6 +2,7 @@ package org.daisy.pipeline.gui;
 
 
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.text.Text;
@@ -22,7 +23,7 @@ public class DetailsPane extends GridPaneHelper {
 	public DetailsPane(MainWindow main) {
 		this.main = main;
 		resultsGrid = new GridPaneHelper();
-		addJobPropertyListeners();
+		addCurrentJobChangeListener();
 	}
 	
 	private void displayJobInfo() {
@@ -97,7 +98,7 @@ public class DetailsPane extends GridPaneHelper {
 	}
 	
 	// listen for when the currently selected job changes
-	private void addJobPropertyListeners() {
+	private void addCurrentJobChangeListener() {
     	currentJobChangeListener = new ChangeListener<ObservableJob>() {
 
 			public void changed(
@@ -129,7 +130,13 @@ public class DetailsPane extends GridPaneHelper {
 			jobStatusListener = new ChangeListener<String>() {
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
-					thiz.refreshLinks();
+					
+					// need this to avoid "you're on the wrong thread" errors
+					Platform.runLater(new Runnable(){
+						public void run() {
+							thiz.refreshLinks();
+						}
+					});
 				}
 			};
 			

@@ -4,6 +4,7 @@ import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job.Status;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -28,7 +29,7 @@ public class AppMenu extends MenuBar {
 		jobStatusListener = null;
 		this.main = main;
 		initControls();
-		addJobPropertyListeners();
+		addCurrentJobChangeListener();
 		
 	}
 	
@@ -82,7 +83,7 @@ public class AppMenu extends MenuBar {
 	}
 	
 	// listen for when the currently selected job changes
-	private void addJobPropertyListeners() {
+	private void addCurrentJobChangeListener() {
     	currentJobChangeListener = new ChangeListener<ObservableJob>() {
 
 			public void changed(
@@ -108,7 +109,13 @@ public class AppMenu extends MenuBar {
 			jobStatusListener = new ChangeListener<String>() {
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
-					thiz.enableJobSpecificMenuItems();
+//					Platform.runLater(new Runnable(){
+//						//@Override
+//						public void run() {
+//							thiz.enableJobSpecificMenuItems();
+//						}
+//					});
+					
 				}
 			};
 			
@@ -117,7 +124,7 @@ public class AppMenu extends MenuBar {
 		enableJobSpecificMenuItems(); // call it now too because we need it to reflect the current status, not just status changes
 	}
 	
-	// decide whether the 'delete' menu item is active
+	// decide whether certain menu items are active
 	private void enableJobSpecificMenuItems() {
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		if (job == null) {

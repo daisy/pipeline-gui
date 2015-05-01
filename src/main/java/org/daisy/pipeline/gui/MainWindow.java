@@ -61,7 +61,7 @@ public class MainWindow extends BorderPane {
 		this.hostServices = hostServices;
 		
 		currentJobProperty = new SimpleObjectProperty<ObservableJob>();
-		addJobPropertyListeners();
+		addCurrentJobChangeListener();
 		
 		jobData = FXCollections.observableArrayList();
 		scriptData = FXCollections.observableArrayList();
@@ -154,7 +154,7 @@ public class MainWindow extends BorderPane {
     	currentJobProperty.set(null);
     }
     
-    private void addJobPropertyListeners() {
+    private void addCurrentJobChangeListener() {
     	final MainWindow thiz = this;
     	currentJobChangeListener = new ChangeListener<ObservableJob>() {
 

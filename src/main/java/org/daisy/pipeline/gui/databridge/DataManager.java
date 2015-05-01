@@ -97,4 +97,22 @@ public class DataManager {
 		objob.setBoundScript(boundScript);
 	}
 	
+	public BoundScript cloneBoundScript(BoundScript boundScript) {
+		BoundScript newBoundScript = new BoundScript(boundScript.getScript());
+		
+		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
+			ScriptFieldAnswer newAnswer = newBoundScript.getInputByName(answer.getField().getName());
+			newAnswer.setAnswer(answer.getAnswer());
+		}
+		for (ScriptFieldAnswer answer : boundScript.getOptionFields()) {
+			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
+			newAnswer.setAnswer(answer.getAnswer());
+		}
+		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
+			ScriptFieldAnswer newAnswer = newBoundScript.getOutputByName(answer.getField().getName());
+			newAnswer.setAnswer(answer.getAnswer());
+		}
+		return newBoundScript;
+	}
+	
 }

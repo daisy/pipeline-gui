@@ -52,6 +52,10 @@ public class NewJobPane extends GridPane {
 		scriptDetailsGrid.clearControls();
 		main.clearValidationMessages();
 	}
+	public void newFromBoundScript(BoundScript boundScript) {
+		scriptsCombo.getSelectionModel().select(boundScript.getScript());
+		
+	}
 	
 	private void initControls() {
 		this.getStyleClass().add("new-job");

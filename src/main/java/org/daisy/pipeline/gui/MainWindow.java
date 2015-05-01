@@ -14,6 +14,7 @@ import javafx.scene.text.Text;
 
 import org.daisy.pipeline.clients.Client;
 import org.daisy.pipeline.event.EventBusProvider;
+import org.daisy.pipeline.gui.databridge.BoundScript;
 import org.daisy.pipeline.gui.databridge.DataManager;
 import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
@@ -176,4 +177,20 @@ public class MainWindow extends BorderPane {
     	};
     	currentJobProperty.addListener(currentJobChangeListener);
     }
+    
+    // create a new job based on the currently-selected job
+ 	// display the new job pane
+	public void runSelectedJobAgain() {
+		ObservableJob job = currentJobProperty.get();
+		// this shouldn't happen... 
+		if (job == null) {
+			return;
+		}
+		BoundScript boundScript = dataManager.cloneBoundScript(job.getBoundScript());
+		newJobPane.newFromBoundScript(boundScript);
+		if (this.getCenter() != newJobPane) {
+			this.setCenter(newJobPane);
+		}
+		
+	}
 }

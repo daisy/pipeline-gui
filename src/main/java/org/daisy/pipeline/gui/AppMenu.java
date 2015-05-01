@@ -19,6 +19,7 @@ public class AppMenu extends MenuBar {
 
 	private MainWindow main;
 	private MenuItem deleteJob;
+	private MenuItem runJobAgain;
 	private ChangeListener<String> jobStatusListener;
 	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
@@ -69,6 +70,15 @@ public class AppMenu extends MenuBar {
         menuFile.getItems().add(deleteJob);
         deleteJob.setDisable(true);
         
+        runJobAgain = new MenuItem("Run job again");
+        runJobAgain.setOnAction(new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent t) {
+        		main.runSelectedJobAgain();
+        	}
+        });
+        menuFile.getItems().add(runJobAgain);
+        runJobAgain.setDisable(false);
+        
 	}
 	
 	// listen for when the currently selected job changes
@@ -98,26 +108,28 @@ public class AppMenu extends MenuBar {
 			jobStatusListener = new ChangeListener<String>() {
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
-					thiz.enableDeleteJob();
+					thiz.enableJobSpecificMenuItems();
 				}
 			};
 			
 			job.statusProperty().addListener(jobStatusListener);
 		}
-		enableDeleteJob(); // call it now too because we need it to reflect the current status, not just status changes
+		enableJobSpecificMenuItems(); // call it now too because we need it to reflect the current status, not just status changes
 	}
 	
 	// decide whether the 'delete' menu item is active
-	private void enableDeleteJob() {
+	private void enableJobSpecificMenuItems() {
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		if (job == null) {
 			deleteJob.setDisable(true);
+			runJobAgain.setDisable(true);
 		}
 		else {
 			Status status = job.getJob().getStatus();
 			if (status == Status.DONE || status == Status.ERROR || status == Status.VALIDATION_FAIL) {
 				deleteJob.setDisable(false);
 			}
+			runJobAgain.setDisable(false);
 		}
 	}
 }

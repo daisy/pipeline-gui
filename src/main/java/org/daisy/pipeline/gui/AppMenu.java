@@ -109,12 +109,13 @@ public class AppMenu extends MenuBar {
 			jobStatusListener = new ChangeListener<String>() {
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
-//					Platform.runLater(new Runnable(){
-//						//@Override
-//						public void run() {
-//							thiz.enableJobSpecificMenuItems();
-//						}
-//					});
+					// somehow when this code is here, the sidebar updates stop working
+					// even though they aren't linked
+					Platform.runLater(new Runnable(){
+						public void run() {
+							thiz.enableJobSpecificMenuItems();
+						}
+					});
 					
 				}
 			};

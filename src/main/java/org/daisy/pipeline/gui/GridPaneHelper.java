@@ -138,6 +138,9 @@ public class GridPaneHelper extends GridPane {
 	// add a checkbox control
 	public void addCheckbox(ScriptFieldAnswer answer) {
 		CheckBox cb = new CheckBox(answer.getField().getNiceName());
+		if (answer.booleanAnswerProperty().get() == true) {
+			cb.selectedProperty().set(true);
+		}
 		cb.selectedProperty().bindBidirectional(answer.booleanAnswerProperty());
 		addRow(cb);
 		addHelpText(answer);

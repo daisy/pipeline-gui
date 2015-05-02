@@ -85,6 +85,10 @@ public class BoundScript {
 		}
 		for (ScriptField field : script.getOptionalOptionFields()) {
 			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
+			// default to true for boolean fields
+			if (field.getDataType() == DataType.BOOLEAN) {
+				answer.booleanAnswerProperty().set(true);
+			}
 			optionalOptionAnswers.add(answer);
 		}
 	}

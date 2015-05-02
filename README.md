@@ -27,7 +27,6 @@ Build all and run './pipeline2' from the assembly target directory.
 ## Keyboard shortcuts
  * New job: Control + N
  * Delete job: Delete
- * Run job (from new job form): Control + R 
  * Run job again: Control + Shift + R
  
 # Out of scope 

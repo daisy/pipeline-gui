@@ -78,7 +78,7 @@ public class ScriptValidator {
 		}
 		
 		private boolean validateString(ScriptFieldAnswer answer) {
-			String answerString = answer.getAnswer();
+			String answerString = answer.answerProperty().get();
 			if (answer.getField().isRequired() && answerString.isEmpty()) {
 				message = EMPTYSTRING + answer.getField().getNiceName();
 				return false;
@@ -90,7 +90,7 @@ public class ScriptValidator {
 			if (!validateString(answer)) {
 				return false;
 			}
-			File file = new File(answer.getAnswer());
+			File file = new File(answer.answerProperty().get());
 			// for input files: check that the file exists
 			if (answer.getField().getFieldType() == FieldType.INPUT ||
 				answer.getField().getFieldType() == FieldType.OPTION) {
@@ -119,7 +119,7 @@ public class ScriptValidator {
 			if (!validateString(answer)) {
 				return false;
 			}
-			File file = new File(answer.getAnswer());
+			File file = new File(answer.answerProperty().get());
 			if (!file.isDirectory()) {
 				message = BADPATH + answer.getField().getNiceName();
 				return false;
@@ -129,7 +129,7 @@ public class ScriptValidator {
 		}
 		
 		private boolean validateInteger(ScriptFieldAnswer answer) {
-			String num = answer.getAnswer();
+			String num = answer.answerProperty().get();
 			try {
 				Integer.parseInt(num);
 			}

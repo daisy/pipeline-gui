@@ -48,7 +48,7 @@ public class JobExecutor {
         while (itInput.hasNext()) {
             XProcPortInfo input = itInput.next();
             String inputName = input.getName();
-            String src = (String)boundScript.getInputByName(inputName).getAnswer();
+            String src = (String)boundScript.getInputByName(inputName).answerProperty().get();
             LazySaxSourceProvider prov = new LazySaxSourceProvider(src);
             inBuilder.withInput(inputName, prov);
         }
@@ -59,7 +59,7 @@ public class JobExecutor {
         	XProcOptionInfo option = itOption.next();
         	String optionName = option.getName().toString();
         	ScriptFieldAnswer optionAnswer = boundScript.getOptionByName(optionName);
-        	String value = optionAnswer.getAnswer();
+        	String value = optionAnswer.answerProperty().get();
         	inBuilder.withOption(new QName(optionName), value);
         }
         

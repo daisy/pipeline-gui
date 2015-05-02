@@ -102,15 +102,15 @@ public class DataManager {
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getInputByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.getAnswer());
+			newAnswer.setAnswer(answer.answerProperty().get());
 		}
 		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.getAnswer());
+			newAnswer.setAnswer(answer.answerProperty().get());
 		}
 		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.getAnswer());
+			newAnswer.setAnswer(answer.answerProperty().get());
 		}
 		
 //		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {

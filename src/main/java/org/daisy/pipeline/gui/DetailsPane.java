@@ -59,14 +59,14 @@ public class DetailsPane extends GridPaneHelper {
 		addRow(settingsLabel);
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
 		}
 		
 		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
 		}
 		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
 		}
 		
 //		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {

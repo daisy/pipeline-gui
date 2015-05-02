@@ -22,9 +22,10 @@ public class ScriptFieldAnswer {
 	public ScriptField getField() {
 		return field;
 	}
-	public String getAnswer() {
-		return stringAnswer.get();
-	}
+	// don't provide a getter; use the property below
+//	public String getAnswer() {
+//		return stringAnswer.get();
+//	}
 	public void setAnswer(String answer) {
 		stringAnswer.set(answer);
 	}

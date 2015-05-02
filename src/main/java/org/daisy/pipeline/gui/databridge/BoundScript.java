@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
 
 public class BoundScript {
 	
@@ -76,6 +77,10 @@ public class BoundScript {
 //		}
 		for (ScriptField field : script.getRequiredOptionFields()) {
 			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
+			// default to true for boolean fields
+			if (field.getDataType() == DataType.BOOLEAN) {
+				answer.booleanAnswerProperty().set(true);
+			}
 			requiredOptionAnswers.add(answer);
 		}
 		for (ScriptField field : script.getOptionalOptionFields()) {

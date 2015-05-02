@@ -63,6 +63,7 @@ public class AppMenu extends MenuBar {
         }
         
         deleteJob = new MenuItem("Delete job");
+        deleteJob.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
         deleteJob.setOnAction(new EventHandler<ActionEvent>() {
         	public void handle(ActionEvent t) {
         		main.deleteSelectedJob();
@@ -72,13 +73,14 @@ public class AppMenu extends MenuBar {
         deleteJob.setDisable(true);
         
         runJobAgain = new MenuItem("Run job again");
+        runJobAgain.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN));
         runJobAgain.setOnAction(new EventHandler<ActionEvent>() {
         	public void handle(ActionEvent t) {
         		main.runSelectedJobAgain();
         	}
         });
         menuFile.getItems().add(runJobAgain);
-        runJobAgain.setDisable(false);
+        runJobAgain.setDisable(true);
         
 	}
 	

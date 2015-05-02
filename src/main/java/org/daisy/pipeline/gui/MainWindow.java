@@ -129,31 +129,6 @@ public class MainWindow extends BorderPane {
 		
     }
     
-    
-    // convenience function to add validation messages to the messages pane
-    public void addValidationMessages(ObservableList<String> messages) {
-    	messagesPane.addMessages(messages);
-    }
-    public void clearValidationMessages() {
-    	messagesPane.clearMessages();
-    }
-    /* GUI EVENTS */
-    public void newJob() {
-		currentJobProperty.set(null);
-		this.setCenter(newJobPane);
-	}
-	
-    public void deleteSelectedJob() {
-    	ObservableJob job = currentJobProperty.get();
-    	if (job == null) {
-    		return;
-    	}
-    	
-    	jobManager.deleteJob(job.getJob().getId());
-    	jobData.remove(job);
-    	currentJobProperty.set(null);
-    }
-    
     private void addCurrentJobChangeListener() {
     	final MainWindow thiz = this;
     	currentJobChangeListener = new ChangeListener<ObservableJob>() {
@@ -177,7 +152,33 @@ public class MainWindow extends BorderPane {
     	};
     	currentJobProperty.addListener(currentJobChangeListener);
     }
+
+    // convenience functions to add/clear validation messages
+    public void addValidationMessages(ObservableList<String> messages) {
+    	messagesPane.addMessages(messages);
+    }
+    public void clearValidationMessages() {
+    	messagesPane.clearMessages();
+    }
     
+    /* GUI EVENTS */
+    public void newJob() {
+		currentJobProperty.set(null);
+		this.setCenter(newJobPane);
+	}
+	
+    public void deleteSelectedJob() {
+    	ObservableJob job = currentJobProperty.get();
+    	if (job == null) {
+    		return;
+    	}
+    	
+    	jobManager.deleteJob(job.getJob().getId());
+    	jobData.remove(job);
+    	currentJobProperty.set(null);
+    }
+    
+        
     // create a new job based on the currently-selected job
  	// display the new job pane
 	public void runSelectedJobAgain() {
@@ -188,6 +189,7 @@ public class MainWindow extends BorderPane {
 		}
 		BoundScript boundScript = dataManager.cloneBoundScript(job.getBoundScript());
 		newJobPane.newFromBoundScript(boundScript);
+		currentJobProperty.set(null);
 		if (this.getCenter() != newJobPane) {
 			this.setCenter(newJobPane);
 		}

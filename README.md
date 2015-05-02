@@ -22,6 +22,7 @@ Build all and run './pipeline2' from the assembly target directory.
  * Access job results in separate application(s)
  * Create new job
  * Run job again
+ * Delete job
 
 ## Keyboard shortcuts
  * New job: Control + N
@@ -29,23 +30,14 @@ Build all and run './pipeline2' from the assembly target directory.
  * Run job (from new job form): Control + R 
  * Run job again: Control + Shift + R
  
-# Out of scope for version 1
+# Out of scope 
  * authentication/connecting to a remote pipeline installation
  * batch jobs
  * job template
  * install new scripts from repo
  * autoupdate installed components
-
-## out of scope (maybe forever)
  * user management (e.g. client user account creation)
  * editing content 
  
-## proposed behaviors
-
- * connect directly to pipeline framework (not via webservice)
- * keep jobs in list until user clears them
- * delete a job => default is to keep job output on disk; option to remove data too.
- * list/detail view (jobs list on left in a sidebar)
- * job views for each variation: new job, running job, completed job
 
 

@@ -52,25 +52,26 @@ public class DetailsPane extends GridPaneHelper {
 		statusValue.textProperty().bind(job.statusProperty());
 		addRow(statusLabel, statusValue);
 		
-		
+		addNameValuePair("ID", job.getJob().getId().toString());
 		
 		Text settingsLabel = new Text("Settings:");
 		settingsLabel.getStyleClass().add("subtitle");
 		addRow(settingsLabel);
 		
-		addNameValuePair("ID", job.getJob().getId().toString());
-		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
 			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
 		}
 		
-		for (ScriptFieldAnswer answer : boundScript.getOptionFields()) {
+		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
+			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+		}
+		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
 			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
 		}
 		
-		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
-		}
+//		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
+//			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
+//		}
 		
 		addRow(resultsGrid);
 		refreshLinks();

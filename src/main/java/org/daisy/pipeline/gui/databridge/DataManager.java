@@ -104,14 +104,19 @@ public class DataManager {
 			ScriptFieldAnswer newAnswer = newBoundScript.getInputByName(answer.getField().getName());
 			newAnswer.setAnswer(answer.getAnswer());
 		}
-		for (ScriptFieldAnswer answer : boundScript.getOptionFields()) {
+		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
 			newAnswer.setAnswer(answer.getAnswer());
 		}
-		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
-			ScriptFieldAnswer newAnswer = newBoundScript.getOutputByName(answer.getField().getName());
+		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
+			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
 			newAnswer.setAnswer(answer.getAnswer());
 		}
+		
+//		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
+//			ScriptFieldAnswer newAnswer = newBoundScript.getOutputByName(answer.getField().getName());
+//			newAnswer.setAnswer(answer.getAnswer());
+//		}
 		return newBoundScript;
 	}
 	

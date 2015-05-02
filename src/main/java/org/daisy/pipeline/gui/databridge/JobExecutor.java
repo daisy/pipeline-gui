@@ -64,16 +64,16 @@ public class JobExecutor {
         }
         
         // add outputs
-        Iterable<XProcPortInfo> outputs = scriptInfo.getOutputPorts();
-        Iterator<XProcPortInfo> itOutput = outputs.iterator();
-        while (itOutput.hasNext()) {
-        	XProcPortInfo output = itOutput.next();
-        	String outputName = output.getName();
-        	ScriptFieldAnswer answer = boundScript.getOutputByName(outputName);
-            String src = answer.getAnswer();
-            LazySaxResultProvider prov= new LazySaxResultProvider(src);
-            outBuilder.withOutput(outputName, prov);
-        }
+//        Iterable<XProcPortInfo> outputs = scriptInfo.getOutputPorts();
+//        Iterator<XProcPortInfo> itOutput = outputs.iterator();
+//        while (itOutput.hasNext()) {
+//        	XProcPortInfo output = itOutput.next();
+//        	String outputName = output.getName();
+//        	ScriptFieldAnswer answer = boundScript.getOutputByName(outputName);
+//            String src = answer.getAnswer();
+//            LazySaxResultProvider prov= new LazySaxResultProvider(src);
+//            outBuilder.withOutput(outputName, prov);
+//        }
         BoundXProcScript bound = BoundXProcScript.from(script, inBuilder.build(), outBuilder.build());
 
         Optional<Job> newJob = main.getJobManager().newJob(bound).isMapping(true).withNiceName("TODO").build();

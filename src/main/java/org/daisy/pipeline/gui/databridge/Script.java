@@ -13,17 +13,17 @@ import org.daisy.pipeline.script.XProcScript;
 public class Script {
 	private String name;
 	private String description;
-	// included in this list: input ports and options that act as inputs (@px:type=anyDirURI)
 	private ArrayList<ScriptField> inputFields;
-	private ArrayList<ScriptField> optionFields;
-	// included in this list: output ports and options that act as outputs (@px:output=result)
-	private ArrayList<ScriptField> outputFields;
+	private ArrayList<ScriptField> requiredOptionFields;
+	private ArrayList<ScriptField> optionalOptionFields;
+	//private ArrayList<ScriptField> outputFields;
 	private XProcScript xprocScript;
 	
 	public Script(XProcScript script) {
 		inputFields = new ArrayList<ScriptField>();
-		outputFields = new ArrayList<ScriptField>();
-		optionFields = new ArrayList<ScriptField>();
+		//outputFields = new ArrayList<ScriptField>();
+		requiredOptionFields = new ArrayList<ScriptField>();
+		optionalOptionFields = new ArrayList<ScriptField>();
 		xprocScript = script;
 		
 		name = script.getName();
@@ -36,32 +36,22 @@ public class Script {
 			inputFields.add(field);
 		}
 		
-		for (XProcPortInfo portInfo : scriptInfo.getOutputPorts()) {
-			XProcPortMetadata metadata = script.getPortMetadata(portInfo.getName());
-			ScriptField field = new ScriptField(portInfo, metadata, ScriptField.FieldType.OUTPUT);
-			outputFields.add(field);
-		}
+//		for (XProcPortInfo portInfo : scriptInfo.getOutputPorts()) {
+//			XProcPortMetadata metadata = script.getPortMetadata(portInfo.getName());
+//			ScriptField field = new ScriptField(portInfo, metadata, ScriptField.FieldType.OUTPUT);
+//			outputFields.add(field);
+//		}
 		
 		for (XProcOptionInfo optionInfo : scriptInfo.getOptions()) {
 			XProcOptionMetadata metadata = script.getOptionMetadata(optionInfo.getName());
 			ScriptField field = new ScriptField(optionInfo, metadata);
-
-			// keep it simple for now; more complex approach commented out below
-			optionFields.add(field);
-			
-			// IF an option is a result type, then call it an output
-//			if (metadata.getOutput() == Output.RESULT ) {
-//				outputFields.add(field);
-//			}
-//			else {
-//				// IF an option field takes anyUri, then call it an input
-//				if (field.dataType == ScriptField.dataTypeMap.get(ScriptField.DataType.FILE)) {
-//					inputFields.add(field);
-//				}
-//				else {
-//					optionFields.add(field);
-//				}
-//			}
+			if (field.isRequired()) {
+				requiredOptionFields.add(field);
+			}
+			else {
+				optionalOptionFields.add(field);
+			}
+				
 		}
 	}
 	
@@ -74,12 +64,15 @@ public class Script {
 	public Iterable<ScriptField> getInputFields() {
 		return inputFields;
 	}
-	public Iterable<ScriptField> getOptionFields() {
-		return optionFields;
+	public Iterable<ScriptField> getRequiredOptionFields() {
+		return requiredOptionFields;
 	}
-	public Iterable<ScriptField> getOutputFields() {
-		return outputFields;
+	public Iterable<ScriptField> getOptionalOptionFields() {
+		return optionalOptionFields;
 	}
+//	public Iterable<ScriptField> getOutputFields() {
+//		return outputFields;
+//	}
 	
 	public XProcScript getXProcScript() {
 		return xprocScript;

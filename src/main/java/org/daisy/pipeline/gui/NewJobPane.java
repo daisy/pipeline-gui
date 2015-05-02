@@ -24,6 +24,8 @@ import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.gui.databridge.ScriptValidator;
 import org.daisy.pipeline.job.Job;
 
+import com.google.common.collect.Iterators;
+
 
 public class NewJobPane extends GridPane {
 	
@@ -149,12 +151,22 @@ public class NewJobPane extends GridPane {
 		for (ScriptFieldAnswer input : boundScript.getInputFields()) {
 			addInputField(input);
 		}
-		for (ScriptFieldAnswer option : boundScript.getOptionFields()) {
+		for (ScriptFieldAnswer option : boundScript.getRequiredOptionFields()) {
 			addOptionField(option);
 		}
-		for (ScriptFieldAnswer output : boundScript.getOutputFields()) {
-			addOutputField(output);
+		
+		if (Iterators.size(boundScript.getOptionalOptionFields().iterator()) > 0) {
+			Text options = new Text("Options:");
+			options.getStyleClass().add("subtitle");
+			scriptDetailsGrid.addRow(options);
 		}
+		for (ScriptFieldAnswer option : boundScript.getOptionalOptionFields()) {
+			addOptionField(option);
+		}
+		
+//		for (ScriptFieldAnswer output : boundScript.getOutputFields()) {
+//			addOutputField(output);
+//		}
 		addStandardButtons();
 			
 	}
@@ -180,10 +192,10 @@ public class NewJobPane extends GridPane {
 		}
 	}
 	
-	private void addOutputField(ScriptFieldAnswer answer) {
-		scriptDetailsGrid.addFileDirPicker(answer);
-	}
-	
+//	private void addOutputField(ScriptFieldAnswer answer) {
+//		scriptDetailsGrid.addFileDirPicker(answer);
+//	}
+//	
 	private void addStandardButtons() {
 		Button run = new Button("Run");
 		run.getStyleClass().add("run-button");

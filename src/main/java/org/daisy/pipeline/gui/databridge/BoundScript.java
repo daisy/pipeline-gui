@@ -1,5 +1,7 @@
 package org.daisy.pipeline.gui.databridge;
 
+import java.util.ArrayList;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -9,14 +11,16 @@ public class BoundScript {
 	
 	private Script script;
 	private ObservableList<ScriptFieldAnswer> inputAnswers;
-	private ObservableList<ScriptFieldAnswer> outputAnswers;
-	private ObservableList<ScriptFieldAnswer> optionAnswers;
+	//private ObservableList<ScriptFieldAnswer> outputAnswers;
+	private ObservableList<ScriptFieldAnswer> requiredOptionAnswers;
+	private ObservableList<ScriptFieldAnswer> optionalOptionAnswers;
 	
 	public BoundScript(Script script) {
 		this.script = script;
 		this.inputAnswers = FXCollections.observableArrayList();
-		this.outputAnswers = FXCollections.observableArrayList();
-		this.optionAnswers = FXCollections.observableArrayList();
+		//this.outputAnswers = FXCollections.observableArrayList();
+		this.requiredOptionAnswers = FXCollections.observableArrayList();
+		this.optionalOptionAnswers = FXCollections.observableArrayList();
 		createAnswers();
 	}
 	public Script getScript() {
@@ -25,22 +29,32 @@ public class BoundScript {
 	public Iterable<ScriptFieldAnswer> getInputFields() {
 		return inputAnswers;
 	}
-	public Iterable<ScriptFieldAnswer> getOutputFields() {
-		return outputAnswers;
+//	public Iterable<ScriptFieldAnswer> getOutputFields() {
+//		return outputAnswers;
+//	}
+	public Iterable<ScriptFieldAnswer> getRequiredOptionFields() {
+		return requiredOptionAnswers;
 	}
-	public Iterable<ScriptFieldAnswer> getOptionFields() {
-		return optionAnswers;
+	public Iterable<ScriptFieldAnswer> getOptionalOptionFields() {
+		return optionalOptionAnswers;
 	}
 	
 	public ScriptFieldAnswer getInputByName(String name) {
 		return findByName(inputAnswers, name);
 	}
 	public ScriptFieldAnswer getOptionByName(String name) {
-		return findByName(optionAnswers, name);
+		// look in both lists
+		ScriptFieldAnswer answer = findByName(requiredOptionAnswers, name);
+		if (answer == null) {
+			return findByName(optionalOptionAnswers, name);
+		}
+		else {
+			return answer;
+		}
 	}
-	public ScriptFieldAnswer getOutputByName(String name) {
-		return findByName(outputAnswers, name);
-	}
+//	public ScriptFieldAnswer getOutputByName(String name) {
+//		return findByName(outputAnswers, name);
+//	}
 	
 	private ScriptFieldAnswer findByName(Iterable<ScriptFieldAnswer> list, String name) {
 		for (ScriptFieldAnswer answer : list) {
@@ -56,13 +70,17 @@ public class BoundScript {
 			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
 			inputAnswers.add(answer);
 		}
-		for (ScriptField field : script.getOutputFields()) {
+//		for (ScriptField field : script.getOutputFields()) {
+//			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
+//			outputAnswers.add(answer);
+//		}
+		for (ScriptField field : script.getRequiredOptionFields()) {
 			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
-			outputAnswers.add(answer);
+			requiredOptionAnswers.add(answer);
 		}
-		for (ScriptField field : script.getOptionFields()) {
+		for (ScriptField field : script.getOptionalOptionFields()) {
 			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
-			optionAnswers.add(answer);
+			optionalOptionAnswers.add(answer);
 		}
 	}
 }

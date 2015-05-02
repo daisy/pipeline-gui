@@ -20,10 +20,11 @@ public class ScriptValidator {
 	}
 	public boolean validate() {
 		boolean inputsAreValid = checkFields(boundScript.getInputFields());
-		boolean optionsAreValid = checkFields(boundScript.getOptionFields());
-		boolean outputsAreValid = checkFields(boundScript.getOutputFields());
+		boolean reqOptionsAreValid = checkFields(boundScript.getRequiredOptionFields());
+		boolean optOptionsAreValid = checkFields(boundScript.getOptionalOptionFields());
+		//boolean outputsAreValid = checkFields(boundScript.getOutputFields());
 		
-		return inputsAreValid && optionsAreValid && outputsAreValid;
+		return inputsAreValid && reqOptionsAreValid && optOptionsAreValid;// && outputsAreValid;
 		
 	}
 	public ObservableList<String> getMessages() {

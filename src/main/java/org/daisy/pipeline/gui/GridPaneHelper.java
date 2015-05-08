@@ -40,7 +40,11 @@ public class GridPaneHelper extends GridPane {
 		}
 		rowcount++;
 	}
-	
+	public void addRow(Node node, int colspan) {
+		node.getStyleClass().add("row");
+		add(node, 0, rowcount, colspan, 1);
+		rowcount++;
+	}
 	// remove all controls from the grid
 	public void clearControls() {
 		int sz = getChildren().size();

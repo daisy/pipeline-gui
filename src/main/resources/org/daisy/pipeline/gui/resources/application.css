@@ -44,7 +44,7 @@
 /* control is a javafx style class */
 .control {
 	/* TODO top padding here seems to have no effect */
-	-fx-padding: 50 0 0 0;
+	/*-fx-padding: 50 0 0 0;*/
 }
 
 

@@ -68,7 +68,6 @@ public class DataManager {
 	}
 	
 	// called once at startup
-	// put any jobs already in the pipeline into the list
 	// read the list of scripts
 	private void initData() {
 		for (XProcScriptService scriptService : main.getScriptRegistry().getScripts()) {
@@ -76,26 +75,29 @@ public class DataManager {
 			addScript(xprocScript);
 		}
 		
+		// not supported now: there's no way to get the input/option values for pre-existing jobs
+		// therefore their details view will be incomplete and they won't be clone-able
+		
 		// these jobs are already in the pipeline so we need to create a BoundScript representation
-		for (Job job : main.getJobManager().getJobs()) {
-			ObservableJob objob = addJob(job);
-			for (Script script : main.getScriptData()) {
-				if (script.getName().equals(job.getContext().getScript().getName())) {
-					createBoundScriptForExistingJob(script, objob);
-				}
-			}
-		}
+//		for (Job job : main.getJobManager().getJobs()) {
+//			ObservableJob objob = addJob(job);
+//			for (Script script : main.getScriptData()) {
+//				if (script.getName().equals(job.getContext().getScript().getName())) {
+//					createBoundScriptForExistingJob(script, objob);
+//				}
+//			}
+//		}
 		
 		
 	}
 	
-	private void createBoundScriptForExistingJob(Script script, ObservableJob objob) {
-		BoundScript boundScript = new BoundScript(script);
-		Job job = objob.getJob();
-		
-		// TODO fill in the bound script parameters (input URIs etc)
-		objob.setBoundScript(boundScript);
-	}
+//	private void createBoundScriptForExistingJob(Script script, ObservableJob objob) {
+//		BoundScript boundScript = new BoundScript(script);
+//		Job job = objob.getJob();
+//		
+//		// TODO fill in the bound script parameters (input URIs etc)
+//		objob.setBoundScript(boundScript);
+//	}
 	
 	public BoundScript cloneBoundScript(BoundScript boundScript) {
 		BoundScript newBoundScript = new BoundScript(boundScript.getScript());

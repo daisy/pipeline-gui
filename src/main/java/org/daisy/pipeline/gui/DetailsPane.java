@@ -5,6 +5,7 @@ package org.daisy.pipeline.gui;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 
 import org.daisy.pipeline.gui.databridge.BoundScript;
@@ -29,6 +30,21 @@ public class DetailsPane extends GridPaneHelper {
 	private void displayJobInfo() {
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		this.getStyleClass().add("details");
+		
+		// why doesn't this work ? 
+		// for example, the zedai to html script has a long description
+		// which pushes the other controls over to the right
+		// it should be spanning 2 columns, defined below (desc control)
+		// but i'm not seeing the effect
+
+		ColumnConstraints col1Constraints = new ColumnConstraints();
+		col1Constraints.setPercentWidth(40);
+		ColumnConstraints col2Constraints = new ColumnConstraints();
+		col2Constraints.setPercentWidth(40);
+		ColumnConstraints col3Constraints = new ColumnConstraints();
+		col3Constraints.setPercentWidth(20);
+		this.getColumnConstraints().addAll(col1Constraints, col2Constraints, col3Constraints);
+		
 		Text title = new Text("Job details");
 		title.getStyleClass().add("title");
 		addRow(title);
@@ -39,7 +55,7 @@ public class DetailsPane extends GridPaneHelper {
 		script.getStyleClass().add("subtitle");
 		addRow(script);
 		Text desc = new Text(boundScript.getScript().getDescription());
-		addRow(desc);
+		addRow(desc, 2);
 		
 		addWebpageLinkRow("Read online documentation", boundScript.getScript().getXProcScript().getHomepage());
 		

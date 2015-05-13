@@ -12,8 +12,11 @@ import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcOutput;
 import org.daisy.common.xproc.XProcPipelineInfo;
 import org.daisy.common.xproc.XProcPortInfo;
+import org.daisy.common.xproc.XProcInput.Builder;
 import org.daisy.pipeline.gui.MainWindow;
 import org.daisy.pipeline.gui.NewJobPane;
+import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
+import org.daisy.pipeline.gui.databridge.ScriptField.FieldType;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.script.BoundXProcScript;
 import org.daisy.pipeline.script.XProcScript;
@@ -48,9 +51,7 @@ public class JobExecutor {
         while (itInput.hasNext()) {
             XProcPortInfo input = itInput.next();
             String inputName = input.getName();
-            String src = (String)boundScript.getInputByName(inputName).answerProperty().get();
-            LazySaxSourceProvider prov = new LazySaxSourceProvider(src);
-            inBuilder.withInput(inputName, prov);
+            addToBuilder(boundScript.getInputByName(inputName), inBuilder);
         }
         
         //add options
@@ -58,22 +59,9 @@ public class JobExecutor {
         while(itOption.hasNext()) {
         	XProcOptionInfo option = itOption.next();
         	String optionName = option.getName().toString();
-        	ScriptFieldAnswer optionAnswer = boundScript.getOptionByName(optionName);
-        	String value = optionAnswer.answerProperty().get();
-        	inBuilder.withOption(new QName(optionName), value);
+        	addToBuilder(boundScript.getOptionByName(optionName), inBuilder);
         }
         
-        // add outputs
-//        Iterable<XProcPortInfo> outputs = scriptInfo.getOutputPorts();
-//        Iterator<XProcPortInfo> itOutput = outputs.iterator();
-//        while (itOutput.hasNext()) {
-//        	XProcPortInfo output = itOutput.next();
-//        	String outputName = output.getName();
-//        	ScriptFieldAnswer answer = boundScript.getOutputByName(outputName);
-//            String src = answer.getAnswer();
-//            LazySaxResultProvider prov= new LazySaxResultProvider(src);
-//            outBuilder.withOutput(outputName, prov);
-//        }
         BoundXProcScript bound = BoundXProcScript.from(script, inBuilder.build(), outBuilder.build());
 
         Optional<Job> newJob = main.getJobManager().newJob(bound).isMapping(true).withNiceName("TODO").build();
@@ -86,5 +74,46 @@ public class JobExecutor {
         return newJob.get();
     }
 	
+        private static void addToBuilder(ScriptFieldAnswer answer, Builder builder) {
+        	
+        	String name = answer.getField().getName();
+        	FieldType type = answer.getField().getFieldType();
+        	
+        	if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
+        		ScriptFieldAnswer.ScriptFieldAnswerString answer_ = 
+        				(ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+        		String value = answer_.answerProperty().get();
+        		if (type == FieldType.INPUT) {
+        			LazySaxSourceProvider prov = new LazySaxSourceProvider(value);
+                    builder.withInput(name, prov);
+        		}
+        		else if (type == FieldType.OPTION) {
+        			builder.withOption(new QName(name), value);
+        		}
+                
+        	}
+        	
+        	else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
+        		ScriptFieldAnswer.ScriptFieldAnswerList answer_ = 
+        				(ScriptFieldAnswer.ScriptFieldAnswerList)answer;
+        		for (String value : answer_.answerProperty()) {
+        			if (type == FieldType.INPUT) {
+            			LazySaxSourceProvider prov = new LazySaxSourceProvider(value);
+                        builder.withInput(name, prov);
+            		}
+            		else if (type == FieldType.OPTION) {
+            			builder.withOption(new QName(name), value);
+            		}
+        		}
+        	}
+        	
+        	else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
+        		ScriptFieldAnswer.ScriptFieldAnswerBoolean answer_ = 
+        				(ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer;
+        		String value = answer_.answerAsString();
+        		// booleans are only possibly ever options
+        		builder.withOption(new QName(name), value);
+        	}
+        }
 	
 }

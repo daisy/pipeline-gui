@@ -1,50 +1,75 @@
 package org.daisy.pipeline.gui.databridge;
 
-import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-public class ScriptFieldAnswer {
-	// only one of these properties will be used
-	// it's horrible design but actually simpler than the alternatives
-	private SimpleStringProperty stringAnswer;
-	// this is just for binding to a checkbox; it gets translated to a string value in the end
-	private SimpleBooleanProperty booleanAnswer; 
+public interface ScriptFieldAnswer<T> {
 	
-	private ScriptField field;
+	public T answerProperty();
+	public ScriptField getField();
 	
-	public ScriptFieldAnswer(ScriptField field) {
-		stringAnswer = new SimpleStringProperty("");
-		booleanAnswer = new SimpleBooleanProperty();
-		this.field = field;
+	public class ScriptFieldAnswerBase {
+		private ScriptField field;
+		public ScriptFieldAnswerBase(ScriptField field) {
+			this.field = field;
+		}
+		public ScriptField getField() {
+			return field;
+		}
+		
 	}
-	public ScriptField getField() {
-		return field;
+	
+	// these classes would be mixins .. if java supported mixins.. 
+	// the getField method is implemented by the base class; the other(s) are implemented for each class
+	
+	// note that there is no Integer variant; we're just using Strings with different validation rules
+	// (the validation rules come from the field's DataType, not the class type below
+	
+	public class ScriptFieldAnswerString extends ScriptFieldAnswerBase implements ScriptFieldAnswer<SimpleStringProperty> {
+		private SimpleStringProperty answer;
+		
+		public ScriptFieldAnswerString(ScriptField field) {
+			super(field);
+			answer = new SimpleStringProperty("");
+		}
+		
+		public SimpleStringProperty answerProperty() {		
+			return answer;
+		}
 	}
-	// don't provide a getter; use the property below
-//	public String getAnswer() {
-//		return stringAnswer.get();
-//	}
-	public void setAnswer(String answer) {
-		stringAnswer.set(answer);
-	}
-	public SimpleStringProperty answerProperty() {
-		// the pipeline wants bools to be true/false strings
-		if (field.getDataType() == DataType.BOOLEAN) {
-			if (booleanAnswer.get() == true) {
-				setAnswer("true");
+
+	
+	public class ScriptFieldAnswerBoolean extends ScriptFieldAnswerBase implements ScriptFieldAnswer<SimpleBooleanProperty> {
+		private SimpleBooleanProperty answer;
+		
+		public ScriptFieldAnswerBoolean(ScriptField field) {
+			super(field);
+			answer = new SimpleBooleanProperty();
+		}
+		public SimpleBooleanProperty answerProperty() {
+			return answer;
+		}
+		public String answerAsString() {
+			if (answer.get() == true) {
+				return "true";
 			}
 			else {
-				setAnswer("false");
+				return "false";
 			}
 		}
-		return stringAnswer;
 	}
 	
-	public SimpleBooleanProperty booleanAnswerProperty() {
-		return booleanAnswer;
+	public class ScriptFieldAnswerList extends ScriptFieldAnswerBase implements ScriptFieldAnswer<ObservableList<String>> {
+		private ObservableList<String> answer;
+		
+		public ScriptFieldAnswerList(ScriptField field) {
+			super(field);
+			answer = FXCollections.observableArrayList();
+		}
+		public ObservableList<String> answerProperty() {
+			return answer;
+		}
 	}
-
 }
-

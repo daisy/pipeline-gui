@@ -164,38 +164,44 @@ public class NewJobPane extends GridPane {
 			addOptionField(option);
 		}
 		
-//		for (ScriptFieldAnswer output : boundScript.getOutputFields()) {
-//			addOutputField(output);
-//		}
 		addStandardButtons();
 			
 	}
 	
 	
 	private void addInputField(ScriptFieldAnswer answer) {
-		scriptDetailsGrid.addFileDirPicker(answer);
+		if (answer.getField().isSequence()) {
+			scriptDetailsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+		}
+		else {
+			scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+		}
 	}
 
 	private void addOptionField(ScriptFieldAnswer answer) {
 		DataType fieldDataType = answer.getField().getDataType();
-		if (fieldDataType == DataType.FILE) {
-			scriptDetailsGrid.addFileDirPicker(answer);
-		}
-		else if (fieldDataType == DataType.DIRECTORY) {
-			scriptDetailsGrid.addFileDirPicker(answer);
+		if (fieldDataType == DataType.FILE || fieldDataType == DataType.DIRECTORY) {
+			if (answer.getField().isSequence()) {
+				scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+			}
+			else {
+				scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+			}
 		}
 		else if (fieldDataType == DataType.BOOLEAN) {
-			scriptDetailsGrid.addCheckbox(answer);
+			scriptDetailsGrid.addCheckbox((ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer);
 		}
 		else {
-			scriptDetailsGrid.addTextField(answer);
+			if (answer.getField().isSequence()) {
+				scriptDetailsGrid.addTextFieldSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+			}
+			else {
+				scriptDetailsGrid.addTextField((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+			}
+			
 		}
 	}
 	
-//	private void addOutputField(ScriptFieldAnswer answer) {
-//		scriptDetailsGrid.addFileDirPicker(answer);
-//	}
-//	
 	private void addStandardButtons() {
 		Button run = new Button("Run");
 		run.getStyleClass().add("run-button");

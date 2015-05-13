@@ -100,8 +100,15 @@ public class GridPaneHelper extends GridPane {
 		addRow(nameTxt, valueTxt);
 	}
 	
+	public void addFileDirPickerSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
+		// TODO
+	}
+	public void addTextFieldSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
+		// TODO
+	}
+	
 	// add a text field with a button for file browsing
-	public void addFileDirPicker(ScriptFieldAnswer answer) {
+	public void addFileDirPicker(ScriptFieldAnswer.ScriptFieldAnswerString answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
 		final TextField inputFileText = new TextField();
@@ -110,7 +117,7 @@ public class GridPaneHelper extends GridPane {
 		addRow(label, inputFileText, inputFileButton);
 		addHelpText(answer);
 		
-		final ScriptFieldAnswer answer_ = answer;
+		final ScriptFieldAnswer.ScriptFieldAnswerString answer_ = answer;
 		inputFileButton.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				File file;
@@ -140,19 +147,19 @@ public class GridPaneHelper extends GridPane {
 	}
 	
 	// add a checkbox control
-	public void addCheckbox(ScriptFieldAnswer answer) {
+	public void addCheckbox(ScriptFieldAnswer.ScriptFieldAnswerBoolean answer) {
 		CheckBox cb = new CheckBox(answer.getField().getNiceName());
-		if (answer.booleanAnswerProperty().get() == true) {
+		if (answer.answerProperty().get() == true) {
 			cb.selectedProperty().set(true);
 		}
-		cb.selectedProperty().bindBidirectional(answer.booleanAnswerProperty());
+		cb.selectedProperty().bindBidirectional(answer.answerProperty());
 		addRow(cb);
 		addHelpText(answer);
 		
 	}
 	
 	// add a label and a text field
-	public void addTextField(ScriptFieldAnswer answer) {
+	public void addTextField(ScriptFieldAnswer.ScriptFieldAnswerString answer) {
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName() + ":");
 		final TextField textField = new TextField();

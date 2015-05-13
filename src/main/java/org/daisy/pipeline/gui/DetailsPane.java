@@ -75,19 +75,15 @@ public class DetailsPane extends GridPaneHelper {
 		addRow(settingsLabel);
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
+			addScriptFieldAnswer(answer);
 		}
 		
 		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
+			addScriptFieldAnswer(answer);
 		}
 		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
-			addNameValuePair(answer.getField().getNiceName(), answer.answerProperty().get());
+			addScriptFieldAnswer(answer);
 		}
-		
-//		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
-//			addNameValuePair(answer.getField().getNiceName(), answer.getAnswer());
-//		}
 		
 		addRow(resultsGrid);
 		refreshLinks();
@@ -159,6 +155,34 @@ public class DetailsPane extends GridPaneHelper {
 			
 			job.statusProperty().addListener(jobStatusListener);
 		}
-		
+	}
+	
+	private void addScriptFieldAnswer(ScriptFieldAnswer answer) {
+		if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
+			ScriptFieldAnswer.ScriptFieldAnswerBoolean answer_ = (ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer;
+			addNameValuePair(answer.getField().getNiceName(), answer_.answerAsString());
+		}
+		else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
+			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+			addNameValuePair(answer.getField().getNiceName(), answer_.answerProperty().get());
+		}
+		else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
+			ScriptFieldAnswer.ScriptFieldAnswerList answer_ = (ScriptFieldAnswer.ScriptFieldAnswerList)answer;
+			int sz = answer_.answerProperty().size();
+			if (sz > 0) {
+				// add the first one along with the field name
+				addNameValuePair(answer.getField().getNiceName(), answer_.answerProperty().get(0));
+				if (sz > 1) {
+					// add the rest with blanks in the field column
+					for (int i = 1; i<sz; i++) {
+						addNameValuePair("", answer_.answerProperty().get(i));
+					}
+				}
+			}
+			else {
+				// just indicate that there is no value present
+				addNameValuePair(answer.getField().getNiceName(), "");
+			}
+		}
 	}
 }

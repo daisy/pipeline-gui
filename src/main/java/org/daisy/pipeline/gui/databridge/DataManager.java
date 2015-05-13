@@ -7,6 +7,7 @@ import org.daisy.pipeline.job.Job.Status;
 import org.daisy.pipeline.script.XProcScript;
 import org.daisy.pipeline.script.XProcScriptService;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 
 // communicate with the gui-friendly list of ObservableJob objects
@@ -75,51 +76,47 @@ public class DataManager {
 			addScript(xprocScript);
 		}
 		
-		// not supported now: there's no way to get the input/option values for pre-existing jobs
-		// therefore their details view will be incomplete and they won't be clone-able
-		
-		// these jobs are already in the pipeline so we need to create a BoundScript representation
-//		for (Job job : main.getJobManager().getJobs()) {
-//			ObservableJob objob = addJob(job);
-//			for (Script script : main.getScriptData()) {
-//				if (script.getName().equals(job.getContext().getScript().getName())) {
-//					createBoundScriptForExistingJob(script, objob);
-//				}
-//			}
-//		}
-		
-		
 	}
-	
-//	private void createBoundScriptForExistingJob(Script script, ObservableJob objob) {
-//		BoundScript boundScript = new BoundScript(script);
-//		Job job = objob.getJob();
-//		
-//		// TODO fill in the bound script parameters (input URIs etc)
-//		objob.setBoundScript(boundScript);
-//	}
 	
 	public BoundScript cloneBoundScript(BoundScript boundScript) {
 		BoundScript newBoundScript = new BoundScript(boundScript.getScript());
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getInputByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.answerProperty().get());
+			copyAnswer(newAnswer, answer);
 		}
 		for (ScriptFieldAnswer answer : boundScript.getRequiredOptionFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.answerProperty().get());
+			copyAnswer(newAnswer, answer);
 		}
 		for (ScriptFieldAnswer answer : boundScript.getOptionalOptionFields()) {
 			ScriptFieldAnswer newAnswer = newBoundScript.getOptionByName(answer.getField().getName());
-			newAnswer.setAnswer(answer.answerProperty().get());
+			copyAnswer(newAnswer, answer);
 		}
 		
-//		for (ScriptFieldAnswer answer : boundScript.getOutputFields()) {
-//			ScriptFieldAnswer newAnswer = newBoundScript.getOutputByName(answer.getField().getName());
-//			newAnswer.setAnswer(answer.getAnswer());
-//		}
 		return newBoundScript;
+	}
+	
+	// copy from old to new
+	private void copyAnswer(ScriptFieldAnswer newAnswer, ScriptFieldAnswer oldAnswer) {
+		if (newAnswer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
+			ScriptFieldAnswer.ScriptFieldAnswerBoolean oldAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerBoolean)oldAnswer;
+			ScriptFieldAnswer.ScriptFieldAnswerBoolean newAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerBoolean)newAnswer;
+			newAnswer_.answerProperty().set(oldAnswer_.answerProperty().get());
+		}
+		else if (newAnswer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
+			ScriptFieldAnswer.ScriptFieldAnswerString oldAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)oldAnswer;
+			ScriptFieldAnswer.ScriptFieldAnswerString newAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)newAnswer;
+			newAnswer_.answerProperty().set(oldAnswer_.answerProperty().get());
+		}
+		else if (newAnswer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
+			ScriptFieldAnswer.ScriptFieldAnswerList oldAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerList)oldAnswer;
+			ScriptFieldAnswer.ScriptFieldAnswerList newAnswer_ = (ScriptFieldAnswer.ScriptFieldAnswerList)newAnswer;
+			int sz = oldAnswer_.answerProperty().size();
+			for (int i = 0; i<sz; i++) {
+				newAnswer_.answerProperty().add(i, oldAnswer_.answerProperty().get(i));
+			}
+		}
 	}
 	
 }

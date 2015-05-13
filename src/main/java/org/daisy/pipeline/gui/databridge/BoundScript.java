@@ -2,6 +2,7 @@ package org.daisy.pipeline.gui.databridge;
 
 import java.util.ArrayList;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -12,14 +13,12 @@ public class BoundScript {
 	
 	private Script script;
 	private ObservableList<ScriptFieldAnswer> inputAnswers;
-	//private ObservableList<ScriptFieldAnswer> outputAnswers;
 	private ObservableList<ScriptFieldAnswer> requiredOptionAnswers;
 	private ObservableList<ScriptFieldAnswer> optionalOptionAnswers;
 	
 	public BoundScript(Script script) {
 		this.script = script;
 		this.inputAnswers = FXCollections.observableArrayList();
-		//this.outputAnswers = FXCollections.observableArrayList();
 		this.requiredOptionAnswers = FXCollections.observableArrayList();
 		this.optionalOptionAnswers = FXCollections.observableArrayList();
 		createAnswers();
@@ -30,9 +29,6 @@ public class BoundScript {
 	public Iterable<ScriptFieldAnswer> getInputFields() {
 		return inputAnswers;
 	}
-//	public Iterable<ScriptFieldAnswer> getOutputFields() {
-//		return outputAnswers;
-//	}
 	public Iterable<ScriptFieldAnswer> getRequiredOptionFields() {
 		return requiredOptionAnswers;
 	}
@@ -53,9 +49,6 @@ public class BoundScript {
 			return answer;
 		}
 	}
-//	public ScriptFieldAnswer getOutputByName(String name) {
-//		return findByName(outputAnswers, name);
-//	}
 	
 	private ScriptFieldAnswer findByName(Iterable<ScriptFieldAnswer> list, String name) {
 		for (ScriptFieldAnswer answer : list) {
@@ -68,28 +61,36 @@ public class BoundScript {
 	
 	private void createAnswers() {
 		for (ScriptField field : script.getInputFields()) {
-			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
+			ScriptFieldAnswer answer = createAnswer(field);
 			inputAnswers.add(answer);
 		}
-//		for (ScriptField field : script.getOutputFields()) {
-//			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
-//			outputAnswers.add(answer);
-//		}
+
 		for (ScriptField field : script.getRequiredOptionFields()) {
-			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
-			// default to true for boolean fields
-			if (field.getDataType() == DataType.BOOLEAN) {
-				answer.booleanAnswerProperty().set(true);
-			}
+			ScriptFieldAnswer answer = createAnswer(field);
 			requiredOptionAnswers.add(answer);
 		}
 		for (ScriptField field : script.getOptionalOptionFields()) {
-			ScriptFieldAnswer answer = new ScriptFieldAnswer(field);
-			// default to true for boolean fields
-			if (field.getDataType() == DataType.BOOLEAN) {
-				answer.booleanAnswerProperty().set(true);
-			}
+			ScriptFieldAnswer answer = createAnswer(field);
 			optionalOptionAnswers.add(answer);
 		}
+	}
+	
+	private ScriptFieldAnswer createAnswer(ScriptField field) {
+		ScriptFieldAnswer answer;
+		if (field.getDataType() == DataType.BOOLEAN) {
+			answer = new ScriptFieldAnswer.ScriptFieldAnswerBoolean(field);
+			// default to true for bool fields
+			SimpleBooleanProperty b = (SimpleBooleanProperty)answer.answerProperty();
+			b.set(true);
+		}
+		else {
+			if (field.isSequence() == true) {
+				answer = new ScriptFieldAnswer.ScriptFieldAnswerList(field);
+			}
+			else {
+				answer = new ScriptFieldAnswer.ScriptFieldAnswerString(field);
+			}
+		}
+		return answer;
 	}
 }

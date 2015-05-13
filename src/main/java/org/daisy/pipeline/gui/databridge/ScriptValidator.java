@@ -22,9 +22,8 @@ public class ScriptValidator {
 		boolean inputsAreValid = checkFields(boundScript.getInputFields());
 		boolean reqOptionsAreValid = checkFields(boundScript.getRequiredOptionFields());
 		boolean optOptionsAreValid = checkFields(boundScript.getOptionalOptionFields());
-		//boolean outputsAreValid = checkFields(boundScript.getOutputFields());
 		
-		return inputsAreValid && reqOptionsAreValid && optOptionsAreValid;// && outputsAreValid;
+		return inputsAreValid && reqOptionsAreValid && optOptionsAreValid;
 		
 	}
 	public ObservableList<String> getMessages() {
@@ -78,7 +77,12 @@ public class ScriptValidator {
 		}
 		
 		private boolean validateString(ScriptFieldAnswer answer) {
-			String answerString = answer.answerProperty().get();
+			if (! (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) ) {
+				return false;
+			}
+			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+			
+			String answerString = answer_.answerProperty().get();
 			if (answer.getField().isRequired() && answerString.isEmpty()) {
 				message = EMPTYSTRING + answer.getField().getNiceName();
 				return false;
@@ -90,7 +94,10 @@ public class ScriptValidator {
 			if (!validateString(answer)) {
 				return false;
 			}
-			File file = new File(answer.answerProperty().get());
+			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+			String answerString = answer_.answerProperty().get();
+			
+			File file = new File(answerString);
 			// for input files: check that the file exists
 			if (answer.getField().getFieldType() == FieldType.INPUT ||
 				answer.getField().getFieldType() == FieldType.OPTION) {
@@ -119,7 +126,10 @@ public class ScriptValidator {
 			if (!validateString(answer)) {
 				return false;
 			}
-			File file = new File(answer.answerProperty().get());
+			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+			String answerString = answer_.answerProperty().get();
+			
+			File file = new File(answerString);
 			if (!file.isDirectory()) {
 				message = BADPATH + answer.getField().getNiceName();
 				return false;
@@ -127,11 +137,15 @@ public class ScriptValidator {
 			return true;
 			
 		}
-		
+		// we'll treat ints like strings with special rules
 		private boolean validateInteger(ScriptFieldAnswer answer) {
-			String num = answer.answerProperty().get();
+			if (!validateString(answer)) {
+				return false;
+			}
+			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+			String answerString = answer_.answerProperty().get();
 			try {
-				Integer.parseInt(num);
+				Integer.parseInt(answerString);
 			}
 			catch (NumberFormatException e) {
 				message = NOTANUM + answer.getField().getNiceName();

@@ -3,16 +3,20 @@ package org.daisy.pipeline.gui;
 import java.io.File;
 import java.io.IOException;
 
+import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
@@ -101,7 +105,59 @@ public class GridPaneHelper extends GridPane {
 	}
 	
 	public void addFileDirPickerSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
-		// TODO
+		final ListView<String> listbox = new ListView<String>();
+		listbox.setItems(answer.answerProperty());
+		Text label = new Text();
+		label.setText(answer.getField().getNiceName());
+		Text description = new Text();
+		description.setText(answer.getField().getDescription());
+		addRow(label, listbox);
+		Button addFileButton = new Button("Add");
+		final Button removeFileButton = new Button("Remove");
+		addRow(description, addFileButton, removeFileButton);
+		
+		final ScriptFieldAnswer.ScriptFieldAnswerList answer_ = answer;
+		addFileButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				File file;
+				if (answer_.getField().getDataType() == DataType.FILE) {
+	                FileChooser fileChooser = new FileChooser();
+	                fileChooser.setTitle("Select File");
+	                file = fileChooser.showOpenDialog(null);
+				}
+				// assume directory
+				else {
+					DirectoryChooser dirChooser = new DirectoryChooser();
+	                dirChooser.setTitle("Select Directory");
+	                file = dirChooser.showDialog(null);
+				}
+				if(file != null) {
+                	answer_.answerProperty().add(file.getPath());
+                }
+			}
+		});
+		
+		removeFileButton.setDisable(true);
+		removeFileButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (listbox.getSelectionModel().isEmpty() == false) {
+					int selection = listbox.getSelectionModel().getSelectedIndex();
+					listbox.getItems().remove(selection);
+				}
+				
+			}
+		});
+		listbox.getSelectionModel().selectedItemProperty().addListener(
+	            new ChangeListener<String>() {
+	                public void changed(ObservableValue<? extends String> ov, 
+	                    String old_val, String new_val) {
+	                	removeFileButton.setDisable(listbox.getSelectionModel().isEmpty());
+	            }
+	        });
+		
+		
+		
+		
 	}
 	public void addTextFieldSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
 		// TODO

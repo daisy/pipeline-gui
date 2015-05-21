@@ -182,7 +182,7 @@ public class NewJobPane extends GridPane {
 		DataType fieldDataType = answer.getField().getDataType();
 		if (fieldDataType == DataType.FILE || fieldDataType == DataType.DIRECTORY) {
 			if (answer.getField().isSequence()) {
-				scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+				scriptDetailsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
 			}
 			else {
 				scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);

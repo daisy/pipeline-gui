@@ -18,6 +18,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -82,6 +83,7 @@ public class GridPaneHelper extends GridPane {
 	public void addFinderLinkRow(String label, final String path) {
 		Hyperlink link = new Hyperlink();
 	    link.setText(label);
+	    link.setTooltip(new Tooltip(path));
     	link.setOnAction(new EventHandler<ActionEvent>() {
 
             public void handle(ActionEvent t) {

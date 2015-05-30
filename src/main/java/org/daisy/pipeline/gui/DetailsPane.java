@@ -2,6 +2,9 @@ package org.daisy.pipeline.gui;
 
 
 
+import java.io.File;
+import java.net.URI;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -104,7 +107,8 @@ public class DetailsPane extends GridPaneHelper {
 	    	
 	    	Iterable<JobResult> results = job.getJob().getContext().getResults().getResults();
 	    	for (JobResult result : results) {
-	    		resultsGrid.addFinderLinkRow(result.getPath().toString(), result.getPath().toString());
+	    		File f = new File(result.getPath());
+	    		resultsGrid.addFinderLinkRow(f.getName(), result.getPath().toString());
 	    	}   	
 	    }
 		

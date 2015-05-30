@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -44,6 +45,7 @@ public class MainWindow extends BorderPane {
 	private NewJobPane newJobPane;
 	private Scene scene;
 	private VBox blankPane;
+	private ScrollPane scrollPane;
 	
 	public SimpleObjectProperty<ObservableJob> currentJobProperty;
 	private ChangeListener<ObservableJob> currentJobChangeListener;
@@ -115,6 +117,8 @@ public class MainWindow extends BorderPane {
 		menubar = new AppMenu(this);
 		this.getChildren().addAll(menubar);
 		
+		scrollPane = new ScrollPane();
+		
 		detailsPane = new DetailsPane(this);
 		
 		newJobPane = new NewJobPane(this);
@@ -125,7 +129,9 @@ public class MainWindow extends BorderPane {
 		blankPane = new VBox();
 		blankPane.getChildren().add(new Text("No job selected"));
 		blankPane.getStyleClass().add("blank");
-		this.setCenter(blankPane);
+		this.setCenter(scrollPane);
+		
+		scrollPane.setContent(blankPane);
 		
     }
     
@@ -137,13 +143,17 @@ public class MainWindow extends BorderPane {
 					ObservableValue<? extends ObservableJob> observable,
 					ObservableJob oldValue, ObservableJob newValue) {
 				if (newValue == null) {
-					thiz.setCenter(blankPane);
+					//thiz.setCenter(blankPane);
+					thiz.scrollPane.setContent(blankPane);
 					return;
 					
 				}
 				else {
-					if (thiz.getCenter() != detailsPane) {
-						thiz.setCenter(detailsPane);
+//					if (thiz.getCenter() != detailsPane) {
+//						thiz.setCenter(detailsPane);
+//					}
+					if (thiz.scrollPane.getContent() != detailsPane) {
+						thiz.scrollPane.setContent(detailsPane);
 					}
 				}
 				
@@ -164,7 +174,8 @@ public class MainWindow extends BorderPane {
     /* GUI EVENTS */
     public void newJob() {
 		currentJobProperty.set(null);
-		this.setCenter(newJobPane);
+		//this.setCenter(newJobPane);
+		scrollPane.setContent(newJobPane);
 	}
 	
     public void deleteSelectedJob() {
@@ -190,8 +201,11 @@ public class MainWindow extends BorderPane {
 		BoundScript boundScript = dataManager.cloneBoundScript(job.getBoundScript());
 		newJobPane.newFromBoundScript(boundScript);
 		currentJobProperty.set(null);
-		if (this.getCenter() != newJobPane) {
-			this.setCenter(newJobPane);
+//		if (this.getCenter() != newJobPane) {
+//			this.setCenter(newJobPane);
+//		}
+		if (this.scrollPane.getContent() != newJobPane) {
+			this.scrollPane.setContent(newJobPane);
 		}
 		
 	}

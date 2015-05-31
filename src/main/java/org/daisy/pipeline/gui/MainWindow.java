@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -207,6 +209,21 @@ public class MainWindow extends BorderPane {
 		if (this.scrollPane.getContent() != newJobPane) {
 			this.scrollPane.setContent(newJobPane);
 		}
+		
+	}
+	
+	// copy the messages to the clipboard
+	public void copyMessages() {
+		Iterable<String> messages = messagesPane.getMessages();
+		final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        String clipboardString = "";
+		
+		for (String message : messages) {
+			clipboardString += message + "\n";
+		}
+		content.putString(clipboardString);
+		clipboard.setContent(content);
 		
 	}
 }

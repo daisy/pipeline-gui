@@ -82,6 +82,14 @@ public class AppMenu extends MenuBar {
         menuFile.getItems().add(runJobAgain);
         runJobAgain.setDisable(true);
         
+        MenuItem copyMessages = new MenuItem("Copy messages to clipboard");
+        copyMessages.setOnAction(new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent t) {
+        		main.copyMessages();
+        	}
+        });
+        menuFile.getItems().add(copyMessages);
+        
 	}
 	
 	// listen for when the currently selected job changes

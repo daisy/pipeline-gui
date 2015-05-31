@@ -32,7 +32,9 @@ public class MessagesPane extends VBox {
 	public void clearMessages() {
 		messages.setItems(null);
 	}
-	
+	public Iterable<String> getMessages() {
+		return messages.getItems();
+	}
 	private void initControls() {
 		this.getStyleClass().add("messages");
 		

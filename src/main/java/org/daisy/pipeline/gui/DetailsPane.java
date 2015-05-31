@@ -3,12 +3,14 @@ package org.daisy.pipeline.gui;
 
 
 import java.io.File;
-import java.net.URI;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.layout.ColumnConstraints;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.daisy.pipeline.gui.databridge.BoundScript;
@@ -17,66 +19,70 @@ import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.job.Job.Status;
 import org.daisy.pipeline.job.JobResult;
 
-public class DetailsPane extends GridPaneHelper {
+public class DetailsPane extends VBox {
 
 	private MainWindow main;
+	private GridPaneHelper jobInfoGrid;
 	private GridPaneHelper resultsGrid; 
 	ChangeListener<String> jobStatusListener;
 	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
 	public DetailsPane(MainWindow main) {
-		super(main);
+		//super(main);
+		super();
 		this.main = main;
+		
 		resultsGrid = new GridPaneHelper(main);
+		jobInfoGrid = new GridPaneHelper(main);
 		addCurrentJobChangeListener();
 	}
 	
 	private void displayJobInfo() {
+		
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		this.getStyleClass().add("details");
-		
-		// why doesn't this work ? 
-		// for example, the zedai to html script has a long description
-		// which pushes the other controls over to the right
-		// it should be spanning 2 columns, defined below (desc control)
-		// but i'm not seeing the effect
-
-		ColumnConstraints col1Constraints = new ColumnConstraints();
-		col1Constraints.setPercentWidth(40);
-		ColumnConstraints col2Constraints = new ColumnConstraints();
-		col2Constraints.setPercentWidth(40);
-		ColumnConstraints col3Constraints = new ColumnConstraints();
-		col3Constraints.setPercentWidth(20);
-		this.getColumnConstraints().addAll(col1Constraints, col2Constraints, col3Constraints);
+		//resultsGrid.getStyleClass().add("details");
+		jobInfoGrid.getStyleClass().add("details");
 		
 		Text title = new Text("Job details");
 		title.getStyleClass().add("title");
-		addRow(title);
+		this.getChildren().add(title);
 		
 		final BoundScript boundScript = job.getBoundScript();
 
 		Text script = new Text(boundScript.getScript().getName());
 		script.getStyleClass().add("subtitle");
-		addRow(script);
+		this.getChildren().add(script);
 		Text desc = new Text(boundScript.getScript().getDescription());
-		addRow(desc, 2);
+		this.getChildren().add(desc);
 		
-		addWebpageLinkRow("Read online documentation", boundScript.getScript().getXProcScript().getHomepage());
+		Hyperlink link = new Hyperlink();
+	    link.setText("Read online documentation");
+	    final String documentationPage = boundScript.getScript().getXProcScript().getHomepage();
+    	link.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+            	main.getHostServices().showDocument(documentationPage);
+            }
+        });
+    	this.getChildren().add(link);
+    	this.getChildren().add(jobInfoGrid);
 		
 		Text statusLabel = new Text("Status:");
 		statusLabel.getStyleClass().add("subtitle");
 		Text statusValue = new Text();
 		statusValue.getStyleClass().add("subtitle");
 		
+		
+		
 		// binding this causes a thread error
 		statusValue.textProperty().bind(job.statusProperty());
-		addRow(statusLabel, statusValue);
+		jobInfoGrid.addRow(statusLabel, statusValue);
 		
-		addNameValuePair("ID", job.getJob().getId().toString());
+		jobInfoGrid.addNameValuePair("ID", job.getJob().getId().toString());
 		
 		Text settingsLabel = new Text("Settings:");
 		settingsLabel.getStyleClass().add("subtitle");
-		addRow(settingsLabel);
+		jobInfoGrid.addRow(settingsLabel);
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {
 			addScriptFieldAnswer(answer);
@@ -89,7 +95,8 @@ public class DetailsPane extends GridPaneHelper {
 			addScriptFieldAnswer(answer);
 		}
 		
-		addRow(resultsGrid);
+		//addRow(resultsGrid);
+		this.getChildren().add(resultsGrid);
 		refreshLinks();
 		
 	}
@@ -165,29 +172,48 @@ public class DetailsPane extends GridPaneHelper {
 	private void addScriptFieldAnswer(ScriptFieldAnswer answer) {
 		if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
 			ScriptFieldAnswer.ScriptFieldAnswerBoolean answer_ = (ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer;
-			addNameValuePair(answer.getField().getNiceName(), answer_.answerAsString());
+			jobInfoGrid.addNameValuePair(answer.getField().getNiceName(), answer_.answerAsString());
 		}
 		else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
 			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
-			addNameValuePair(answer.getField().getNiceName(), answer_.answerProperty().get());
+			String value = answer_.answerProperty().get();
+			if (value.isEmpty()) {
+				value = "Not specified";
+			}
+			jobInfoGrid.addNameValuePair(answer.getField().getNiceName(), value);
 		}
 		else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
 			ScriptFieldAnswer.ScriptFieldAnswerList answer_ = (ScriptFieldAnswer.ScriptFieldAnswerList)answer;
 			int sz = answer_.answerProperty().size();
 			if (sz > 0) {
 				// add the first one along with the field name
-				addNameValuePair(answer.getField().getNiceName(), answer_.answerProperty().get(0));
+				String value = answer_.answerProperty().get(0);
+				if (value.isEmpty()) {
+					value = "Not specified";
+				}
+				jobInfoGrid.addNameValuePair(answer.getField().getNiceName(), value);
 				if (sz > 1) {
 					// add the rest with blanks in the field column
 					for (int i = 1; i<sz; i++) {
-						addNameValuePair("", answer_.answerProperty().get(i));
+						jobInfoGrid.addNameValuePair("", answer_.answerProperty().get(i));
 					}
 				}
 			}
 			else {
 				// just indicate that there is no value present
-				addNameValuePair(answer.getField().getNiceName(), "");
+				jobInfoGrid.addNameValuePair(answer.getField().getNiceName(), "");
 			}
 		}
+	}
+	
+	private void clearControls() {
+		jobInfoGrid.clearControls();
+		resultsGrid.clearControls();
+		
+		int sz = getChildren().size();
+		if (sz > 0) {
+			getChildren().remove(0, sz); // removes all controls from 0 to sz
+		}
+		
 	}
 }

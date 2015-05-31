@@ -25,8 +25,9 @@ public class DetailsPane extends GridPaneHelper {
 	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
 	public DetailsPane(MainWindow main) {
+		super(main);
 		this.main = main;
-		resultsGrid = new GridPaneHelper();
+		resultsGrid = new GridPaneHelper(main);
 		addCurrentJobChangeListener();
 	}
 	

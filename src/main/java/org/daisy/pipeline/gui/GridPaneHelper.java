@@ -31,9 +31,11 @@ import javafx.stage.FileChooser;
 public class GridPaneHelper extends GridPane {
 
 	private int rowcount = 0;
+	private MainWindow main;
 	
-	public GridPaneHelper() {
+	public GridPaneHelper(MainWindow main) {
 		super();
+		this.main = main;
 	}
 	
 	public void addRow(Node... nodes) {
@@ -67,12 +69,14 @@ public class GridPaneHelper extends GridPane {
     	link.setOnAction(new EventHandler<ActionEvent>() {
 
             public void handle(ActionEvent t) {
-            	try {
-					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//            	try {
+//					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+            	
+            	main.getHostServices().showDocument(path);
             }
         });
     	

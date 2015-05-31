@@ -118,7 +118,7 @@ public class NewJobPane extends GridPane {
 			}
 		});
 		
-		scriptDetailsGrid = new GridPaneHelper();
+		scriptDetailsGrid = new GridPaneHelper(main);
 		this.add(scriptDetailsGrid, 0, 1);
 		
 	}

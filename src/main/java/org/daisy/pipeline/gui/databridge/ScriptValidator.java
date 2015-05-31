@@ -23,7 +23,7 @@ public class ScriptValidator {
 		boolean reqOptionsAreValid = checkFields(boundScript.getRequiredOptionFields());
 		boolean optOptionsAreValid = checkFields(boundScript.getOptionalOptionFields());
 		
-		return inputsAreValid && reqOptionsAreValid && optOptionsAreValid;
+		return inputsAreValid && reqOptionsAreValid;// && optOptionsAreValid;
 		
 	}
 	public ObservableList<String> getMessages() {
@@ -42,7 +42,7 @@ public class ScriptValidator {
 	}
 	public class ScriptFieldValidator {
 		
-		private String EMPTYSTRING = "ERROR: Required value is empty for ";
+		private String EMPTYSTRING = "ERROR: Value is empty for ";
 		private String BADPATH = "ERROR: Path invalid for ";
 		private String NOTANUM = "ERROR: Numeric value required for ";
 		
@@ -94,8 +94,14 @@ public class ScriptValidator {
 			if (!validateString(answer)) {
 				return false;
 			}
+			
 			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
 			String answerString = answer_.answerProperty().get();
+			
+			// optional fields can have empty values; but if it's not empty, proceed to make sure it's valid
+			if (answer.getField().isRequired() == false && answerString.isEmpty()) {
+				return true;
+			}
 			
 			File file = new File(answerString);
 			// for input files: check that the file exists
@@ -129,6 +135,11 @@ public class ScriptValidator {
 			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
 			String answerString = answer_.answerProperty().get();
 			
+			// optional fields can have empty values; but if it's not empty, proceed to make sure it's valid
+			if (answer.getField().isRequired() == false && answerString.isEmpty()) {
+				return true;
+			}
+			
 			File file = new File(answerString);
 			if (!file.isDirectory()) {
 				message = BADPATH + answer.getField().getNiceName();
@@ -144,6 +155,12 @@ public class ScriptValidator {
 			}
 			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
 			String answerString = answer_.answerProperty().get();
+			
+			// optional fields can have empty values; but if it's not empty, proceed to make sure it's valid
+			if (answer.getField().isRequired() == false && answerString.isEmpty()) {
+				return true;
+			}
+			
 			try {
 				Integer.parseInt(answerString);
 			}

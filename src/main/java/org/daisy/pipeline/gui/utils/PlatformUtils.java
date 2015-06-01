@@ -19,7 +19,7 @@ public class PlatformUtils {
 			return "explorer";
 		}
 		if (isUnix()) {
-			return "nautilus"; // TODO is this right?
+			return "xdg-open"; 
 		}
 		return "";
 	}

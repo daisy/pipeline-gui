@@ -11,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -31,7 +32,7 @@ import com.google.common.collect.Iterators;
 public class NewJobPane extends VBox {
 	
 	private ScriptInfoHeaderVBox scriptInfoBox;
-	private GridPaneHelper scriptDetailsGrid;
+	private GridPaneHelper scriptFormControlsGrid;
 	private MainWindow main;
 	private ObservableList<Script> scripts;
 	private BoundScript boundScript;
@@ -55,7 +56,7 @@ public class NewJobPane extends VBox {
 	public void clearScriptDetails() {
 		scriptsCombo.getSelectionModel().clearSelection();
 		scriptInfoBox.clearControls();
-		scriptDetailsGrid.clearControls();
+		scriptFormControlsGrid.clearControls();
 		main.clearValidationMessages();
 	}
 	public void newFromBoundScript(BoundScript boundScript) {
@@ -65,12 +66,14 @@ public class NewJobPane extends VBox {
 	
 	private void initControls() {
 		this.getStyleClass().add("new-job");
-	    GridPane topGrid = new GridPane();
-	    //this.add(topGrid, 0, 0);
+	    HBox topGrid = new HBox();
 	    this.getChildren().add(topGrid);
 	    
+	    topGrid.setSpacing(20.0);
+	    
 		Text title = new Text("Choose a script:");
-		topGrid.add(title,  0,  0);
+		topGrid.getChildren().add(title);
+		
 		
 		scriptsCombo.setItems(scripts);
 		scriptsCombo.setCellFactory(new Callback<ListView<Script>,ListCell<Script>>(){
@@ -112,7 +115,7 @@ public class NewJobPane extends VBox {
           
       });
 		
-		topGrid.add(scriptsCombo, 1, 0);
+		topGrid.getChildren().add(scriptsCombo);
 		
 		scriptsCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Script>() {
 
@@ -125,9 +128,9 @@ public class NewJobPane extends VBox {
 		
 		scriptInfoBox = new ScriptInfoHeaderVBox(main);
 		this.getChildren().add(scriptInfoBox);
-		scriptDetailsGrid = new GridPaneHelper(main);
-		//this.add(scriptDetailsGrid, 0, 1);
-		this.getChildren().add(scriptDetailsGrid);
+		scriptFormControlsGrid = new GridPaneHelper(main);
+		scriptFormControlsGrid.setColumnWidths(50, 40, 20);
+		this.getChildren().add(scriptFormControlsGrid);
 		
 	}
 	
@@ -137,7 +140,7 @@ public class NewJobPane extends VBox {
 		}
 		main.clearValidationMessages();
 		scriptInfoBox.clearControls();
-		scriptDetailsGrid.clearControls();
+		scriptFormControlsGrid.clearControls();
 		boundScript = new BoundScript(script);
 		populateScriptDetailsGrid();
 	}
@@ -156,7 +159,7 @@ public class NewJobPane extends VBox {
 		if (Iterators.size(boundScript.getOptionalOptionFields().iterator()) > 0) {
 			Text options = new Text("Options:");
 			options.getStyleClass().add("subtitle");
-			scriptDetailsGrid.addRow(options);
+			scriptFormControlsGrid.addRow(options);
 		}
 		for (ScriptFieldAnswer option : boundScript.getOptionalOptionFields()) {
 			addOptionField(option);
@@ -169,10 +172,10 @@ public class NewJobPane extends VBox {
 	
 	private void addInputField(ScriptFieldAnswer answer) {
 		if (answer.getField().isSequence()) {
-			scriptDetailsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+			scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
 		}
 		else {
-			scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+			scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
 		}
 	}
 
@@ -180,21 +183,21 @@ public class NewJobPane extends VBox {
 		DataType fieldDataType = answer.getField().getDataType();
 		if (fieldDataType == DataType.FILE || fieldDataType == DataType.DIRECTORY) {
 			if (answer.getField().isSequence()) {
-				scriptDetailsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+				scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
 			}
 			else {
-				scriptDetailsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+				scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
 			}
 		}
 		else if (fieldDataType == DataType.BOOLEAN) {
-			scriptDetailsGrid.addCheckbox((ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer);
+			scriptFormControlsGrid.addCheckbox((ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer);
 		}
 		else {
 			if (answer.getField().isSequence()) {
-				scriptDetailsGrid.addTextFieldSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+				scriptFormControlsGrid.addTextFieldSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
 			}
 			else {
-				scriptDetailsGrid.addTextField((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+				scriptFormControlsGrid.addTextField((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
 			}
 			
 		}
@@ -203,7 +206,7 @@ public class NewJobPane extends VBox {
 	private void addStandardButtons() {
 		Button run = new Button("Run");
 		run.getStyleClass().add("run-button");
-		scriptDetailsGrid.addRow(run);
+		scriptFormControlsGrid.addRow(run);
 		
 		run.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {

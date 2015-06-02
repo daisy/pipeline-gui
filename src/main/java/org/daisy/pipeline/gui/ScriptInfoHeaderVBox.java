@@ -14,6 +14,7 @@ public class ScriptInfoHeaderVBox extends VBox {
 	public ScriptInfoHeaderVBox(MainWindow main) {
 		super();
 		this.main = main;
+		this.getStyleClass().add("script-info");
 		
 	}
 	

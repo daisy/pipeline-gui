@@ -120,6 +120,7 @@ public class MainWindow extends BorderPane {
 		this.getChildren().addAll(menubar);
 		
 		scrollPane = new ScrollPane();
+		scrollPane.getStyleClass().add("center-scroll");
 		
 		detailsPane = new DetailsPane(this);
 		

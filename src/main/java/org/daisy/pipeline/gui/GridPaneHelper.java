@@ -12,14 +12,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -36,21 +41,33 @@ public class GridPaneHelper extends GridPane {
 	public GridPaneHelper(MainWindow main) {
 		super();
 		this.main = main;
+		this.getStyleClass().add("grid");
 	}
 	
-	public void setColumnWidths(int... widths) {
-		
-		
+	// widths is a series of percent width values
+	public void setColumnWidths(int... widths) {		
+		for (int width : widths) {
+			ColumnConstraints constraints = new ColumnConstraints();
+			constraints.setPercentWidth(width);
+			this.getColumnConstraints().add(constraints);
+		}
 	}
+	// pass in null values for row spacing
 	public void addRow(Node... nodes) {
 		int colcount = 0;
 		for (Node n : nodes) {
-			n.getStyleClass().add("row");
-			add(n, colcount, rowcount);
-			colcount++;
+			if (n == null) {
+				colcount++;
+			}
+			else {
+				n.getStyleClass().add("row");
+				add(n, colcount, rowcount);
+				colcount++;
+			}
 		}
 		rowcount++;
 	}
+	
 	public void addRow(Node node, int colspan) {
 		node.getStyleClass().add("row");
 		add(node, 0, rowcount, colspan, 1);
@@ -64,20 +81,6 @@ public class GridPaneHelper extends GridPane {
 			getChildren().remove(0, sz); // removes all controls from 0 to sz
 		}
 		rowcount = 0;
-	}
-	
-	// add a link that launches a webpage
-	public void addWebpageLinkRow(String label, final String path) {
-		Hyperlink link = new Hyperlink();
-	    link.setText(label);
-    	link.setOnAction(new EventHandler<ActionEvent>() {
-
-            public void handle(ActionEvent t) {
-            	main.getHostServices().showDocument(path);
-            }
-        });
-    	
-    	addRow(link);
 	}
 	
 	// add a link that launches the file or opens the file browser (depending on how the OS interprets the command)
@@ -110,14 +113,23 @@ public class GridPaneHelper extends GridPane {
 	public void addFileDirPickerSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
 		final ListView<String> listbox = new ListView<String>();
 		listbox.setItems(answer.answerProperty());
+		listbox.getStyleClass().add("files");
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName());
-		Text description = new Text();
-		description.setText(answer.getField().getDescription());
-		addRow(label, listbox);
+		Text help = makeHelpText(answer);
+		VBox vbox = new VBox();
+		vbox.getChildren().addAll(label, help);
+		addRow(vbox, listbox);
+		wrapCorrectly(vbox);
+		vbox.getStyleClass().add("label-helper-vbox");
+		
+		
 		Button addFileButton = new Button("Add");
 		final Button removeFileButton = new Button("Remove");
-		addRow(description, addFileButton, removeFileButton);
+		HBox hbox = new HBox();
+		hbox.getChildren().addAll(addFileButton, removeFileButton);
+		hbox.setSpacing(30.0);
+		addRow(null, hbox);
 		
 		final ScriptFieldAnswer.ScriptFieldAnswerList answer_ = answer;
 		addFileButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -173,8 +185,12 @@ public class GridPaneHelper extends GridPane {
 		final TextField inputFileText = new TextField();
 		inputFileText.textProperty().bindBidirectional(answer.answerProperty());
 		Button inputFileButton = new Button("Browse");
-		addRow(label, inputFileText, inputFileButton);
-		addHelpText(answer);
+		VBox vbox = new VBox();
+		Text help = makeHelpText(answer);
+		vbox.getChildren().addAll(label, help);
+		addRow(vbox, inputFileText, inputFileButton);
+		wrapCorrectly(vbox);
+		vbox.getStyleClass().add("label-helper-vbox");
 		
 		final ScriptFieldAnswer.ScriptFieldAnswerString answer_ = answer;
 		inputFileButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -198,11 +214,36 @@ public class GridPaneHelper extends GridPane {
 		});
 	}
 	
-	// add descriptive text below a field
-	public void addHelpText(ScriptFieldAnswer answer) {
+	// add the descriptive text to its own row (sometimes it's added in other ways, which is why
+	// these help text functions are broken into 3)
+	private void addHelpText(ScriptFieldAnswer answer) {
+		Text text = makeHelpText(answer);
+		addRow(text);
+		
+		
+	}
+	// create the descriptive text
+	private Text makeHelpText(ScriptFieldAnswer answer) {
+		String helpText = answer.getField().getDescription();
+		helpText = helpText.trim();
+		helpText.replace('\n', ' ');
+		helpText.replace('\t', ' ');
+		
 		Text help = new Text(answer.getField().getDescription());
 		help.getStyleClass().add("help");
-		addRow(help);
+		
+		return help;
+	}
+	private void wrapCorrectly(VBox vbox) {
+		int col = getColumnIndex(vbox);
+		if (col < 0) return;
+		vbox.prefWidthProperty().bind(this.getColumnConstraints().get(col).prefWidthProperty());
+		
+		for (Node node : vbox.getChildren()) {
+			if (node instanceof Text) {
+				((Text)node).wrappingWidthProperty().bind(vbox.prefWidthProperty());
+			}
+		}
 	}
 	
 	// add a checkbox control
@@ -225,5 +266,6 @@ public class GridPaneHelper extends GridPane {
 		textField.textProperty().bindBidirectional(answer.answerProperty());
 		addRow(label, textField);
 		addHelpText(answer);
+		
 	}
 }

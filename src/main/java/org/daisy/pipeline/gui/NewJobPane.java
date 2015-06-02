@@ -11,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -27,8 +28,9 @@ import org.daisy.pipeline.job.Job;
 import com.google.common.collect.Iterators;
 
 
-public class NewJobPane extends GridPane {
+public class NewJobPane extends VBox {
 	
+	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper scriptDetailsGrid;
 	private MainWindow main;
 	private ObservableList<Script> scripts;
@@ -38,6 +40,7 @@ public class NewJobPane extends GridPane {
 	private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
 	
 	public NewJobPane(MainWindow main) {
+		super();
 		this.main = main;
 		scripts = main.getScriptData();
 		initControls();
@@ -51,6 +54,7 @@ public class NewJobPane extends GridPane {
 	// reset the combo selection and clear the script details grid
 	public void clearScriptDetails() {
 		scriptsCombo.getSelectionModel().clearSelection();
+		scriptInfoBox.clearControls();
 		scriptDetailsGrid.clearControls();
 		main.clearValidationMessages();
 	}
@@ -62,7 +66,8 @@ public class NewJobPane extends GridPane {
 	private void initControls() {
 		this.getStyleClass().add("new-job");
 	    GridPane topGrid = new GridPane();
-	    this.add(topGrid, 0, 0);
+	    //this.add(topGrid, 0, 0);
+	    this.getChildren().add(topGrid);
 	    
 		Text title = new Text("Choose a script:");
 		topGrid.add(title,  0,  0);
@@ -118,8 +123,11 @@ public class NewJobPane extends GridPane {
 			}
 		});
 		
+		scriptInfoBox = new ScriptInfoHeaderVBox(main);
+		this.getChildren().add(scriptInfoBox);
 		scriptDetailsGrid = new GridPaneHelper(main);
-		this.add(scriptDetailsGrid, 0, 1);
+		//this.add(scriptDetailsGrid, 0, 1);
+		this.getChildren().add(scriptDetailsGrid);
 		
 	}
 	
@@ -128,6 +136,7 @@ public class NewJobPane extends GridPane {
 			return;
 		}
 		main.clearValidationMessages();
+		scriptInfoBox.clearControls();
 		scriptDetailsGrid.clearControls();
 		boundScript = new BoundScript(script);
 		populateScriptDetailsGrid();
@@ -135,18 +144,7 @@ public class NewJobPane extends GridPane {
 	
 	private void populateScriptDetailsGrid() {
 		
-		Text title = new Text();
-		title.setText(boundScript.getScript().getName());
-		title.getStyleClass().add("subtitle");
-		scriptDetailsGrid.addRow(title);
-		
-		Text label = new Text();
-		label.setText(boundScript.getScript().getDescription());
-		scriptDetailsGrid.addRow(label);
-		
-		scriptDetailsGrid.addWebpageLinkRow("Read online documentation", 
-				boundScript.getScript().getXProcScript().getHomepage());
-		
+		scriptInfoBox.populate(boundScript.getScript());
 		
 		for (ScriptFieldAnswer input : boundScript.getInputFields()) {
 			addInputField(input);

@@ -22,6 +22,7 @@ import org.daisy.pipeline.job.JobResult;
 public class DetailsPane extends VBox {
 
 	private MainWindow main;
+	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper jobInfoGrid;
 	private GridPaneHelper resultsGrid; 
 	ChangeListener<String> jobStatusListener;
@@ -31,7 +32,7 @@ public class DetailsPane extends VBox {
 		//super(main);
 		super();
 		this.main = main;
-		
+		scriptInfoBox = new ScriptInfoHeaderVBox(main);
 		resultsGrid = new GridPaneHelper(main);
 		jobInfoGrid = new GridPaneHelper(main);
 		addCurrentJobChangeListener();
@@ -41,7 +42,6 @@ public class DetailsPane extends VBox {
 		
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		this.getStyleClass().add("details");
-		//resultsGrid.getStyleClass().add("details");
 		jobInfoGrid.getStyleClass().add("details");
 		
 		Text title = new Text("Job details");
@@ -50,29 +50,15 @@ public class DetailsPane extends VBox {
 		
 		final BoundScript boundScript = job.getBoundScript();
 
-		Text script = new Text(boundScript.getScript().getName());
-		script.getStyleClass().add("subtitle");
-		this.getChildren().add(script);
-		Text desc = new Text(boundScript.getScript().getDescription());
-		this.getChildren().add(desc);
+		scriptInfoBox.populate(boundScript.getScript());
+		this.getChildren().add(scriptInfoBox);
 		
-		Hyperlink link = new Hyperlink();
-	    link.setText("Read online documentation");
-	    final String documentationPage = boundScript.getScript().getXProcScript().getHomepage();
-    	link.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent t) {
-            	main.getHostServices().showDocument(documentationPage);
-            }
-        });
-    	this.getChildren().add(link);
     	this.getChildren().add(jobInfoGrid);
 		
 		Text statusLabel = new Text("Status:");
 		statusLabel.getStyleClass().add("subtitle");
 		Text statusValue = new Text();
 		statusValue.getStyleClass().add("subtitle");
-		
-		
 		
 		// binding this causes a thread error
 		statusValue.textProperty().bind(job.statusProperty());
@@ -95,7 +81,6 @@ public class DetailsPane extends VBox {
 			addScriptFieldAnswer(answer);
 		}
 		
-		//addRow(resultsGrid);
 		this.getChildren().add(resultsGrid);
 		refreshLinks();
 		
@@ -207,6 +192,7 @@ public class DetailsPane extends VBox {
 	}
 	
 	private void clearControls() {
+		scriptInfoBox.clearControls();
 		jobInfoGrid.clearControls();
 		resultsGrid.clearControls();
 		

@@ -38,6 +38,10 @@ public class GridPaneHelper extends GridPane {
 		this.main = main;
 	}
 	
+	public void setColumnWidths(int... widths) {
+		
+		
+	}
 	public void addRow(Node... nodes) {
 		int colcount = 0;
 		for (Node n : nodes) {
@@ -69,13 +73,6 @@ public class GridPaneHelper extends GridPane {
     	link.setOnAction(new EventHandler<ActionEvent>() {
 
             public void handle(ActionEvent t) {
-//            	try {
-//					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-            	
             	main.getHostServices().showDocument(path);
             }
         });
@@ -83,7 +80,7 @@ public class GridPaneHelper extends GridPane {
     	addRow(link);
 	}
 	
-	// add a link that launches the finder
+	// add a link that launches the file or opens the file browser (depending on how the OS interprets the command)
 	public void addFinderLinkRow(String label, final String path) {
 		Hyperlink link = new Hyperlink();
 	    link.setText(label);

@@ -92,7 +92,9 @@ public class GridPaneHelper extends GridPane {
 
             public void handle(ActionEvent t) {
             	try {
-					Runtime.getRuntime().exec(PlatformUtils.getFileBrowserCommand() + " " + path);
+            		String cmd = PlatformUtils.getFileBrowserCommand() + " " + path;
+    				System.out.println("$$$$$$$$$$$$ GUI link clicked: " + cmd);
+					Runtime.getRuntime().exec(cmd);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

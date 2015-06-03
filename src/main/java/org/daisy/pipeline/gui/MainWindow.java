@@ -22,6 +22,7 @@ import org.daisy.pipeline.gui.databridge.DataManager;
 import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
+import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.JobManager;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
@@ -117,7 +118,12 @@ public class MainWindow extends BorderPane {
 		this.setLeft(sidebar);
 		
 		menubar = new AppMenu(this);
-		this.getChildren().addAll(menubar);
+		if (PlatformUtils.isMac()) {
+			this.getChildren().addAll(menubar);
+		}
+		else {
+			this.setTop(menubar);
+		}
 		
 		scrollPane = new ScrollPane();
 		scrollPane.getStyleClass().add("center-scroll");

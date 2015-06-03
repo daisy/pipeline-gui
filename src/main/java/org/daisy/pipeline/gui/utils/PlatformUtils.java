@@ -1,15 +1,17 @@
 package org.daisy.pipeline.gui.utils;
 
 public class PlatformUtils {
+	
+	private static String OS = System.getProperty("os.name").toLowerCase();
 
 	public static boolean isMac() {
-		return System.getProperty("os.name").toLowerCase().contains("mac"); 
+		return OS.contains("mac"); 
 	}
 	public static boolean isWin() {
-		return System.getProperty("os.name").toLowerCase().contains("win");
+		return OS.contains("win");
 	}
 	public static boolean isUnix() {
-		return System.getProperty("os.name").toLowerCase().contains("nix");
+		return OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
 	}
 	public static String getFileBrowserCommand() {
 		if (isMac()) {

@@ -1,6 +1,9 @@
 package org.daisy.pipeline.gui;
 
+import java.io.IOException;
+
 import org.daisy.pipeline.gui.databridge.Script;
+import org.daisy.pipeline.gui.utils.PlatformUtils;
 
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
@@ -34,16 +37,27 @@ public class ScriptInfoHeaderVBox extends VBox {
 			Hyperlink link = new Hyperlink();
 		    link.setText("Read online documentation");
 		    
-		    
+		    final boolean useHostServices = !PlatformUtils.isUnix();
 		    final MainWindow main_ = main;
 	    	link.setOnAction(new EventHandler<ActionEvent>() {
 	            public void handle(ActionEvent t) {
-	            	HostServices hostServices = main_.getHostServices();
-	            	if (hostServices != null) {
-	            		hostServices.showDocument(documentationPage);
+	            	if (useHostServices) {
+		            	HostServices hostServices = main_.getHostServices();
+		            	if (hostServices != null) {
+		            		hostServices.showDocument(documentationPage);
+		            	}
+		            	else {
+		            		System.out.println("$$$$$$$$$$$$$$$$$$$$$$ GUI: error launching hyperlink");
+		            	}
 	            	}
 	            	else {
-	            		System.out.println("$$$$$$$$$$$$$$$$$$$$$$ GUI: error launching hyperlink");
+	            		String cmd = PlatformUtils.getFileBrowserCommand() + " " + documentationPage;
+	    				try {
+							Runtime.getRuntime().exec(cmd);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	}
 	            }
 	        });

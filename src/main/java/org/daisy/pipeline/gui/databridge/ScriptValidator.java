@@ -1,6 +1,7 @@
 package org.daisy.pipeline.gui.databridge;
 
 import java.io.File;
+import java.io.IOException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,8 +46,10 @@ public class ScriptValidator {
 	public class ScriptFieldValidator {
 		
 		private String EMPTYSTRING = "ERROR: Value is empty for ";
-		private String BADPATH = "ERROR: Path invalid for ";
+		private String BADPATH = "ERROR: File not found: ";
 		private String NOTANUM = "ERROR: Numeric value required for ";
+		private String CANTCREATEDIR = "ERROR: Could not create directory ";
+		private String NOTADIR = "ERROR: Not a directory: ";
 		
 	
 		String message;
@@ -92,6 +95,7 @@ public class ScriptValidator {
 			return true;
 		}
 		
+		// validate file paths
 		private boolean validateFile(ScriptFieldAnswer answer) {
 			if (!validateString(answer)) {
 				return false;
@@ -107,28 +111,18 @@ public class ScriptValidator {
 			
 			File file = new File(answerString);
 			// for input files: check that the file exists
-			if (answer.getField().getFieldType() == FieldType.INPUT ||
-				answer.getField().getFieldType() == FieldType.OPTION) {
+			if (answer.getField().getFieldType() == FieldType.INPUT || 
+					answer.getField().getFieldType() == FieldType.OPTION) {
 				if (!file.exists()) {
 					message = BADPATH + answer.getField().getNiceName();
 					return false;
 				}
 			}
-			// for output files: check that the parent directory exists
-			else {
-				if (file.getParentFile() == null) {
-					message = BADPATH + answer.getField().getNiceName();
-					return false;
-				}
-				if (!file.getParentFile().isDirectory()) {
-					message = BADPATH + answer.getField().getNiceName();
-					return false;
-				}
-			}
 			return true;
-			
 		}
 		
+		// validate directory paths
+		// attempt to create directories for result or temp options
 		private boolean validateDirectory(ScriptFieldAnswer answer) {
 			
 			if (!validateString(answer)) {
@@ -143,9 +137,27 @@ public class ScriptValidator {
 			}
 			
 			File file = new File(answerString);
-			if (!file.isDirectory()) {
-				message = BADPATH + answer.getField().getNiceName();
-				return false;
+			
+			
+			if (answer.getField().isResult() || answer.getField().isTemp()) {
+				// try to create if it doesn't exist
+				if (!file.exists()) {
+					boolean couldCreateDir = file.mkdirs();
+					if (!couldCreateDir) {
+						message = CANTCREATEDIR + answerString;
+						return false;
+					}
+				}
+			}
+			else {
+				if (!file.exists()) {
+					message = BADPATH + answer.getField().getNiceName();
+					return false;
+				}
+				if (!file.isDirectory()) {
+					message = NOTADIR + answer.getField().getNiceName();
+					return false;
+				}
 			}
 			return true;
 			

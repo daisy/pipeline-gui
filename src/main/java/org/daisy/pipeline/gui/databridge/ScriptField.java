@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.daisy.common.xproc.XProcOptionInfo;
 import org.daisy.common.xproc.XProcPortInfo;
 import org.daisy.pipeline.script.XProcOptionMetadata;
+import org.daisy.pipeline.script.XProcOptionMetadata.Output;
 import org.daisy.pipeline.script.XProcPortMetadata;
 
 public class ScriptField {
@@ -33,8 +34,11 @@ public class ScriptField {
 	private boolean isRequired;
 	private boolean isSequence;
 	private DataType dataType; /* @type attribute of script XML; e.g. anyFileURI */
-	private boolean isOrdered; /* NOT used for input/output */
-	private boolean isPrimary; /* NOT used for options */
+	private boolean isOrdered; /* ONLY for options */
+	private boolean isPrimary; /* ONLY for input/output */
+	private boolean isTemp;		/* ONLY for options */
+	private boolean isResult;	/* ONLY for options */
+	
 	
 	
 	public ScriptField(XProcPortInfo portInfo, XProcPortMetadata metadata, FieldType fieldType) {
@@ -48,6 +52,8 @@ public class ScriptField {
 		isOrdered = false;
 		dataType = DataType.FILE;
 		isPrimary = portInfo.isPrimary();
+		isTemp = false;
+		isResult = false;
 	}
 	public ScriptField(XProcOptionInfo optionInfo, XProcOptionMetadata metadata) {
 		name = optionInfo.getName().toString();
@@ -60,6 +66,8 @@ public class ScriptField {
 		isRequired = optionInfo.isRequired();
 		isOrdered = metadata.isOrdered();
 		isPrimary = false;
+		isResult = metadata.getOutput() == Output.RESULT;
+		isTemp = metadata.getOutput() == Output.TEMP;
 	}
 	public String getName() {
 		return name;
@@ -91,12 +99,18 @@ public class ScriptField {
 	public boolean isPrimary() {
 		return isPrimary;
 	}
+	public boolean isTemp() {
+		return isTemp;
+	}
+	public boolean isResult() {
+		return isResult;
+	}
 	private DataType getDataType(String dataType) {
 		if (dataTypeMap.containsKey(dataType)) {
 			return dataTypeMap.get(dataType);
 		}
 		else {
-			System.out.println("############################DATA TYPE not found: " + dataType);
+			//System.out.println("############################DATA TYPE not found: " + dataType);
 		}
 		return DataType.STRING; // default to string
 	}

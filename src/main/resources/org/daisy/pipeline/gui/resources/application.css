@@ -15,7 +15,7 @@
 }
 
 .details {
-	-fx-padding: 20 0 20 0;
+	-fx-padding: 10 0 20 0;
 	-fx-hgap: 20;
 	-fx-vgap: 20;
 }
@@ -26,7 +26,7 @@
 	
 }
 .new-job {
-	-fx-padding: 20;
+	-fx-padding: 10;
 	-fx-hgap: 20;
 	-fx-vgap: 20;
 }

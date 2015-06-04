@@ -21,6 +21,7 @@ public class AppMenu extends MenuBar {
 	private MainWindow main;
 	private MenuItem deleteJob;
 	private MenuItem runJobAgain;
+	private MenuItem runJob;
 	private ChangeListener<String> jobStatusListener;
 	private ChangeListener<ObservableJob> currentJobChangeListener;
 	
@@ -49,6 +50,17 @@ public class AppMenu extends MenuBar {
         
         if (PlatformUtils.isMac()) {
         	this.setUseSystemMenuBar(true);
+        	
+      /*  	NSMenuBarAdapter adapter = new NSMenuBarAdapter();
+        	// Get the default menu bar as JavaFX object
+        	MenuBar menuBar = adapter.getMenuBar();
+
+        	// Change the name of the first menu item
+        	menuBar.getMenus().get(0).setText("Hello World");
+
+        	// Update the menu bar
+        	adapter.setMenuBar(menuBar);
+*/
         }
         
         else {
@@ -61,6 +73,16 @@ public class AppMenu extends MenuBar {
         	});
         	menuFile.getItems().add(exit);
         }
+        
+        runJob = new MenuItem("Run job");
+        runJob.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN));
+        runJob.setOnAction(new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent t) {
+        		main.runJob();
+        	}
+        });
+        menuFile.getItems().add(runJob);
+        runJob.setDisable(true);
         
         deleteJob = new MenuItem("Delete job");
         deleteJob.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
@@ -90,6 +112,10 @@ public class AppMenu extends MenuBar {
         });
         menuFile.getItems().add(copyMessages);
         
+	}
+	
+	public void setRunJobEnabled(boolean value) {
+		runJob.setDisable(!value);
 	}
 	
 	// listen for when the currently selected job changes

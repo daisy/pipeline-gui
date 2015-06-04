@@ -139,6 +139,7 @@ public class NewJobPane extends VBox {
 			return;
 		}
 		main.clearValidationMessages();
+		main.enableRunJobMenuItem();
 		scriptInfoBox.clearControls();
 		scriptFormControlsGrid.clearControls();
 		boundScript = new BoundScript(script);
@@ -210,24 +211,28 @@ public class NewJobPane extends VBox {
 		
 		run.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
-				ScriptValidator validator = new ScriptValidator(boundScript);
-				if (!validator.validate()) {
-					ObservableList<String> messages = validator.getMessages();
-					main.addValidationMessages(messages);
-				}
-				else {
-					Job newJob = JobExecutor.runJob(main, boundScript);
-					if (newJob != null) {
-						ObservableJob objob = main.getDataManager().addJob(newJob);
-						objob.setBoundScript(boundScript);
-						main.getCurrentJobProperty().set(objob);
-					}
-					else {
-						System.out.println("NEW JOB ERROR");
-					}
-				}
+				runJob();
 			}
 		});
 	
+	}
+	
+	public void runJob() {
+		ScriptValidator validator = new ScriptValidator(boundScript);
+		if (!validator.validate()) {
+			ObservableList<String> messages = validator.getMessages();
+			main.addValidationMessages(messages);
+		}
+		else {
+			Job newJob = JobExecutor.runJob(main, boundScript);
+			if (newJob != null) {
+				ObservableJob objob = main.getDataManager().addJob(newJob);
+				objob.setBoundScript(boundScript);
+				main.getCurrentJobProperty().set(objob);
+			}
+			else {
+				System.out.println("NEW JOB ERROR");
+			}
+		}
 	}
 }

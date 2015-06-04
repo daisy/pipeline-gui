@@ -139,8 +139,7 @@ public class MainWindow extends BorderPane {
 		blankPane.getChildren().add(new Text("No job selected"));
 		blankPane.getStyleClass().add("blank");
 		this.setCenter(scrollPane);
-		
-		scrollPane.setContent(blankPane);
+		showBlankPane();
 		
     }
     
@@ -152,18 +151,12 @@ public class MainWindow extends BorderPane {
 					ObservableValue<? extends ObservableJob> observable,
 					ObservableJob oldValue, ObservableJob newValue) {
 				if (newValue == null) {
-					//thiz.setCenter(blankPane);
-					thiz.scrollPane.setContent(blankPane);
+					thiz.showBlankPane();
 					return;
 					
 				}
 				else {
-//					if (thiz.getCenter() != detailsPane) {
-//						thiz.setCenter(detailsPane);
-//					}
-					if (thiz.scrollPane.getContent() != detailsPane) {
-						thiz.scrollPane.setContent(detailsPane);
-					}
+					thiz.showJobDetailsPane();
 				}
 				
 			}
@@ -180,13 +173,33 @@ public class MainWindow extends BorderPane {
     	messagesPane.clearMessages();
     }
     
-    /* GUI EVENTS */
+    private void showNewJobPane() {
+    	if (this.scrollPane.getContent() != newJobPane) {
+    		scrollPane.setContent(newJobPane);
+    	}    	
+    }
+    private void showJobDetailsPane() {
+    	if (scrollPane.getContent() != detailsPane) {
+			scrollPane.setContent(detailsPane);
+		}
+    	menubar.setRunJobEnabled(false);
+    }
+    private void showBlankPane() {
+    	this.scrollPane.setContent(blankPane);
+    	menubar.setRunJobEnabled(false);
+    }
+    
+    /* GUI HOOKS (other objects can call these methods to make things happen) */
     public void newJob() {
 		currentJobProperty.set(null);
-		//this.setCenter(newJobPane);
-		scrollPane.setContent(newJobPane);
+		showNewJobPane();
 	}
-	
+    public void enableRunJobMenuItem() {
+    	menubar.setRunJobEnabled(true);
+    }
+	public void runJob() {
+		newJobPane.runJob();
+	}
     public void deleteSelectedJob() {
     	ObservableJob job = currentJobProperty.get();
     	if (job == null) {
@@ -210,13 +223,7 @@ public class MainWindow extends BorderPane {
 		BoundScript boundScript = dataManager.cloneBoundScript(job.getBoundScript());
 		newJobPane.newFromBoundScript(boundScript);
 		currentJobProperty.set(null);
-//		if (this.getCenter() != newJobPane) {
-//			this.setCenter(newJobPane);
-//		}
-		if (this.scrollPane.getContent() != newJobPane) {
-			this.scrollPane.setContent(newJobPane);
-		}
-		
+		showNewJobPane();
 	}
 	
 	// copy the messages to the clipboard

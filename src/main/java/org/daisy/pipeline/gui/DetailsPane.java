@@ -35,6 +35,7 @@ public class DetailsPane extends VBox {
 		scriptInfoBox = new ScriptInfoHeaderVBox(main);
 		resultsGrid = new GridPaneHelper(main);
 		jobInfoGrid = new GridPaneHelper(main);
+		resultsGrid.getStyleClass().add("results");
 		addCurrentJobChangeListener();
 	}
 	
@@ -42,7 +43,6 @@ public class DetailsPane extends VBox {
 		
 		ObservableJob job = this.main.getCurrentJobProperty().get();
 		this.getStyleClass().add("details");
-		jobInfoGrid.getStyleClass().add("details");
 		
 		Text title = new Text("Job details");
 		title.getStyleClass().add("title");

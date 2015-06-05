@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -115,7 +116,8 @@ public class MainWindow extends BorderPane {
 		scene.getStylesheets().add(css);
     		
 		sidebar = new Sidebar(this);
-		this.setLeft(sidebar);
+		//this.setLeft(sidebar);
+		
 		
 		menubar = new AppMenu(this);
 		if (PlatformUtils.isMac()) {
@@ -138,7 +140,13 @@ public class MainWindow extends BorderPane {
 		blankPane = new VBox();
 		blankPane.getChildren().add(new Text("No job selected"));
 		blankPane.getStyleClass().add("blank");
-		this.setCenter(scrollPane);
+		
+		SplitPane splitPane = new SplitPane();
+		splitPane.getItems().addAll(sidebar, scrollPane);
+		splitPane.setDividerPositions(0.3f);
+		
+		//this.setCenter(scrollPane);
+		this.setCenter(splitPane);
 		showBlankPane();
 		
     }

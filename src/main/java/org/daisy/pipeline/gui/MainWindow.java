@@ -232,6 +232,7 @@ public class MainWindow extends BorderPane {
 		newJobPane.newFromBoundScript(boundScript);
 		currentJobProperty.set(null);
 		showNewJobPane();
+		menubar.setRunJobEnabled(true);
 	}
 	
 	// copy the messages to the clipboard

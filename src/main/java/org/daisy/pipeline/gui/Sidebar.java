@@ -27,9 +27,12 @@ public class Sidebar extends VBox {
 	}
 	
 	private void initControls() {
-		table = new TableView<ObservableJob>();
 		this.getStyleClass().add("sidebar");
-	
+		
+		table = new TableView<ObservableJob>();
+		// this prevents an extra column in the table
+		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		
 	    Text title = new Text("Jobs");
 	    title.getStyleClass().add("title");
 	    this.getChildren().add(title);

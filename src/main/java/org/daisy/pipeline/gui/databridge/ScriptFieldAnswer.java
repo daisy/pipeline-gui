@@ -21,7 +21,6 @@ public interface ScriptFieldAnswer<T> {
 		
 	}
 	
-	// these classes would be mixins .. if java supported mixins.. 
 	// the getField method is implemented by the base class; the other(s) are implemented for each class
 	
 	// note that there is no Integer variant; we're just using Strings with different validation rules

@@ -114,7 +114,7 @@ public class GridPaneHelper extends GridPane {
 	public void addFileDirPickerSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
 		final ListView<String> listbox = new ListView<String>();
 		listbox.setItems(answer.answerProperty());
-		listbox.getStyleClass().add("files");
+		listbox.getStyleClass().add("input-list");
 		Text label = new Text();
 		label.setText(answer.getField().getNiceName());
 		Text help = makeHelpText(answer);
@@ -176,7 +176,52 @@ public class GridPaneHelper extends GridPane {
 		
 	}
 	public void addTextFieldSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
-		// TODO
+		Text label = new Text();
+		label.setText(answer.getField().getNiceName() + ":");
+		final TextField inputText = new TextField();
+		Button addTextButton = new Button("Add");
+		Text help = makeHelpText(answer);
+		VBox vbox = new VBox();
+		vbox.getChildren().addAll(label, help);
+		addRow(vbox, inputText, addTextButton);
+		wrapCorrectly(vbox);
+		vbox.getStyleClass().add("label-helper-vbox");
+		
+		final ListView<String> listbox = new ListView<String>();
+		listbox.setItems(answer.answerProperty());
+		listbox.getStyleClass().add("input-list");
+		addRow(null, listbox);
+		
+		final Button removeTextButton = new Button("Remove");
+		addRow(null, removeTextButton);
+		
+		final ScriptFieldAnswer.ScriptFieldAnswerList answer_ = answer;
+		addTextButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (!inputText.getText().isEmpty()) {
+					answer_.answerProperty().add(inputText.getText());
+                }
+			}
+		});
+		
+		removeTextButton.setDisable(true);
+		removeTextButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (listbox.getSelectionModel().isEmpty() == false) {
+					int selection = listbox.getSelectionModel().getSelectedIndex();
+					listbox.getItems().remove(selection);
+				}
+				
+			}
+		});
+		listbox.getSelectionModel().selectedItemProperty().addListener(
+	            new ChangeListener<String>() {
+	                public void changed(ObservableValue<? extends String> ov, 
+	                    String old_val, String new_val) {
+	                	removeTextButton.setDisable(listbox.getSelectionModel().isEmpty());
+	            }
+	        });
+		
 	}
 	
 	// add a text field with a button for file browsing

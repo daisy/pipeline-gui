@@ -9,12 +9,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.stage.Stage;
 
 public class AppMenu extends MenuBar {
 
@@ -33,6 +35,27 @@ public class AppMenu extends MenuBar {
 		addCurrentJobChangeListener();
 		
 	}
+
+    private void initHelp() {
+        Menu menuHelp= new Menu("Help");
+        MenuItem update= new MenuItem("Check updates");
+                
+        update.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                UpdaterPane updater=new UpdaterPane();
+                Stage otherStage = new Stage();
+                Scene secondScene = new Scene(updater, 600, 400);
+                String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
+
+                secondScene.getStylesheets().add(css);
+                    updater.build();
+                    otherStage.setScene(secondScene);
+                    otherStage.show();
+            }
+        });
+        menuHelp.getItems().add(update);
+        this.getMenus().addAll(menuHelp);
+    }
 	
 	private void initControls() {
 		Menu menuFile = new Menu("File");
@@ -60,20 +83,18 @@ public class AppMenu extends MenuBar {
 
         	// Update the menu bar
         	adapter.setMenuBar(menuBar);
-*/
+        */
+        } else {
+            MenuItem exit = new MenuItem("Exit");
+            exit.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
+            exit.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent t) {
+                    System.exit(0);
+                }
+            });
+            menuFile.getItems().add(exit);
         }
-        
-        else {
-        	MenuItem exit = new MenuItem("Exit");
-        	exit.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
-        	exit.setOnAction(new EventHandler<ActionEvent>() {
-        	    public void handle(ActionEvent t) {
-        	        System.exit(0);
-        	    }
-        	});
-        	menuFile.getItems().add(exit);
-        }
-        
+                
         runJob = new MenuItem("Run job");
         runJob.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN));
         runJob.setOnAction(new EventHandler<ActionEvent>() {
@@ -111,7 +132,8 @@ public class AppMenu extends MenuBar {
         	}
         });
         menuFile.getItems().add(copyMessages);
-        
+
+        initHelp();
 	}
 	
 	public void setRunJobEnabled(boolean value) {

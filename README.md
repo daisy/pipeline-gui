@@ -1,55 +1,42 @@
 pipeline-gui
 ============
 
-Desktop GUI interface for the pipeline
+Desktop GUI interface for the pipeline. Written in JavaFX.
 
-# This code
+# Building this code
 
-Until the GUI is integrated into the default Pipeline build process, it can be built this way:
+Requires Java 8. Get the latest Java 8 for the best accessibility support.
 
-Install the correct libraries in Maven:
-    cd pipeline-gui/extras
-    ./install-to-maven
+Get the following repositories:
+ * pipeline-gui 'javafx' branch
+ * pipeline-assembly 'javafx' branch
+ * pipeline-framework 'master' branch
 
-Build the GUI:
-    cd pipeline-gui
-    mvn clean install
+Plus any scripts or modules that you want to use.
 
-Use the master branch of the pipeline-framework
+Build all and run './pipeline2' from the assembly target directory.
 
-Get the gui-august branch of the assembly
+# Features
+ * View jobs list
+ * View job details
+ * Access job results in separate application(s)
+ * Create new job
+ * Run job again
+ * Delete job
 
-Then build the pipeline-assembly project (optionally use the dev-launcher version):
-    mvn clean package -P dev-launcher
-
-# Project description
-
-##in scope
- * cross or multi platform desktop application
- * start jobs
- * stop jobs
- * view jobs (running/completed/cancelled)
- * view job results in other applications [e.g. browser]
-
-
-## initially out of scope
+## Keyboard shortcuts
+ * New job: Control + N
+ * Delete job: Delete
+ * Run job again: Control + Shift + R
+ 
+# Out of scope 
  * authentication/connecting to a remote pipeline installation
  * batch jobs
- * duplicate job
  * job template
  * install new scripts from repo
  * autoupdate installed components
-
-## out of scope (maybe forever)
  * user management (e.g. client user account creation)
  * editing content 
  
-## proposed behaviors
-
- * connect directly to pipeline framework (not via webservice)
- * keep jobs in list until user clears them
- * delete a job => default is to keep job output on disk; option to remove data too.
- * list/detail view (jobs list on left in a sidebar)
- * job views for each variation: new job, running job, completed job
 
 

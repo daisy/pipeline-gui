@@ -121,7 +121,8 @@ public class GridPaneHelper extends GridPane {
 		VBox vbox = new VBox();
 		vbox.getChildren().addAll(label, help);
 		addRow(vbox, listbox);
-		wrapCorrectly(vbox);
+		//wrapCorrectly(vbox);
+		wrapCorrectly(help, vbox);
 		vbox.getStyleClass().add("label-helper-vbox");
 		
 		
@@ -184,7 +185,8 @@ public class GridPaneHelper extends GridPane {
 		VBox vbox = new VBox();
 		vbox.getChildren().addAll(label, help);
 		addRow(vbox, inputText, addTextButton);
-		wrapCorrectly(vbox);
+		//wrapCorrectly(vbox);
+		wrapCorrectly(help, vbox);
 		vbox.getStyleClass().add("label-helper-vbox");
 		
 		final ListView<String> listbox = new ListView<String>();
@@ -235,7 +237,8 @@ public class GridPaneHelper extends GridPane {
 		Text help = makeHelpText(answer);
 		vbox.getChildren().addAll(label, help);
 		addRow(vbox, inputFileText, inputFileButton);
-		wrapCorrectly(vbox);
+		//wrapCorrectly(vbox);
+		wrapCorrectly(help, vbox);
 		vbox.getStyleClass().add("label-helper-vbox");
 		
 		final ScriptFieldAnswer.ScriptFieldAnswerString answer_ = answer;
@@ -265,6 +268,7 @@ public class GridPaneHelper extends GridPane {
 	private void addHelpText(ScriptFieldAnswer answer) {
 		Text text = makeHelpText(answer);
 		addRow(text);
+		wrapCorrectly(text);
 		
 		
 	}
@@ -280,7 +284,7 @@ public class GridPaneHelper extends GridPane {
 		
 		return help;
 	}
-	private void wrapCorrectly(VBox vbox) {
+	private void wrapCorrectly1(VBox vbox) {
 		int col = getColumnIndex(vbox);
 		if (col < 0) return;
 		vbox.prefWidthProperty().bind(this.getColumnConstraints().get(col).prefWidthProperty());
@@ -291,7 +295,33 @@ public class GridPaneHelper extends GridPane {
 			}
 		}
 	}
-	
+	private void wrapCorrectly(Text text) {
+		int col = getColumnIndex(text);
+		if (col < 0) return;
+		// I'd rather bind the wrappingWidth property but as we just have a percent width
+		// on the column, we can't
+		text.setWrappingWidth(200); 
+
+		
+//		ColumnConstraints constr = this.getColumnConstraints().get(col);
+//		System.out.println("$$$$$$$$$$$$$$$$$$$ WIDTHS ");
+//		System.out.println("MAX: " + constr.getMaxWidth());
+//		System.out.println("MIN: " + constr.getMinWidth());
+//		System.out.println("PCT: " + constr.getPercentWidth());
+//		System.out.println("PREF: " + constr.getPrefWidth());
+	}
+	private void wrapCorrectly(Text text, VBox vbox) {
+		int col = getColumnIndex(vbox);
+		if (col < 0) return;
+		text.setWrappingWidth(200);
+		
+//		ColumnConstraints constr = this.getColumnConstraints().get(col);
+//		System.out.println("$$$$$$$$$$$$$$$$$$$ WIDTHS (VBOX) ");
+//		System.out.println("MAX: " + constr.getMaxWidth());
+//		System.out.println("MIN: " + constr.getMinWidth());
+//		System.out.println("PCT: " + constr.getPercentWidth());
+//		System.out.println("PREF: " + constr.getPrefWidth());
+	}
 	// add a checkbox control
 	public void addCheckbox(ScriptFieldAnswer.ScriptFieldAnswerBoolean answer) {
 		CheckBox cb = new CheckBox(answer.getField().getNiceName());

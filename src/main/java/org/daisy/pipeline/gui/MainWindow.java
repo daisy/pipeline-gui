@@ -57,11 +57,10 @@ public class MainWindow extends BorderPane {
 	
 	public MainWindow(ScriptRegistry scriptRegistry, 
 			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
-			BundleContext context, HostServices hostServices) {
+			HostServices hostServices) {
 		super();
 		
 		this.eventBusProvider = eventBusProvider;
-		this.bundleContext = context;
 		this.scriptRegistry = scriptRegistry;
 		this.jobManager = jobManagerFactory.createFor(client);
 		this.hostServices = hostServices;
@@ -89,9 +88,9 @@ public class MainWindow extends BorderPane {
     	return eventBusProvider;
     }
     
-    public BundleContext getBundleContext() {
-    	return bundleContext;
-    }
+    //public BundleContext getBundleContext() {
+            //return bundleContext;
+    //}
 	public DataManager getDataManager() {
 		return dataManager;
 	}

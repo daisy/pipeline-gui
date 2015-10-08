@@ -1,17 +1,20 @@
 package org.daisy.pipeline.gui.databridge;
 
 import java.io.File;
-import java.io.IOException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
 import org.daisy.pipeline.gui.databridge.ScriptField.FieldType;
-import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 public class ScriptValidator {
 	
+        private static final Logger logger = LoggerFactory.getLogger(ScriptValidator.class);
 	private BoundScript boundScript;
 	private ObservableList<String> messages;
 	
@@ -25,7 +28,10 @@ public class ScriptValidator {
 		// validate the optional options just to get any messages about their values
 		// for example, a file path might be expected
 		checkFields(boundScript.getOptionalOptionFields());
+                
 		
+                logger.debug("Inputs "+inputsAreValid);
+                logger.debug("reqOptionsAreValid "+reqOptionsAreValid);
 		return inputsAreValid && reqOptionsAreValid;
 		
 	}
@@ -97,24 +103,36 @@ public class ScriptValidator {
 		
 		// validate file paths
 		private boolean validateFile(ScriptFieldAnswer answer) {
-			if (!validateString(answer)) {
-				return false;
+			boolean valid=true;
+			if (! (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList)) {
+				valid= validateString(answer) && validateFile(((ScriptFieldAnswer.ScriptFieldAnswerString)answer).answerProperty().get(),answer.getField());
+			}else{
+				for (String s:((ScriptFieldAnswer.ScriptFieldAnswerList)answer).answerProperty()){
+					if (! validateFile(s,answer.getField())){
+						valid=false;
+						break;
+					}
+					
+				}
 			}
+			return valid;
+		}
+		private boolean validateFile(String answerString,ScriptField field) {
 			
-			ScriptFieldAnswer.ScriptFieldAnswerString answer_ = (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
-			String answerString = answer_.answerProperty().get();
+			
+			
 			
 			// optional fields can have empty values; but if it's not empty, proceed to make sure it's valid
-			if (answer.getField().isRequired() == false && answerString.isEmpty()) {
+			if (field.isRequired() == false && answerString.isEmpty()) {
 				return true;
 			}
 			
 			File file = new File(answerString);
 			// for input files: check that the file exists
-			if (answer.getField().getFieldType() == FieldType.INPUT || 
-					answer.getField().getFieldType() == FieldType.OPTION) {
+			if (field.getFieldType() == FieldType.INPUT || 
+					field.getFieldType() == FieldType.OPTION) {
 				if (!file.exists()) {
-					message = BADPATH + answer.getField().getNiceName();
+					message = BADPATH + field.getNiceName();
 					return false;
 				}
 			}

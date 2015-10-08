@@ -10,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -25,11 +24,15 @@ import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.gui.databridge.ScriptValidator;
 import org.daisy.pipeline.job.Job;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterators;
 
 
 public class NewJobPane extends VBox {
+        private static final Logger logger = LoggerFactory.getLogger(NewJobPane.class);
+
 	
 	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper scriptFormControlsGrid;
@@ -220,6 +223,7 @@ public class NewJobPane extends VBox {
 	public void runJob() {
 		ScriptValidator validator = new ScriptValidator(boundScript);
 		if (!validator.validate()) {
+                        logger.debug("Script is not valid");
 			ObservableList<String> messages = validator.getMessages();
 			main.addValidationMessages(messages);
 		}
@@ -229,9 +233,8 @@ public class NewJobPane extends VBox {
 				ObservableJob objob = main.getDataManager().addJob(newJob);
 				objob.setBoundScript(boundScript);
 				main.getCurrentJobProperty().set(objob);
-			}
-			else {
-				System.out.println("NEW JOB ERROR");
+			} else {
+                                logger.error("Couldn't create the job");
 			}
 		}
 	}

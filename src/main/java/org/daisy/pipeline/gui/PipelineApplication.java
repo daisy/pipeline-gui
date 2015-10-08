@@ -30,9 +30,7 @@ public class PipelineApplication extends Application {
                                         ServiceRegistry.getInstance().notifyReady(PipelineApplication.this);
                                         ServiceRegistry services=PipelineApplication.this.services;
                                         HostServices hostServices = getHostServices();
-                                        System.out.println("Gui run");
                                         Client client = services.getWebserviceStorage().getClientStorage().defaultClient();
-                                        System.out.println("HELLO");
                                         MainWindow mainWindow = new MainWindow(services.getScriptRegistry(), services.getJobManagerFactory(),
                                                 client, 
                                                 services.getEventBusProvider(), 

@@ -5,14 +5,14 @@ import org.daisy.pipeline.script.ScriptRegistry;
 import org.daisy.pipeline.webserviceutils.storage.WebserviceStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.osgi.framework.BundleContext;
 
 
-public class GUIService implements Runnable
+public class GUIService 
 {
         private static final Logger logger = LoggerFactory.getLogger(GUIService.class);
-        @Override
-        public void run() 
-        {
+
+        public void init(BundleContext ctxt) {
                 //Otherwise launch will block
                 new Thread(){
                         public void run(){

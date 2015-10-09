@@ -49,5 +49,9 @@ public class PipelineApplication extends Application {
                 });
         }
 
+        public void stop(){
+                ServiceRegistry.getInstance().getGUIService().stopGUI();
+        }
+
 
 }

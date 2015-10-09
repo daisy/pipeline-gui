@@ -32,6 +32,8 @@ public class ServiceRegistry{
                 }
         };
 
+        private GUIService guiService;
+
         private ServiceRegistry() {
         }
 
@@ -119,6 +121,16 @@ public class ServiceRegistry{
                 this.monitor.enter();
                 this.webserviceStorage = webserviceStorage;
                 this.monitor.leave();
+        }
+
+        public void setGUIService(GUIService guiService) {
+                this.monitor.enter();
+                this.guiService=guiService;
+                this.monitor.leave();
+        }
+
+        public GUIService getGUIService(){
+                return this.guiService;
         }
 
         

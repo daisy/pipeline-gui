@@ -3,16 +3,21 @@ import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
 import org.daisy.pipeline.webserviceutils.storage.WebserviceStorage;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.launch.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.osgi.framework.BundleContext;
 
 
 public class GUIService 
 {
         private static final Logger logger = LoggerFactory.getLogger(GUIService.class);
+        private BundleContext ctxt;
 
         public void init(BundleContext ctxt) {
+                this.ctxt=ctxt;
+                ServiceRegistry.getInstance().setGUIService(this);
                 //Otherwise launch will block
                 new Thread(){
                         public void run(){
@@ -22,6 +27,17 @@ public class GUIService
                 }.start();
                 logger.debug("Main Module is loaded!");
         }
+
+        public void stopGUI(){
+                try {
+                        ((Framework) this.ctxt.getBundle(0)).stop();
+                } catch (BundleException e) {
+                        logger.error("Error closing the framework ",e);
+                        //exit the hard way
+                        System.exit(-1);
+                }
+        }
+
 
 
         public void setScriptRegistry(ScriptRegistry scriptRegistry) {

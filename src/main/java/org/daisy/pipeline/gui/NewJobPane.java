@@ -1,7 +1,10 @@
 
 package org.daisy.pipeline.gui;
 
+import java.text.Collator;
+
 import javafx.beans.value.ChangeListener;
+import javafx.collections.transformation.SortedList;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,18 +19,18 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-import org.daisy.pipeline.gui.databridge.BoundScript;
-import org.daisy.pipeline.gui.databridge.JobExecutor;
-import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
-import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
-import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
-import org.daisy.pipeline.gui.databridge.ScriptValidator;
 import org.daisy.pipeline.job.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterators;
+import org.daisy.pipeline.gui.databridge.BoundScript;
+import org.daisy.pipeline.gui.databridge.JobExecutor;
+import org.daisy.pipeline.gui.databridge.ObservableJob;
+import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
+import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.daisy.pipeline.gui.databridge.ScriptValidator;
 
 
 public class NewJobPane extends VBox {
@@ -78,7 +81,8 @@ public class NewJobPane extends VBox {
 		topGrid.getChildren().add(title);
 		
 		
-		scriptsCombo.setItems(scripts);
+		//scriptsCombo.setItems(scripts.sorted());
+		scriptsCombo.setItems(new SortedList<Script>(scripts,new Script.ScriptComparator()));
 		scriptsCombo.setCellFactory(new Callback<ListView<Script>,ListCell<Script>>(){
 			 
             public ListCell<Script> call(ListView<Script> p) {

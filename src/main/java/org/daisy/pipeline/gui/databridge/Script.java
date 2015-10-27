@@ -12,7 +12,7 @@ import org.daisy.pipeline.script.XProcPortMetadata;
 import org.daisy.pipeline.script.XProcScript;
 
 // representation of a pipeline script in a GUI-friendly way
-public class Script implements Comparable<Script>{
+public class Script {
         private String name;
         private String description;
         private ArrayList<ScriptField> inputFields;

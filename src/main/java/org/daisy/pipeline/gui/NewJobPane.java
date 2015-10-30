@@ -1,9 +1,10 @@
 
 package org.daisy.pipeline.gui;
 
+import java.text.Collator;
 import java.net.MalformedURLException;
-
 import javafx.beans.value.ChangeListener;
+import javafx.collections.transformation.SortedList;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,71 +20,73 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.collections.FXCollections;
 
-import org.daisy.pipeline.gui.databridge.BoundScript;
-import org.daisy.pipeline.gui.databridge.JobExecutor;
-import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
-import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
-import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
-import org.daisy.pipeline.gui.databridge.ScriptValidator;
 import org.daisy.pipeline.job.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterators;
+import org.daisy.pipeline.gui.databridge.BoundScript;
+import org.daisy.pipeline.gui.databridge.JobExecutor;
+import org.daisy.pipeline.gui.databridge.ObservableJob;
+import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
+import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
+import org.daisy.pipeline.gui.databridge.ScriptValidator;
 
 
 public class NewJobPane extends VBox {
         private static final Logger logger = LoggerFactory.getLogger(NewJobPane.class);
 
-        
-        private ScriptInfoHeaderVBox scriptInfoBox;
-        private GridPaneHelper scriptFormControlsGrid;
-        private MainWindow main;
-        private ObservableList<Script> scripts;
-        private BoundScript boundScript;
-        
-        
-        private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
-        
-        public NewJobPane(MainWindow main) {
-                super();
-                this.main = main;
-                scripts = main.getScriptData();
-                initControls();
-                
-        }
-        
-        public BoundScript getBoundScript() {
-                return boundScript;
-        }
-        
-        // reset the combo selection and clear the script details grid
-        public void clearScriptDetails() {
-                scriptsCombo.getSelectionModel().clearSelection();
-                scriptInfoBox.clearControls();
-                scriptFormControlsGrid.clearControls();
-                main.clearValidationMessages();
-        }
-        public void newFromBoundScript(BoundScript boundScript) {
-                scriptsCombo.getSelectionModel().select(boundScript.getScript());
-                
-        }
-        
-        private void initControls() {
-                this.getStyleClass().add("new-job");
-            HBox topGrid = new HBox();
-            this.getChildren().add(topGrid);
-            
-            topGrid.setSpacing(20.0);
-            
-                Text title = new Text("Choose a script:");
-                topGrid.getChildren().add(title);
-                
-                
-                scriptsCombo.setItems(scripts);
-                scriptsCombo.setCellFactory(new Callback<ListView<Script>,ListCell<Script>>(){
-                         
+<<<<<<< HEAD
+	
+	private ScriptInfoHeaderVBox scriptInfoBox;
+	private GridPaneHelper scriptFormControlsGrid;
+	private MainWindow main;
+	private ObservableList<Script> scripts;
+	private BoundScript boundScript;
+	
+	
+	private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
+	
+	public NewJobPane(MainWindow main) {
+		super();
+		this.main = main;
+		scripts = main.getScriptData();
+		initControls();
+		
+	}
+	
+	public BoundScript getBoundScript() {
+		return boundScript;
+	}
+	
+	// reset the combo selection and clear the script details grid
+	public void clearScriptDetails() {
+		scriptsCombo.getSelectionModel().clearSelection();
+		scriptInfoBox.clearControls();
+		scriptFormControlsGrid.clearControls();
+		main.clearValidationMessages();
+	}
+	public void newFromBoundScript(BoundScript boundScript) {
+		scriptsCombo.getSelectionModel().select(boundScript.getScript());
+		
+	}
+	
+	private void initControls() {
+		this.getStyleClass().add("new-job");
+	    HBox topGrid = new HBox();
+	    this.getChildren().add(topGrid);
+	    
+	    topGrid.setSpacing(20.0);
+	    
+		Text title = new Text("Choose a script:");
+		topGrid.getChildren().add(title);
+		
+		
+		//scriptsCombo.setItems(scripts.sorted());
+		scriptsCombo.setItems(new SortedList<Script>(scripts,new Script.ScriptComparator()));
+		scriptsCombo.setCellFactory(new Callback<ListView<Script>,ListCell<Script>>(){
+			 
             public ListCell<Script> call(ListView<Script> p) {
                 final ListCell<Script> cell = new ListCell<Script>(){
                     @Override

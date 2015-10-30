@@ -2,7 +2,7 @@
 package org.daisy.pipeline.gui;
 
 import java.text.Collator;
-
+import java.net.MalformedURLException;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.beans.value.ObservableValue;
@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import javafx.collections.FXCollections;
 
 import org.daisy.pipeline.gui.databridge.Script;
 import org.daisy.pipeline.job.Job;
@@ -36,6 +37,7 @@ import org.daisy.pipeline.gui.databridge.ScriptValidator;
 public class NewJobPane extends VBox {
         private static final Logger logger = LoggerFactory.getLogger(NewJobPane.class);
 
+<<<<<<< HEAD
 	
 	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper scriptFormControlsGrid;
@@ -100,9 +102,9 @@ public class NewJobPane extends VBox {
                     }
                 };
                 return cell;
-            }			
+            }                   
         });
-		scriptsCombo.setConverter(new StringConverter<Script>() {
+                scriptsCombo.setConverter(new StringConverter<Script>() {
             @Override
             public String toString(Script script) {
               if (script == null){
@@ -113,133 +115,141 @@ public class NewJobPane extends VBox {
               }
             }
 
-			@Override
-			public Script fromString(String string) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+                        @Override
+                        public Script fromString(String string) {
+                                // TODO Auto-generated method stub
+                                return null;
+                        }
 
           
       });
-		
-		topGrid.getChildren().add(scriptsCombo);
-		
-		scriptsCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Script>() {
+                
+                topGrid.getChildren().add(scriptsCombo);
+                
+                scriptsCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Script>() {
 
-			public void changed(ObservableValue<? extends Script> observable,
-					Script oldValue, Script newValue) {
-				
-				newScriptSelected(newValue);
-			}
-		});
-		
-		scriptInfoBox = new ScriptInfoHeaderVBox(main);
-		this.getChildren().add(scriptInfoBox);
-		scriptFormControlsGrid = new GridPaneHelper(main);
-		scriptFormControlsGrid.setColumnWidths(50, 40, 20);
-		this.getChildren().add(scriptFormControlsGrid);
-		
-	}
-	
-	private void newScriptSelected(Script script) {
-		if (script == null) {
-			return;
-		}
-		main.clearValidationMessages();
-		main.enableRunJobMenuItem();
-		scriptInfoBox.clearControls();
-		scriptFormControlsGrid.clearControls();
-		boundScript = new BoundScript(script);
-		populateScriptDetailsGrid();
-	}
-	
-	private void populateScriptDetailsGrid() {
-		
-		scriptInfoBox.populate(boundScript.getScript());
-		
-		for (ScriptFieldAnswer input : boundScript.getInputFields()) {
-			addInputField(input);
-		}
-		for (ScriptFieldAnswer option : boundScript.getRequiredOptionFields()) {
-			addOptionField(option);
-		}
-		
-		if (Iterators.size(boundScript.getOptionalOptionFields().iterator()) > 0) {
-			Text options = new Text("Options:");
-			options.getStyleClass().add("subtitle");
-			scriptFormControlsGrid.addRow(options);
-		}
-		for (ScriptFieldAnswer option : boundScript.getOptionalOptionFields()) {
-			addOptionField(option);
-		}
-		
-		addStandardButtons();
-			
-	}
-	
-	
-	private void addInputField(ScriptFieldAnswer answer) {
-		if (answer.getField().isSequence()) {
-			scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
-		}
-		else {
-			scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
-		}
-	}
+                        public void changed(ObservableValue<? extends Script> observable,
+                                        Script oldValue, Script newValue) {
+                                
+                                newScriptSelected(newValue);
+                        }
+                });
+                
+                scriptInfoBox = new ScriptInfoHeaderVBox(main);
+                this.getChildren().add(scriptInfoBox);
+                scriptFormControlsGrid = new GridPaneHelper(main);
+                scriptFormControlsGrid.setColumnWidths(50, 40, 20);
+                this.getChildren().add(scriptFormControlsGrid);
+                
+        }
+        
+        private void newScriptSelected(Script script) {
+                if (script == null) {
+                        return;
+                }
+                main.clearValidationMessages();
+                main.enableRunJobMenuItem();
+                scriptInfoBox.clearControls();
+                scriptFormControlsGrid.clearControls();
+                boundScript = new BoundScript(script);
+                populateScriptDetailsGrid();
+        }
+        
+        private void populateScriptDetailsGrid() {
+                
+                scriptInfoBox.populate(boundScript.getScript());
+                
+                for (ScriptFieldAnswer input : boundScript.getInputFields()) {
+                        addInputField(input);
+                }
+                for (ScriptFieldAnswer option : boundScript.getRequiredOptionFields()) {
+                        addOptionField(option);
+                }
+                
+                if (Iterators.size(boundScript.getOptionalOptionFields().iterator()) > 0) {
+                        Text options = new Text("Options:");
+                        options.getStyleClass().add("subtitle");
+                        scriptFormControlsGrid.addRow(options);
+                }
+                for (ScriptFieldAnswer option : boundScript.getOptionalOptionFields()) {
+                        addOptionField(option);
+                }
+                
+                addStandardButtons();
+                        
+        }
+        
+        
+        private void addInputField(ScriptFieldAnswer answer) {
+                if (answer.getField().isSequence()) {
+                        scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+                }
+                else {
+                        scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+                }
+        }
 
-	private void addOptionField(ScriptFieldAnswer answer) {
-		DataType fieldDataType = answer.getField().getDataType();
-		if (fieldDataType == DataType.FILE || fieldDataType == DataType.DIRECTORY) {
-			if (answer.getField().isSequence()) {
-				scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
-			}
-			else {
-				scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
-			}
-		}
-		else if (fieldDataType == DataType.BOOLEAN) {
-			scriptFormControlsGrid.addCheckbox((ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer);
-		}
-		else {
-			if (answer.getField().isSequence()) {
-				scriptFormControlsGrid.addTextFieldSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
-			}
-			else {
-				scriptFormControlsGrid.addTextField((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
-			}
-			
-		}
-	}
-	
-	private void addStandardButtons() {
-		Button run = new Button("Run");
-		run.getStyleClass().add("run-button");
-		scriptFormControlsGrid.addRow(run);
-		
-		run.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent event) {
-				runJob();
-			}
-		});
-	
-	}
-	
-	public void runJob() {
-		ScriptValidator validator = new ScriptValidator(boundScript);
-		if (!validator.validate()) {
+        private void addOptionField(ScriptFieldAnswer answer) {
+                DataType fieldDataType = answer.getField().getDataType();
+                if (fieldDataType == DataType.FILE || fieldDataType == DataType.DIRECTORY) {
+                        if (answer.getField().isSequence()) {
+                                scriptFormControlsGrid.addFileDirPickerSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+                        }
+                        else {
+                                scriptFormControlsGrid.addFileDirPicker((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+                        }
+                }
+                else if (fieldDataType == DataType.BOOLEAN) {
+                        scriptFormControlsGrid.addCheckbox((ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer);
+                }
+                else {
+                        if (answer.getField().isSequence()) {
+                                scriptFormControlsGrid.addTextFieldSequence((ScriptFieldAnswer.ScriptFieldAnswerList)answer);
+                        }
+                        else {
+                                scriptFormControlsGrid.addTextField((ScriptFieldAnswer.ScriptFieldAnswerString)answer);
+                        }
+                        
+                }
+        }
+        
+        private void addStandardButtons() {
+                Button run = new Button("Run");
+                run.getStyleClass().add("run-button");
+                scriptFormControlsGrid.addRow(run);
+                
+                run.setOnAction(new EventHandler<ActionEvent>() {
+                        public void handle(ActionEvent event) {
+                                runJob();
+                        }
+                });
+        
+        }
+        
+        public void runJob() {
+                ScriptValidator validator = new ScriptValidator(boundScript);
+                if (!validator.validate()) {
                         logger.debug("Script is not valid");
-			ObservableList<String> messages = validator.getMessages();
-			main.addValidationMessages(messages);
-		}
-		else {
-			Job newJob = JobExecutor.runJob(main, boundScript);
-			if (newJob != null) {
-				ObservableJob objob = main.getDataManager().addJob(newJob);
-				objob.setBoundScript(boundScript);
-				main.getCurrentJobProperty().set(objob);
-			} else {
-                                logger.error("Couldn't create the job");
-			}
-		}
-	}
+                        ObservableList<String> messages = validator.getMessages();
+                        main.addValidationMessages(messages);
+                }
+                else {
+                        Job newJob;
+                        try {
+                                newJob = JobExecutor.runJob(main, boundScript);
+                                if (newJob != null) {
+                                        ObservableJob objob = main.getDataManager().addJob(newJob);
+                                        objob.setBoundScript(boundScript);
+                                        main.getCurrentJobProperty().set(objob);
+                                } else {
+                                        logger.error("Couldn't create the job");
+                                }
+                        } catch (MalformedURLException e) {
+                                ObservableList<String> error= FXCollections.observableArrayList();
+                                error.add("Error while trasfroming path: "+e.getMessage());
+                                main.addValidationMessages(error);
+                                logger.error("Couldn't create the job",e);
+                        }
+                }
+        }
 }

@@ -1,6 +1,8 @@
 package org.daisy.pipeline.gui.databridge;
 
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -27,18 +29,19 @@ import com.google.common.base.Optional;
 
 public class JobExecutor {
 
-	private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
-	
-	public static Job runJob(MainWindow main, BoundScript boundScript) {
-		
-		NewJobPane newJobPane = main.getNewJobPane();
-		if (newJobPane == null) {
-			logger.error("Job could not be created: new job view panel is null");
-        	return null;
-		}
+        private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
+        
+        public static Job runJob(MainWindow main, BoundScript boundScript)
+                        throws MalformedURLException {
+               
+                NewJobPane newJobPane = main.getNewJobPane();
+                if (newJobPane == null) {
+                        logger.error("Job could not be created: new job view panel is null");
+                return null;
+                }
         if (boundScript == null) {
-        	logger.error("Job could not be created: script is null");
-        	return null;
+                logger.error("Job could not be created: script is null");
+                return null;
         }
         
         XProcScript script = boundScript.getScript().getXProcScript();
@@ -57,9 +60,9 @@ public class JobExecutor {
         //add options
         Iterator<XProcOptionInfo> itOption = scriptInfo.getOptions().iterator();
         while(itOption.hasNext()) {
-        	XProcOptionInfo option = itOption.next();
-        	String optionName = option.getName().toString();
-        	addToBuilder(boundScript.getOptionByName(optionName), inBuilder);
+                XProcOptionInfo option = itOption.next();
+                String optionName = option.getName().toString();
+                addToBuilder(boundScript.getOptionByName(optionName), inBuilder);
         }
         
         BoundXProcScript bound = BoundXProcScript.from(script, inBuilder.build(), outBuilder.build());
@@ -68,52 +71,61 @@ public class JobExecutor {
         
         // TODO what does isPresent() do?
 //        if(!newJob.isPresent()){
-//        	return Optional.absent();
+//              return Optional.absent();
 //        }
-		
+                
         return newJob.get();
     }
-	
-        private static void addToBuilder(ScriptFieldAnswer answer, Builder builder) {
-        	
-        	String name = answer.getField().getName();
-        	FieldType type = answer.getField().getFieldType();
-        	
-        	if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
-        		ScriptFieldAnswer.ScriptFieldAnswerString answer_ = 
-        				(ScriptFieldAnswer.ScriptFieldAnswerString)answer;
-        		String value = answer_.answerProperty().get();
-        		if (type == FieldType.INPUT) {
-        			LazySaxSourceProvider prov = new LazySaxSourceProvider(value);
-                    builder.withInput(name, prov);
-        		}
-        		else if (type == FieldType.OPTION) {
-        			builder.withOption(new QName(name), value);
-        		}
+        
+        private static void addToBuilder(ScriptFieldAnswer answer, Builder builder)
+                        throws MalformedURLException {
                 
-        	}
-        	
-        	else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
-        		ScriptFieldAnswer.ScriptFieldAnswerList answer_ = 
-        				(ScriptFieldAnswer.ScriptFieldAnswerList)answer;
-        		for (String value : answer_.answerProperty()) {
-        			if (type == FieldType.INPUT) {
-            			LazySaxSourceProvider prov = new LazySaxSourceProvider(value);
-                        builder.withInput(name, prov);
-            		}
-            		else if (type == FieldType.OPTION) {
-            			builder.withOption(new QName(name), value);
-            		}
-        		}
-        	}
-        	
-        	else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
-        		ScriptFieldAnswer.ScriptFieldAnswerBoolean answer_ = 
-        				(ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer;
-        		String value = answer_.answerAsString();
-        		// booleans are only possibly ever options
-        		builder.withOption(new QName(name), value);
-        	}
+                String name = answer.getField().getName();
+                FieldType type = answer.getField().getFieldType();
+                DataType dataType=answer.getField().getDataType();
+                
+                if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerString) {
+                        ScriptFieldAnswer.ScriptFieldAnswerString answer_ = 
+                                        (ScriptFieldAnswer.ScriptFieldAnswerString)answer;
+                        String value = answer_.answerProperty().get();
+                        if (type == FieldType.INPUT) {
+                                LazySaxSourceProvider prov = new LazySaxSourceProvider(new File(value).toURI().toString());
+                    builder.withInput(name, prov);
+                        }
+                        else {
+                                if (dataType==DataType.DIRECTORY || dataType == DataType.FILE){
+                                        value=new File(value).toURI().toString();
+                                }
+                                builder.withOption(new QName(name), value);
+                        }
+                
+                }
+                
+                else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerList) {
+                        ScriptFieldAnswer.ScriptFieldAnswerList answer_ = 
+                                (ScriptFieldAnswer.ScriptFieldAnswerList)answer;
+                        for (String value : answer_.answerProperty()) {
+                                if (type == FieldType.INPUT) {
+                                        LazySaxSourceProvider prov = new LazySaxSourceProvider(new File(value).toURI().toString());
+                                        builder.withInput(name, prov);
+                                }
+                                else {
+
+                                        if (dataType==DataType.DIRECTORY || dataType == DataType.FILE){
+                                                value=new File(value).toURI().toString();
+                                        }
+                                        builder.withOption(new QName(name), value);
+                                }
+                        }
+                }
+                
+                else if (answer instanceof ScriptFieldAnswer.ScriptFieldAnswerBoolean) {
+                        ScriptFieldAnswer.ScriptFieldAnswerBoolean answer_ = 
+                                        (ScriptFieldAnswer.ScriptFieldAnswerBoolean)answer;
+                        String value = answer_.answerAsString();
+                        // booleans are only possibly ever options
+                        builder.withOption(new QName(name), value);
+                }
         }
-	
+        
 }

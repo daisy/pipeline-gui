@@ -37,7 +37,6 @@ import org.daisy.pipeline.gui.databridge.ScriptValidator;
 public class NewJobPane extends VBox {
         private static final Logger logger = LoggerFactory.getLogger(NewJobPane.class);
 
-<<<<<<< HEAD
 	
 	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper scriptFormControlsGrid;

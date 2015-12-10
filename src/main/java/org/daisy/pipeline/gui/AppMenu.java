@@ -4,6 +4,8 @@ import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job.Status;
 
+
+import de.codecentric.centerdevice.MenuToolkit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -73,17 +75,9 @@ public class AppMenu extends MenuBar {
         
         if (PlatformUtils.isMac()) {
         	this.setUseSystemMenuBar(true);
+            MenuToolkit toolkit = MenuToolkit.toolkit();
+            toolkit.setApplicationMenu(toolkit.createDefaultApplicationMenu("DAISY Pipeline 2"));
         	
-      /*  	NSMenuBarAdapter adapter = new NSMenuBarAdapter();
-        	// Get the default menu bar as JavaFX object
-        	MenuBar menuBar = adapter.getMenuBar();
-
-        	// Change the name of the first menu item
-        	menuBar.getMenus().get(0).setText("Hello World");
-
-        	// Update the menu bar
-        	adapter.setMenuBar(menuBar);
-        */
         } else {
             MenuItem exit = new MenuItem("Exit");
             exit.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));

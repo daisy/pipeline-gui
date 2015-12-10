@@ -3,6 +3,7 @@ package org.daisy.pipeline.gui;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import org.daisy.pipeline.clients.Client;
@@ -38,6 +39,7 @@ public class PipelineApplication extends Application {
 
                                         stage.setScene(mainWindow.getScene());
                                         stage.setTitle("DAISY Pipeline 2");
+                                        stage.getIcons().add(new Image(getClass().getResourceAsStream("/org/daisy/pipeline/gui/resources/logo.png")));
                                         stage.show();
 
                                 }

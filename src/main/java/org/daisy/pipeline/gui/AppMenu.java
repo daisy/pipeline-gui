@@ -74,9 +74,12 @@ public class AppMenu extends MenuBar {
         });
         
         if (PlatformUtils.isMac()) {
-        	this.setUseSystemMenuBar(true);
+            this.setUseSystemMenuBar(true);
             MenuToolkit toolkit = MenuToolkit.toolkit();
-            toolkit.setApplicationMenu(toolkit.createDefaultApplicationMenu("DAISY Pipeline 2"));
+            Menu toolkitMenu = toolkit.createDefaultApplicationMenu("DAISY Pipeline 2");
+            toolkit.setApplicationMenu(toolkitMenu);
+            toolkitMenu.setText("DAISY Pipeline 2");
+            
         	
         } else {
             MenuItem exit = new MenuItem("Exit");

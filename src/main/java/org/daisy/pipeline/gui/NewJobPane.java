@@ -50,8 +50,11 @@ public class NewJobPane extends VBox {
 	public NewJobPane(MainWindow main) {
 		super();
 		this.main = main;
-		scripts = main.getScriptData();
-		initControls();
+                scripts = main.getScriptData();
+                String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
+                this.getStylesheets().add(css);
+                initControls();
+                
 		
 	}
 	

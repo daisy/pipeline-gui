@@ -101,7 +101,6 @@ class LogPane extends VBox implements UpdaterObserver{
                 this.messageList.add(msg);
         }
         public void info(final String msg){
-                System.out.println("ADding infog!");
                 Platform.runLater(new Runnable(){
                         public void run(){
                                 messageList.add("INFO "+msg);
@@ -124,6 +123,8 @@ class LogPane extends VBox implements UpdaterObserver{
                         super.updateItem(item, empty);
                         if (!empty && item.startsWith("ERROR ")) {
                                 this.setBackground(new Background(new BackgroundFill(Paint.valueOf("rgba(120,0,0,0.25)"),null,null)));
+                        }else{
+                                this.setBackground(new Background(new BackgroundFill(Paint.valueOf("rgba(255,255,255,0.25)"),null,null)));
                         }
                         this.setText(item);
                 }

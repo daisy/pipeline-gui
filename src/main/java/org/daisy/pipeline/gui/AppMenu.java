@@ -37,24 +37,26 @@ public class AppMenu extends MenuBar {
         }
 
         private void initHelp() {
-                Menu menuHelp= new Menu("Help");
-                MenuItem update= new MenuItem("Check updates");
+                if (!PlatformUtils.isWin()){
+                        Menu menuHelp= new Menu("Help");
+                        MenuItem update= new MenuItem("Check updates");
 
-                update.setOnAction(new EventHandler<ActionEvent>() {
-                        public void handle(ActionEvent t) {
-                                UpdaterPane updater=new UpdaterPane();
-                                Stage otherStage = new Stage();
-                                Scene secondScene = new Scene(updater, 600, 400);
-                                String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
+                        update.setOnAction(new EventHandler<ActionEvent>() {
+                                public void handle(ActionEvent t) {
+                                        UpdaterPane updater=new UpdaterPane();
+                                        Stage otherStage = new Stage();
+                                        Scene secondScene = new Scene(updater, 600, 400);
+                                        String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
 
-                                secondScene.getStylesheets().add(css);
-                                updater.build();
-                                otherStage.setScene(secondScene);
-                                otherStage.show();
-                        }
-                });
-                menuHelp.getItems().add(update);
-                this.getMenus().addAll(menuHelp);
+                                        secondScene.getStylesheets().add(css);
+                                        updater.build();
+                                        otherStage.setScene(secondScene);
+                                        otherStage.show();
+                                }
+                        });
+                        menuHelp.getItems().add(update);
+                        this.getMenus().addAll(menuHelp);
+                }
         }
 
         private void initControls() {

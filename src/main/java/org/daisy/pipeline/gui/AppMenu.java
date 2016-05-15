@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 
 public class AppMenu extends MenuBar {
 
+<<<<<<< HEAD
         private MainWindow main;
         private MenuItem deleteJob;
         private MenuItem runJobAgain;
@@ -58,6 +59,73 @@ public class AppMenu extends MenuBar {
                         });
                         menuHelp.getItems().add(update);
                         this.getMenus().addAll(menuHelp);
+=======
+	private MainWindow main;
+	private MenuItem deleteJob;
+	private MenuItem runJobAgain;
+	private MenuItem runJob;
+	private ChangeListener<String> jobStatusListener;
+	private ChangeListener<ObservableJob> currentJobChangeListener;
+	
+	public AppMenu(MainWindow main) {
+		super();
+		jobStatusListener = null;
+		this.main = main;
+		initControls();
+		addCurrentJobChangeListener();
+		
+	}
+
+    private void initHelp() {
+        Menu menuHelp= new Menu("Help");
+        MenuItem update= new MenuItem("Check updates");
+                
+        update.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                UpdaterPane updater=new UpdaterPane();
+                Stage otherStage = new Stage();
+                Scene secondScene = new Scene(updater, 600, 400);
+                String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
+
+                secondScene.getStylesheets().add(css);
+                    updater.build();
+                    otherStage.setScene(secondScene);
+                    otherStage.show();
+            }
+        });
+        menuHelp.getItems().add(update);
+        this.getMenus().addAll(menuHelp);
+    }
+	
+	private void initControls() {
+		Menu menuFile = new Menu("File");
+        
+        this.getMenus().addAll(menuFile);
+ 
+        MenuItem newjob = new MenuItem("New job");
+        newjob.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
+        menuFile.getItems().addAll(newjob);
+        newjob.setOnAction(new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent t) {
+        		main.newJob();
+        	}
+        });
+        
+        if (PlatformUtils.isMac()) {
+            this.setUseSystemMenuBar(true);
+            MenuToolkit toolkit = MenuToolkit.toolkit();
+            Menu toolkitMenu = toolkit.createDefaultApplicationMenu("DAISY Pipeline 2");
+            toolkit.setApplicationMenu(toolkitMenu);
+            toolkitMenu.setText("DAISY Pipeline 2");
+            
+        	
+        } else {
+            MenuItem exit = new MenuItem("Exit");
+            exit.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
+            exit.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent t) {
+                    System.exit(0);
+>>>>>>> 7216be0a9758bf47f6effdbb1201ec26d3efb2f6
                 }
         }
 	

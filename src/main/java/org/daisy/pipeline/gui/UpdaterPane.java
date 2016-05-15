@@ -2,27 +2,26 @@ package org.daisy.pipeline.gui;
 
 import java.io.IOException;
 
+import org.daisy.pipeline.updater.Updater;
+import org.daisy.pipeline.updater.UpdaterObserver;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import javafx.scene.layout.BackgroundFill;
-
-
-
-import org.daisy.pipeline.updater.Updater;
-import org.daisy.pipeline.updater.UpdaterObserver;
 
 public class UpdaterPane extends BorderPane{
 
@@ -37,6 +36,7 @@ public class UpdaterPane extends BorderPane{
                 final ProgressBar bar= new ProgressBar();
                 bar.setVisible(false);
                 bar.setProgress(-1);
+                bar.setMaxWidth(this.getWidth()-50);
                 logPane.getStyleClass().add("messages");
                 butt.setOnAction(new EventHandler<ActionEvent>() {
                         public void handle(ActionEvent t) {
@@ -101,7 +101,6 @@ class LogPane extends VBox implements UpdaterObserver{
                 this.messageList.add(msg);
         }
         public void info(final String msg){
-                System.out.println("ADding infog!");
                 Platform.runLater(new Runnable(){
                         public void run(){
                                 messageList.add("INFO "+msg);
@@ -124,6 +123,8 @@ class LogPane extends VBox implements UpdaterObserver{
                         super.updateItem(item, empty);
                         if (!empty && item.startsWith("ERROR ")) {
                                 this.setBackground(new Background(new BackgroundFill(Paint.valueOf("rgba(120,0,0,0.25)"),null,null)));
+                        }else{
+                                this.setBackground(new Background(new BackgroundFill(Paint.valueOf("rgba(255,255,255,0.25)"),null,null)));
                         }
                         this.setText(item);
                 }

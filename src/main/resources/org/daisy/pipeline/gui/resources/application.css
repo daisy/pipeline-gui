@@ -2,6 +2,8 @@
 	-fx-padding: 10;
 	-fx-spacing: 8;
 }
+
+
 .title {
 	-fx-font-family: Arial;
 	-fx-font-weight: bold;
@@ -78,4 +80,43 @@
 .vbox {
     -fx-border-width: 0px;
     -fx-padding: 0 0 0 10;
+}
+
+.emph{
+        -fx-font-style: normal;
+}
+/*
+ * Markdown support classes
+ */
+
+.strong{
+        -fx-font-weight: bold;
+}
+
+.h1{
+        -fx-font-weight: bold;
+        -fx-font-style: normal;
+        -fx-font-size:18 ;
+}
+.h2{
+        -fx-font-weight: bold;
+        -fx-font-style: italic;
+        -fx-font-size:15 ;
+}
+.h3{
+        -fx-font-style: italic;
+        -fx-font-size:13 ;
+}
+.h4{
+        -fx-font-style: italic;
+        -fx-font-size:13 ;
+}
+
+.h5{
+        -fx-font-style: italic;
+        -fx-font-size:13 ;
+}
+.h6{
+        -fx-font-style: italic;
+        -fx-font-size:13 ;
 }

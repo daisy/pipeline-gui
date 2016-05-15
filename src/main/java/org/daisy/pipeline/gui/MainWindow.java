@@ -132,6 +132,7 @@ public class MainWindow extends BorderPane {
 		detailsPane = new DetailsPane(this);
 		
 		newJobPane = new NewJobPane(this);
+                newJobPane.getStylesheets().add(css);
 		
 		messagesPane = new MessagesPane(this);
 		this.setBottom(messagesPane);

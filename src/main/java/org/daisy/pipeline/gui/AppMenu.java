@@ -1,5 +1,7 @@
 package org.daisy.pipeline.gui;
 
+import de.codecentric.centerdevice.MenuToolkit;
+
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
 import org.daisy.pipeline.job.Job.Status;
@@ -74,19 +76,15 @@ public class AppMenu extends MenuBar {
                 });
 
                 if (PlatformUtils.isMac()) {
-                        this.setUseSystemMenuBar(true);
-
-                        /*  	NSMenuBarAdapter adapter = new NSMenuBarAdapter();
-                        // Get the default menu bar as JavaFX object
-                        MenuBar menuBar = adapter.getMenuBar();
-
-                        // Change the name of the first menu item
-                        menuBar.getMenus().get(0).setText("Hello World");
-
-                        // Update the menu bar
-                        adapter.setMenuBar(menuBar);
-                        */
-                } else {
+                    this.setUseSystemMenuBar(true);
+                    MenuToolkit toolkit = MenuToolkit.toolkit();
+                    Menu toolkitMenu = toolkit.createDefaultApplicationMenu("DAISY Pipeline 2");
+                    toolkit.setApplicationMenu(toolkitMenu);
+                    // the application menu title still reads "java" on OSX; this
+                    // has to be changed in Info.plist when the application is bundled
+                    
+                	
+                }  else {
                         MenuItem exit = new MenuItem("Exit");
                         exit.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
                         exit.setOnAction(new EventHandler<ActionEvent>() {

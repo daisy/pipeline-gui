@@ -1,5 +1,7 @@
 package org.daisy.pipeline.gui;
 
+import java.io.IOException;
+
 import de.codecentric.centerdevice.MenuToolkit;
 
 import org.daisy.pipeline.gui.databridge.ObservableJob;
@@ -42,6 +44,7 @@ public class AppMenu extends MenuBar {
                 if (!PlatformUtils.isWin()){
                         Menu menuHelp= new Menu("Help");
                         MenuItem update= new MenuItem("Check updates");
+                        MenuItem userguide = new MenuItem("User guide");
 
                         update.setOnAction(new EventHandler<ActionEvent>() {
                                 public void handle(ActionEvent t) {
@@ -56,7 +59,19 @@ public class AppMenu extends MenuBar {
                                         otherStage.show();
                                 }
                         });
+                        userguide.setOnAction(new EventHandler<ActionEvent>() {
+                        	public void handle(ActionEvent t) {
+                        		try {
+                                    String cmd = PlatformUtils.getFileBrowserCommand() + " " + PipelineApplication.USERGUIDE_URL;
+                                    Runtime.getRuntime().exec(cmd);
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                	e.printStackTrace();
+                                }
+                        	}
+                        });
                         menuHelp.getItems().add(update);
+                        menuHelp.getItems().add(userguide);
                         this.getMenus().addAll(menuHelp);
                 }
         }

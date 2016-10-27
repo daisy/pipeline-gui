@@ -313,7 +313,7 @@ public class GridPaneHelper extends GridPane {
                  RootNode node = mdProcessor.parseMarkdown(answer.getField().getDescription().toCharArray());
                 node.accept(mdToFx);
                 parent.getChildren().add(flow);
-                flow.setMaxWidth(200);
+                flow.setMaxWidth(350);
                 //helpText = helpText.trim();
                 //helpText.replace('\n', ' ');
                 //helpText.replace('\t', ' ');

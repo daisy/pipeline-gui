@@ -28,7 +28,10 @@
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>framework-bom</artifactId>
-        <version>1.10.1</version>
+        <!--
+            depends on https://github.com/daisy/pipeline-framework/pull/113
+        -->
+        <version>1.10.2-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

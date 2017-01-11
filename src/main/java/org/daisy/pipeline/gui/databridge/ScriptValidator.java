@@ -24,10 +24,10 @@ public class ScriptValidator {
 	}
 	public boolean validate() {
 		boolean inputsAreValid = checkFields(boundScript.getInputFields());
-		boolean reqOptionsAreValid = checkFields(boundScript.getRequiredOptionFields());
+		boolean reqOptionsAreValid = checkFields(boundScript.getOptionFields(true));
 		// validate the optional options just to get any messages about their values
 		// for example, a file path might be expected
-		checkFields(boundScript.getOptionalOptionFields());
+		checkFields(boundScript.getOptionFields(false));
                 
 		
                 logger.debug("Inputs "+inputsAreValid);

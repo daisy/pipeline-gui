@@ -2,6 +2,7 @@
 package org.daisy.pipeline.gui;
 
 import java.text.Collator;
+import java.util.prefs.Preferences;
 import java.io.File;
 import java.net.MalformedURLException;
 import javafx.beans.value.ChangeListener;
@@ -192,6 +193,9 @@ public class NewJobPane extends VBox {
                 
                 // if this script produces results, add an output directory field. that directory will contain subdirs for each specific output option.
                 if (boundScript.getScript().hasResultOptions()) {
+                	Preferences prefs = Preferences.userRoot().node("com/org/daisy/pipeline/gui");
+                	String lastUsedOutputDir = prefs.get("LastUsedOutputDir", "");
+                	boundScript.getOutputDir().set(lastUsedOutputDir);
                 	// pass it the property in boundScript to bind the text field widget to
                 	scriptFormControlsGrid.addOutputField(boundScript.getOutputDir());
                 }
@@ -272,6 +276,11 @@ public class NewJobPane extends VBox {
                         main.getMessagesPane().addMessages(messages);
                 }
                 else {
+                        // store the output dir preference, because by this point, we're sure it's valid
+                        if (boundScript.getScript().hasResultOptions()) {
+                                Preferences prefs = Preferences.userRoot().node("com/org/daisy/pipeline/gui");
+                                prefs.put("LastUsedOutputDir", boundScript.getOutputDir().get());
+                        }
                         Job newJob;
                         try {
                                 newJob = JobExecutor.runJob(main, pipelineServices, boundScript);

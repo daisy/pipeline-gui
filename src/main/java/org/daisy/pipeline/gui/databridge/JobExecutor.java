@@ -53,7 +53,7 @@ public class JobExecutor {
         // job output goes in directories like this:
         //     path/to/boundScript.getOutputDir/jobDir/optionDir1..n/
         // where the optionDirs are the options' names
-        Path jobDir = createJobOutputDirectory(boundScript.getOutputDir().get(), boundScript.getScript().getName());
+        Path jobDir = createJobOutputDirectory(boundScript.getOutputDir().get(), boundScript.getScript().getName(), main);
         if (jobDir == null) { // this means the specified directory doesn't exist, or a subdir for this specific job couldn't be created
                 return null;
         }
@@ -156,30 +156,26 @@ public class JobExecutor {
                 }
         }
 
-        // create a folder for this job in the given directory, and return a path to
-        // this new folder
-        private static Path createJobOutputDirectory(String parentDir, String scriptName) {
-                // make sure this dir exists
+        // create a folder for this job in the given directory, and return a path to this new folder
+        private static Path createJobOutputDirectory(String parentDir, String scriptName, MainWindow main) {
+                // the script validator already ensures that this parentDir exists
                 Path path = Paths.get(parentDir);
-                if (Files.exists(path)) {
-                        // create a directory for the job, based on the script name
-                        String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-                        String jobDir = timestamp + "_" + scriptName;
-                        Path jobDirPath = path.resolve(jobDir);
-                        // there is an extremely small chance that this folder would
-                        // actually already exist .. but just to be safe
-                        if (Files.exists(jobDirPath)) {
-                                jobDirPath = path.resolve(jobDir + "_" + UUID.randomUUID().toString());
-                        }
-                        try {
-                                Files.createDirectory(jobDirPath);
-                        } catch (IOException e) {
-                                logger.error("Could not create job directory: " + jobDirPath.toString());
-                                return null;
-                        }
-                        return jobDirPath;
+                // create a directory for the job, based on the script name
+                String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+                String jobDir = timestamp + "_" + scriptName;
+                Path jobDirPath = path.resolve(jobDir);
+                // there is an extremely small chance that this folder would
+                // actually already exist .. but just to be safe
+                if (Files.exists(jobDirPath)) {
+                        jobDirPath = path.resolve(jobDir + "_" + UUID.randomUUID().toString());
                 }
-                logger.error("Output directory does not exist: " + parentDir);
-                return null;
+                try {
+                        Files.createDirectory(jobDirPath);
+                } catch (IOException e) {
+                        logger.error("Could not create job directory: " + jobDirPath.toString());
+                        main.getMessagesPane().addMessage("ERROR: Could not create job directory: " + jobDirPath.toString());
+                        return null;
+                }
+                return jobDirPath;
         }
 }

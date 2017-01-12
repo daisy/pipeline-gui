@@ -77,7 +77,7 @@ public class NewJobPane extends VBox {
 		scriptsCombo.getSelectionModel().clearSelection();
 		scriptInfoBox.clearControls();
 		scriptFormControlsGrid.clearControls();
-		main.clearValidationMessages();
+		main.getMessagesPane().clearMessages();
 	}
 	public void newFromBoundScript(BoundScript boundScript) {
 		scriptsCombo.getSelectionModel().select(boundScript.getScript());
@@ -174,7 +174,7 @@ public class NewJobPane extends VBox {
                 if (script == null) {
                         return;
                 }
-                main.clearValidationMessages();
+                main.getMessagesPane().clearMessages();
                 main.enableRunJobMenuItem();
                 scriptInfoBox.clearControls();
                 scriptFormControlsGrid.clearControls();
@@ -263,11 +263,13 @@ public class NewJobPane extends VBox {
         }
         
         public void runJob() {
+                main.getMessagesPane().clearMessages();
+    
                 ScriptValidator validator = new ScriptValidator(boundScript);
                 if (!validator.validate()) {
                         logger.debug("Script is not valid");
                         ObservableList<String> messages = validator.getMessages();
-                        main.addValidationMessages(messages);
+                        main.getMessagesPane().addMessages(messages);
                 }
                 else {
                         Job newJob;
@@ -280,9 +282,7 @@ public class NewJobPane extends VBox {
                                         logger.error("Couldn't create the job");
                                 }
                         } catch (MalformedURLException e) {
-                                ObservableList<String> error= FXCollections.observableArrayList();
-                                error.add("Error while trasfroming path: "+e.getMessage());
-                                main.addValidationMessages(error);
+                                main.getMessagesPane().addMessage("ERROR while transforming path: " + e.getMessage());
                                 logger.error("Couldn't create the job",e);
                         }
                 }

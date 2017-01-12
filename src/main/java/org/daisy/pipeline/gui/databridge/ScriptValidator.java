@@ -1,6 +1,13 @@
 package org.daisy.pipeline.gui.databridge;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,16 +31,17 @@ public class ScriptValidator {
 	}
 	public boolean validate() {
 		boolean inputsAreValid = checkFields(boundScript.getInputFields());
-		boolean reqOptionsAreValid = checkFields(boundScript.getOptionFields(true));
+		boolean	reqOptionsAreValid = checkFields(boundScript.getOptionFields(true));
+		boolean outputDirIsValid = checkOutputDir(boundScript);
 		// validate the optional options just to get any messages about their values
 		// for example, a file path might be expected
 		checkFields(boundScript.getOptionFields(false));
-                
-		
-                logger.debug("Inputs "+inputsAreValid);
-                logger.debug("reqOptionsAreValid "+reqOptionsAreValid);
-		return inputsAreValid && reqOptionsAreValid;
-		
+
+
+		logger.debug("Inputs "+inputsAreValid);
+		logger.debug("reqOptionsAreValid "+reqOptionsAreValid);
+		return inputsAreValid && reqOptionsAreValid && outputDirIsValid;
+
 	}
 	public ObservableList<String> getMessages() {
 		return messages;
@@ -49,14 +57,39 @@ public class ScriptValidator {
 		}
 		return isValid;
 	}
+	
+	private boolean checkOutputDir(BoundScript boundScript) {
+		if (boundScript.getScript().hasResultOptions()) {
+			if (boundScript.getOutputDir() == null || boundScript.getOutputDir().get() == null || boundScript.getOutputDir().get().isEmpty()) {
+				logger.error("Output directory field is blank");
+				messages.add("ERROR: output directory field is blank");
+				return false;
+			}
+			// make sure the output dir is valid
+			Path path = Paths.get(boundScript.getOutputDir().get());
+			if (Files.exists(path) == false) {
+				// try to create it
+				try {
+					Files.createDirectory(path);
+				} catch (IOException e) {
+					logger.error("Output directory does not exist, and could not be created: " + path.toString());
+					messages.add("ERROR: Output directory does not exist, and could not be created: " + path.toString());
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	public class ScriptFieldValidator {
 		
-		private String EMPTYSTRING = "ERROR: Value is empty for ";
-		private String BADPATH = "ERROR: File not found: ";
-		private String NOTANUM = "ERROR: Numeric value required for ";
-		private String CANTCREATEDIR = "ERROR: Could not create directory ";
-		private String NOTADIR = "ERROR: Not a directory: ";
-		private String NOTINENUM = "ERROR: Value is not in the list of accepted values: ";
+		public static final String EMPTYSTRING = "ERROR: Value is empty for ";
+		public static final String BADPATH = "ERROR: File not found: ";
+		public static final String NOTANUM = "ERROR: Numeric value required for ";
+		public static final String CANTCREATEDIR = "ERROR: Could not create directory ";
+		public static final String NOTADIR = "ERROR: Not a directory: ";
+		public static final String NOTINENUM = "ERROR: Value is not in the list of accepted values: ";
 		
 	
 		String message;

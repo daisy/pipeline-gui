@@ -46,8 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
-      <artifactId>updater</artifactId>
-      <version>1.0.0</version>
+      <artifactId>updater-wrapper</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>

@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
@@ -81,7 +82,8 @@ public class NewJobPane extends VBox {
 	    
 	    topGrid.setSpacing(20.0);
 	    
-		Text title = new Text("Choose a script:");
+		Label title = new Label("Choose a script:");
+		title.setLabelFor(scriptsCombo);
 		topGrid.getChildren().add(title);
 		
 		

@@ -69,8 +69,8 @@ public class ObservableJob { //extends SimpleObjectProperty {
 		if (status == Status.RUNNING) {
 			return "Running";
 		}
-		if (status == Status.VALIDATION_FAIL) {
-			return "Validation fail";
+		if (status == Status.FAIL) {
+			return "Fail";
 		}
 		return "";
 	}

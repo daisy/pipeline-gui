@@ -1,6 +1,5 @@
 package org.daisy.pipeline.gui.databridge;
 
-import org.daisy.common.messaging.Message;
 import org.daisy.pipeline.gui.MainWindow;
 import org.daisy.pipeline.job.Job;
 import org.daisy.pipeline.job.JobId;
@@ -20,15 +19,6 @@ public class EventBusListener {
 		this.dataManager = main.getDataManager();
 	}
 	
-	
-	@Subscribe
-    public synchronized void handleMessage(Message msg) {
-		//System.out.println("##################### GUI EVENT BUS MSG");
-    	String jobId = msg.getJobId();
-    	Job job = jobManager.getJob(JobIdFactory.newIdFromString(jobId)).get();
-    	dataManager.addMessage(job, msg.getText(), msg.getLevel());
-    }
-
     @Subscribe
     public void handleStatus(StatusMessage message) {
     	//System.out.println("##################### GUI EVENT BUS STATUS");

@@ -4,6 +4,7 @@ package org.daisy.pipeline.gui;
 import java.text.Collator;
 import java.net.MalformedURLException;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.SortedList;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -14,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -84,6 +86,8 @@ public class NewJobPane extends VBox {
 	    
 		Label title = new Label("Choose a script:");
 		title.setLabelFor(scriptsCombo);
+    //scriptsCombo.accessibleTextProperty().bind( new SimpleStringProperty( ((Script)scriptsCombo.getSelectionModel().selectedItemProperty().getValue()).getName()) );
+    //scriptsCombo.accessibleHelpProperty().bind( new SimpleStringProperty( ((Script)scriptsCombo.getSelectionModel().selectedItemProperty().getValue()).getDescription()) );
 		topGrid.getChildren().add(title);
 		
 		
@@ -155,8 +159,11 @@ public class NewJobPane extends VBox {
                 main.enableRunJobMenuItem();
                 scriptInfoBox.clearControls();
                 scriptFormControlsGrid.clearControls();
+                scriptsCombo.setAccessibleText(script.getName());
+                scriptsCombo.setAccessibleHelp(script.getDescription());
                 boundScript = new BoundScript(script);
                 populateScriptDetailsGrid();
+                scriptsCombo.requestFocus();
         }
         
         private void populateScriptDetailsGrid() {

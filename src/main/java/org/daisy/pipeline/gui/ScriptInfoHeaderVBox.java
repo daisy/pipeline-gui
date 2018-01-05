@@ -38,7 +38,6 @@ public class ScriptInfoHeaderVBox extends VBox implements MarkdownToJavafx.JavaF
                 this.flow = new TextFlow();
                 Text name = new Text(script.getName());
                 name.getStyleClass().add("subtitle");
-                name.setFocusTraversable(true);
                 this.getChildren().add(name);
                 
 

@@ -159,11 +159,8 @@ public class NewJobPane extends VBox {
                 main.enableRunJobMenuItem();
                 scriptInfoBox.clearControls();
                 scriptFormControlsGrid.clearControls();
-                scriptsCombo.setAccessibleText(script.getName());
-                scriptsCombo.setAccessibleHelp(script.getDescription());
                 boundScript = new BoundScript(script);
                 populateScriptDetailsGrid();
-                scriptsCombo.requestFocus();
         }
         
         private void populateScriptDetailsGrid() {

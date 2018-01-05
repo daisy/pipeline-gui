@@ -18,14 +18,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -150,12 +148,11 @@ public class GridPaneHelper extends GridPane {
         public void addFileDirPickerSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
                 Text label = new Text();
                 label.setText(answer.getField().getNiceName());
-                label.setFocusTraversable(true);
                 final ListView<String> listbox = new ListView<String>();
                 listbox.setItems(answer.answerProperty());
                 listbox.getStyleClass().add("input-list");
                 listbox.setAccessibleText(label.getText());
-                listbox.setTooltip(new Tooltip(label.getText()));
+                listbox.setTooltip(new Tooltip(answer.getField().getDescription().split("\\r?\\n")[0]));
                 VBox vbox = new VBox();
                 vbox.getChildren().addAll(label);
                 addRow(vbox, listbox);
@@ -218,10 +215,9 @@ public class GridPaneHelper extends GridPane {
         public void addTextFieldSequence(ScriptFieldAnswer.ScriptFieldAnswerList answer) {
                 Text label = new Text();
                 label.setText(answer.getField().getNiceName() + ":");
-                label.setFocusTraversable(true);
                 final TextField inputText = new TextField();
                 inputText.setAccessibleText(label.getText());
-                inputText.setTooltip(new Tooltip(answer.getField().getDescription()));
+                inputText.setTooltip(new Tooltip(answer.getField().getDescription().split("\\r?\\n")[0]));
                 Button addTextButton = new Button("Add");
                 VBox vbox = new VBox();
                 vbox.getChildren().addAll(label);
@@ -235,7 +231,7 @@ public class GridPaneHelper extends GridPane {
                 listbox.setItems(answer.answerProperty());
                 listbox.getStyleClass().add("input-list");
                 listbox.setAccessibleText(label.getText());
-                listbox.setTooltip(new Tooltip(answer.getField().getDescription()));
+                listbox.setTooltip(new Tooltip(answer.getField().getDescription().split("\\r?\\n")[0]));
                 addRow(null, listbox);
                 
                 final Button removeTextButton = new Button("Remove");
@@ -278,11 +274,12 @@ public class GridPaneHelper extends GridPane {
                     labelText = "Output directory for: " + labelText;
                 }
                 label.setText(labelText);
-                label.setFocusTraversable(true);
                 final TextField inputFileText = new TextField();
                 inputFileText.textProperty().bindBidirectional(answer.answerProperty());
                 inputFileText.setAccessibleText(label.getText());
-                inputFileText.setTooltip(new Tooltip(answer.getField().getDescription()));
+                String desc = answer.getField().getDescription();
+                if (desc != null)
+                    inputFileText.setTooltip(new Tooltip(desc.split("\\r?\\n")[0]));
                 Button inputFileButton = new Button("Browse");
                 VBox vbox = new VBox();
                 vbox.getChildren().addAll(label);
@@ -351,7 +348,6 @@ public class GridPaneHelper extends GridPane {
                 	node.accept(mdToFx);
                   parent.getChildren().add(flow);
                   flow.setMaxWidth(350);
-                  flow.setFocusTraversable(true);
                 }
                 //helpText = helpText.trim();
                 //helpText.replace('\n', ' ');
@@ -407,7 +403,6 @@ public class GridPaneHelper extends GridPane {
                 Text label = new Text();
                 VBox vbox = new VBox();
                 label.setText(answer.getField().getNiceName() + ":");
-                label.setFocusTraversable(true);
                 vbox.getChildren().add(label);
                 CheckBox cb = new CheckBox("");
                 if (answer.answerProperty().get() == true) {
@@ -415,7 +410,7 @@ public class GridPaneHelper extends GridPane {
                 }
                 cb.selectedProperty().bindBidirectional(answer.answerProperty());
                 cb.setAccessibleText(label.getText());
-                cb.setTooltip(new Tooltip(answer.getField().getDescription()));
+                cb.setTooltip(new Tooltip(answer.getField().getDescription().split("\\r?\\n")[0]));
                 //vbox.getChildren().add(cb);
                 addRow(vbox,cb);
                 makeHelpText(answer,vbox);
@@ -427,12 +422,11 @@ public class GridPaneHelper extends GridPane {
                 Text label = new Text();
                 VBox vbox = new VBox();
                 label.setText(answer.getField().getNiceName() + ":");
-                label.setFocusTraversable(true);
                 vbox.getChildren().add(label);
                 final TextField textField = new TextField();
                 textField.textProperty().bindBidirectional(answer.answerProperty());
                 textField.setAccessibleText(label.getText());
-                textField.setTooltip(new Tooltip(answer.getField().getDescription()));
+                textField.setTooltip(new Tooltip(answer.getField().getDescription().split("\\r?\\n")[0]));
                 addRow(vbox, textField);
                 makeHelpText(answer,vbox);
                 

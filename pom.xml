@@ -92,8 +92,10 @@
         <version>2.4.0</version>
         <configuration>
           <instructions>
-            <!--<Bundle-Activator>org.daisy.pipeline.gui.Activator</Bundle-Activator>-->
-            <Service-Component>OSGI-INF/gui.xml</Service-Component>
+            <_dsannotations>
+              org.daisy.pipeline.gui.GUIService,
+              org.daisy.pipeline.gui.ServiceRegistry$ServiceBinder
+            </_dsannotations>
           </instructions>
         </configuration>
       </plugin>

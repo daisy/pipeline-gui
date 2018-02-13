@@ -1,65 +1,72 @@
 package org.daisy.pipeline.gui;
 
+import com.google.common.util.concurrent.Monitor;
+
 import org.daisy.pipeline.datatypes.DatatypeRegistry;
 import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.job.JobManagerFactory;
 import org.daisy.pipeline.script.ScriptRegistry;
 import org.daisy.pipeline.webserviceutils.storage.WebserviceStorage;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.util.concurrent.Monitor;
+/* This is a hack to make OSGi services available to objects that are not instantiated by
+ * the OSGi framework, such as PipelineApplication.
+ */
+public class ServiceRegistry {
 
-public class ServiceRegistry{
         private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
 
-
-        private  ScriptRegistry scriptRegistry = null;
-        private  JobManagerFactory jobManagerFactory = null;
-        private  EventBusProvider eventBusProvider = null;
-        private WebserviceStorage webserviceStorage = null;
-        private DatatypeRegistry datatypeRegistry = null;
-
-        private static ServiceRegistry instance=null;
-
-        private final Monitor monitor = new Monitor();
-        private final Monitor.Guard pipelineServicesAvailable = new Monitor.Guard(monitor) {
-                public boolean isSatisfied() {
-                        return instance!=null &&
-                                ServiceRegistry.this.scriptRegistry!=null &&
-                                ServiceRegistry.this.jobManagerFactory!=null &&
-                                ServiceRegistry.this.eventBusProvider!=null &&
-                                ServiceRegistry.this.webserviceStorage!=null &&
-                                ServiceRegistry.this.datatypeRegistry!=null
-                                ;
-                }
-        };
-
-        private GUIService guiService;
-
+        private static ServiceRegistry instance = null;
+        
         private ServiceRegistry() {
         }
 
-        static ServiceRegistry getInstance(){
-                if (instance==null){
-                        instance=new ServiceRegistry();
-
-                }
+        static ServiceRegistry getInstance() {
+                if (instance == null)
+                        instance = new ServiceRegistry();
                 return instance;
         }
+
+        private ScriptRegistry scriptRegistry = null;
+        private JobManagerFactory jobManagerFactory = null;
+        private EventBusProvider eventBusProvider = null;
+        private WebserviceStorage webserviceStorage = null;
+        private DatatypeRegistry datatypeRegistry = null;
+        private GUIService guiService = null;
+
+        private final Monitor monitor = new Monitor();
+        private final Monitor.Guard servicesAvailable = new Monitor.Guard(monitor) {
+                public boolean isSatisfied() {
+                        return instance != null &&
+                                ServiceRegistry.this.scriptRegistry != null &&
+                                ServiceRegistry.this.jobManagerFactory != null &&
+                                ServiceRegistry.this.eventBusProvider != null &&
+                                ServiceRegistry.this.webserviceStorage != null &&
+                                ServiceRegistry.this.datatypeRegistry != null &&
+                                ServiceRegistry.this.guiService != null;
+                }
+        };
+
+        public boolean isReady() {
+                return servicesAvailable.isSatisfied();
+        }
         
-        public void notifyReady(PipelineApplication app)throws InterruptedException{
-                try{
-                        monitor.enterWhen(this.pipelineServicesAvailable);
+        public void waitUntilReady() throws InterruptedException {
+                try {
+                        monitor.enterWhen(this.servicesAvailable);
                         logger.debug("setting serviceregistry");
-                        app.setServiceRegistry(this);
-                }catch (InterruptedException ie){
+                } catch (InterruptedException ie) {
                         throw ie;
-                }finally{
+                } finally {
                         monitor.leave();
                 }
-
-
         }
 
         /**
@@ -144,13 +151,70 @@ public class ServiceRegistry{
 
         public void setGUIService(GUIService guiService) {
                 this.monitor.enter();
-                this.guiService=guiService;
+                this.guiService = guiService;
                 this.monitor.leave();
         }
 
-        public GUIService getGUIService(){
+        public GUIService getGUIService() {
                 return this.guiService;
         }
 
-        
+        @Component
+        public static class ServiceBinder {
+
+                @Reference(
+                        name = "script-registry",
+                        unbind = "-",
+                        service = ScriptRegistry.class,
+                        cardinality = ReferenceCardinality.MANDATORY,
+                        policy = ReferencePolicy.STATIC
+                )
+                public void setScriptRegistry(ScriptRegistry scriptRegistry) {
+                        ServiceRegistry.getInstance().setScriptRegistry(scriptRegistry);
+                }
+
+                @Reference(
+                        name = "job-manager-factory",
+                        unbind = "-",
+                        service = JobManagerFactory.class,
+                        cardinality = ReferenceCardinality.MANDATORY,
+                        policy = ReferencePolicy.STATIC
+                )
+                public void setJobManagerFactory(JobManagerFactory jobManagerFactory) {
+                        ServiceRegistry.getInstance().setJobManagerFactory(jobManagerFactory);
+                }
+
+                @Reference(
+                        name = "event-bus-provider",
+                        unbind = "-",
+                        service = EventBusProvider.class,
+                        cardinality = ReferenceCardinality.MANDATORY,
+                        policy = ReferencePolicy.STATIC
+                )
+                public void setEventBusProvider(EventBusProvider eventBusProvider) {
+                        ServiceRegistry.getInstance().setEventBusProvider(eventBusProvider);
+                }
+
+                @Reference(
+                        name = "webservice-storage",
+                        unbind = "-",
+                        service = WebserviceStorage.class,
+                        cardinality = ReferenceCardinality.MANDATORY,
+                        policy = ReferencePolicy.STATIC
+                )
+                public void setWebserviceStorage(WebserviceStorage webserviceStorage) {
+                        ServiceRegistry.getInstance().setWebserviceStorage(webserviceStorage);
+                }
+
+                @Reference(
+                        name = "datatype-registry",
+                        unbind = "-",
+                        service = DatatypeRegistry.class,
+                        cardinality = ReferenceCardinality.MANDATORY,
+                        policy = ReferencePolicy.STATIC
+                )
+                public void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+                        ServiceRegistry.getInstance().setDatatypeRegistry(datatypeRegistry);
+                }
+        }
 }

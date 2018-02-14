@@ -1,7 +1,6 @@
 package org.daisy.pipeline.gui;
 
 import javafx.application.Application;
-import javafx.application.HostServices;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
@@ -17,8 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import org.daisy.pipeline.clients.Client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,15 +101,7 @@ public class PipelineApplication extends Application {
         }
 
         private void showMainWindow(Stage stage, ServiceRegistry services) {
-                HostServices hostServices = getHostServices();
-                Client client = services.getWebserviceStorage().getClientStorage().defaultClient();
-                MainWindow mainWindow = new MainWindow(
-                        services.getScriptRegistry(),
-                        services.getJobManagerFactory(),
-                        client,
-                        services.getEventBusProvider(),
-                        hostServices,
-                        services.getDatatypeRegistry());
+                MainWindow mainWindow = new MainWindow(services, getHostServices());
                 stage.setScene(mainWindow.getScene());
                 stage.setTitle("DAISY Pipeline 2");
                 stage.show();

@@ -44,15 +44,17 @@ public class NewJobPane extends VBox {
 	private ScriptInfoHeaderVBox scriptInfoBox;
 	private GridPaneHelper scriptFormControlsGrid;
 	private MainWindow main;
+	private ServiceRegistry pipelineServices;
 	private ObservableList<Script> scripts;
 	private BoundScript boundScript;
 	
 	
 	private final ComboBox<Script> scriptsCombo = new ComboBox<Script>();
 	
-	public NewJobPane(MainWindow main) {
+	public NewJobPane(MainWindow main, ServiceRegistry pipelineServices) {
 		super();
 		this.main = main;
+		this.pipelineServices = pipelineServices;
                 scripts = main.getScriptData();
                 String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
                 this.getStylesheets().add(css);
@@ -244,7 +246,7 @@ public class NewJobPane extends VBox {
                 else {
                         Job newJob;
                         try {
-                                newJob = JobExecutor.runJob(main, boundScript);
+                                newJob = JobExecutor.runJob(main, pipelineServices, boundScript);
                                 if (newJob != null) {
                                         ObservableJob objob = main.getDataManager().addJob(newJob);
                                         objob.setBoundScript(boundScript);

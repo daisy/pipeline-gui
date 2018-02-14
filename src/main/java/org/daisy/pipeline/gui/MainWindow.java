@@ -1,7 +1,6 @@
 package org.daisy.pipeline.gui;
 
 import javafx.application.HostServices;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -16,28 +15,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.daisy.pipeline.clients.Client;
-import org.daisy.pipeline.datatypes.DatatypeRegistry;
-import org.daisy.pipeline.event.EventBusProvider;
 import org.daisy.pipeline.gui.databridge.BoundScript;
 import org.daisy.pipeline.gui.databridge.DataManager;
 import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
-import org.daisy.pipeline.job.JobManager;
-import org.daisy.pipeline.job.JobManagerFactory;
-import org.daisy.pipeline.script.ScriptRegistry;
-import org.osgi.framework.BundleContext;
 
 public class MainWindow extends BorderPane {
-    
 
-	private JobManager jobManager;
-    private ScriptRegistry scriptRegistry;    
-    private EventBusListener eventBusListener;
-    private BundleContext bundleContext;
-    private EventBusProvider eventBusProvider;
+	private ServiceRegistry pipelineServices;
     private HostServices hostServices;
     private DataManager dataManager;
     private ObservableList<ObservableJob> jobData;
@@ -54,16 +41,13 @@ public class MainWindow extends BorderPane {
 	
 	public SimpleObjectProperty<ObservableJob> currentJobProperty;
 	private ChangeListener<ObservableJob> currentJobChangeListener;
+
+	static final String APPLICATION_CSS
+		= MainWindow.class.getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
 	
-	
-	public MainWindow(ScriptRegistry scriptRegistry, 
-			JobManagerFactory jobManagerFactory, Client client, EventBusProvider eventBusProvider,
-			HostServices hostServices, DatatypeRegistry datatypeRegistry) {
+	public MainWindow(ServiceRegistry pipelineServices, HostServices hostServices) {
 		super();
-		
-		this.eventBusProvider = eventBusProvider;
-		this.scriptRegistry = scriptRegistry;
-		this.jobManager = jobManagerFactory.createFor(client);
+		this.pipelineServices = pipelineServices;
 		this.hostServices = hostServices;
 		
 		currentJobProperty = new SimpleObjectProperty<ObservableJob>();
@@ -71,27 +55,12 @@ public class MainWindow extends BorderPane {
 		
 		jobData = FXCollections.observableArrayList();
 		scriptData = FXCollections.observableArrayList();
-		dataManager = new DataManager(this, datatypeRegistry);
-		this.eventBusListener = new EventBusListener(this);	
-		eventBusProvider.get().register(eventBusListener);
+		dataManager = new DataManager(this, scriptData, pipelineServices);
+		pipelineServices.registerEventBusListener(new EventBusListener(pipelineServices, dataManager));
 		
 		buildWindow();	
     }
-	public JobManager getJobManager() {
-    	return jobManager;
-    }
-    
-    public ScriptRegistry getScriptRegistry() {
-    	return scriptRegistry;
-    }
 
-    public EventBusProvider getEventBusProvider() {
-    	return eventBusProvider;
-    }
-    
-    //public BundleContext getBundleContext() {
-            //return bundleContext;
-    //}
 	public DataManager getDataManager() {
 		return dataManager;
 	}
@@ -99,6 +68,7 @@ public class MainWindow extends BorderPane {
 		return jobData;
 	}
 	public ObservableList<Script> getScriptData() {
+		dataManager.readScripts();
 		return scriptData;
 	}
 	public NewJobPane getNewJobPane() {
@@ -112,8 +82,7 @@ public class MainWindow extends BorderPane {
 	}
     private void buildWindow() {
     	scene = new Scene(this ,1024, 768);
-    	String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
-		scene.getStylesheets().add(css);
+		scene.getStylesheets().add(APPLICATION_CSS);
     		
 		sidebar = new Sidebar(this);
 		//this.setLeft(sidebar);
@@ -131,9 +100,6 @@ public class MainWindow extends BorderPane {
 		scrollPane.getStyleClass().add("center-scroll");
 		
 		detailsPane = new DetailsPane(this);
-		
-		newJobPane = new NewJobPane(this);
-                newJobPane.getStylesheets().add(css);
 		
 		messagesPane = new MessagesPane(this);
 		this.setBottom(messagesPane);
@@ -201,6 +167,8 @@ public class MainWindow extends BorderPane {
     /* GUI HOOKS (other objects can call these methods to make things happen) */
     public void newJob() {
 		currentJobProperty.set(null);
+		newJobPane = new NewJobPane(this, pipelineServices);
+		newJobPane.getStylesheets().add(APPLICATION_CSS);
 		showNewJobPane();
 	}
     public void enableRunJobMenuItem() {
@@ -215,7 +183,7 @@ public class MainWindow extends BorderPane {
     		return;
     	}
     	
-    	jobManager.deleteJob(job.getJob().getId());
+    	pipelineServices.getJobManager().deleteJob(job.getJob().getId());
     	jobData.remove(job);
     	currentJobProperty.set(null);
     }

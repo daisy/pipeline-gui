@@ -73,6 +73,7 @@ public class PipelineApplication extends Application {
                         "-fx-background-color: #5577FF;" +
                         "-fx-border-width: 2; " +
                         "-fx-border-color: #0000FF;");
+                splashBackGround.setAccessibleText("DAISY Pipeline 2: starting");
                 Scene splashScene = new Scene(splashLayout, Color.TRANSPARENT);
                 splashStage.setScene(splashScene);
                 Rectangle2D bounds = Screen.getPrimary().getBounds();

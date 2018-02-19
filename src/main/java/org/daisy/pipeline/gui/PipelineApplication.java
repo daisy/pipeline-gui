@@ -80,6 +80,8 @@ public class PipelineApplication extends Application {
                 splashStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
                 splashStage.setAlwaysOnTop(true);
                 return mainWindow -> {
+                        splashStage.show();
+                        final long started = System.currentTimeMillis();
                         splashText.textProperty().bind(mainWindow.messageProperty());
                         progress.progressProperty().bind(mainWindow.progressProperty());
                         mainWindow.stateProperty().addListener((observableValue, oldState, newState) -> {
@@ -89,13 +91,19 @@ public class PipelineApplication extends Application {
                                         splashText.textProperty().unbind();
                                         splashText.setText("");
                                         mainWindow.getValue().run();
+                                        long keepVisibleForAtLeast = 2000; // 2 seconds
+                                        long visibleFor = System.currentTimeMillis() - started;
+                                        if (visibleFor < keepVisibleForAtLeast)
+                                                try {
+                                                        Thread.sleep(keepVisibleForAtLeast - visibleFor); }
+                                                catch (InterruptedException e) {
+                                                        throw new RuntimeException(e); }
                                         splashStage.hide();
                                 } else if (newState == Worker.State.FAILED) {
                                         // FIXME: show that there has been an error
                                         splashStage.hide();
                                 }
                         });
-                        splashStage.show();
                         new Thread(mainWindow).start();
                 };
         }

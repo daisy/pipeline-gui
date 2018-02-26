@@ -57,10 +57,8 @@ public class DetailsPane extends VBox {
 		
 		Text statusLabel = new Text("Status:");
 		statusLabel.getStyleClass().add("subtitle");
-		statusLabel.setFocusTraversable(true);
 		Text statusValue = new Text();
 		statusValue.getStyleClass().add("subtitle");
-		statusValue.setFocusTraversable(true);
 		
 		// binding this causes a thread error
 		statusValue.textProperty().bind(job.statusProperty());
@@ -70,7 +68,6 @@ public class DetailsPane extends VBox {
 		
 		Text settingsLabel = new Text("Settings:");
 		settingsLabel.getStyleClass().add("subtitle");
-		settingsLabel.setFocusTraversable(true);
 		jobInfoGrid.addRow(settingsLabel);
 		
 		for (ScriptFieldAnswer answer : boundScript.getInputFields()) {

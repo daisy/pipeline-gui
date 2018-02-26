@@ -140,8 +140,6 @@ public class GridPaneHelper extends GridPane {
         public void addNameValuePair(String name, String value) {
                 Text nameTxt = new Text(name + ":");
                 Text valueTxt = new Text(value);
-                nameTxt.setFocusTraversable(true);
-                valueTxt.setFocusTraversable(true);
                 addRow(nameTxt, valueTxt);
         }
         

@@ -46,7 +46,6 @@ public class ScriptInfoHeaderVBox extends VBox implements MarkdownToJavafx.JavaF
                 //this.getChildren().add(desc);
                 node.accept(this.mdToFx);
                 //add description flow
-                flow.setFocusTraversable(true);
                 this.getChildren().add(flow);
                 
                 

@@ -1,16 +1,21 @@
 package org.daisy.pipeline.gui;
 
+import java.util.function.Supplier;
+
 import javafx.application.HostServices;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -58,8 +63,47 @@ public class MainWindow extends BorderPane {
 		dataManager = new DataManager(this, scriptData, pipelineServices);
 		pipelineServices.registerEventBusListener(new EventBusListener(pipelineServices, dataManager));
 		
-		buildWindow();	
-    }
+		buildWindow();
+		
+		Supplier<Void> cyclePanes = new Supplier<Void>() {
+			int state = 0;
+			@Override
+			public Void get() {
+				switch (state) {
+					case 0:
+						sidebar.requestFocus();
+						state = 1;
+						break;
+					case 1:
+						if (scrollPane.getContent() == detailsPane) {
+							detailsPane.requestFocus();
+							state = 2;
+							break;
+						} else if (scrollPane.getContent() == newJobPane) {
+							newJobPane.requestFocus();
+							state = 2;
+							break;
+						}
+					case 2:
+						messagesPane.requestFocus();
+						state = 0;
+						break;
+				}
+				return null;
+			}
+		};
+		
+		scene.addEventFilter(
+			KeyEvent.KEY_PRESSED,
+			new EventHandler<KeyEvent>() {
+				public void handle(KeyEvent event) {
+					if (event.getCode() == KeyCode.F6) {
+						cyclePanes.get();
+						event.consume();
+					}
+				}
+		});
+	}
 
 	public DataManager getDataManager() {
 		return dataManager;

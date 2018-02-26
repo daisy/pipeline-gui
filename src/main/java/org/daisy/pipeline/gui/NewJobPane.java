@@ -79,6 +79,11 @@ public class NewJobPane extends VBox {
 		
 	}
 	
+	@Override
+	public void requestFocus() {
+		scriptsCombo.requestFocus();
+	}
+	
 	private void initControls() {
 		this.getStyleClass().add("new-job");
 	    HBox topGrid = new HBox();

@@ -26,6 +26,11 @@ public class Sidebar extends VBox {
 		addCurrentJobChangeListener();
 	}
 	
+	@Override
+	public void requestFocus() {
+		table.requestFocus();
+	}
+	
 	private void initControls() {
 		this.getStyleClass().add("sidebar");
 		

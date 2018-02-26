@@ -44,6 +44,12 @@ public class MessagesPane extends VBox {
         public Iterable<String> getMessages() {
                 return messages.getItems();
         }
+        
+        @Override
+        public void requestFocus() {
+                messages.requestFocus();
+        }
+        
         private void initControls() {
                 this.getStyleClass().add("messages");
                 

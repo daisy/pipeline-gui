@@ -11,6 +11,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.text.Text;
 
 import org.daisy.pipeline.gui.databridge.BoundScript;
@@ -37,6 +39,23 @@ public class DetailsPane extends VBox {
 		jobInfoGrid = new GridPaneHelper(main);
 		resultsGrid.getStyleClass().add("results");
 		addCurrentJobChangeListener();
+	}
+	
+	@Override
+	public void requestFocus() {
+		focusFirstTraversable(this);
+	}
+	
+	private static boolean focusFirstTraversable(Parent parent) {
+		for (Node n : parent.getChildrenUnmodifiable()) {
+			if (n.isFocusTraversable()) {
+				n.requestFocus();
+				return true;
+			} else if (n instanceof Parent && focusFirstTraversable((Parent)n)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void displayJobInfo() {

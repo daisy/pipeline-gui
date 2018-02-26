@@ -214,6 +214,7 @@ public class MainWindow extends BorderPane {
 		newJobPane = new NewJobPane(this, pipelineServices);
 		newJobPane.getStylesheets().add(APPLICATION_CSS);
 		showNewJobPane();
+		newJobPane.requestFocus();
 	}
     public void enableRunJobMenuItem() {
     	menubar.setRunJobEnabled(true);

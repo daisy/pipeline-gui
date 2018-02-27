@@ -8,16 +8,23 @@ import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import com.google.common.base.Throwables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +53,26 @@ public class PipelineApplication extends Application {
                                                                 throw new RuntimeException("Gave up waiting for the Pipeline services");
                                                 } catch (RuntimeException e) {
                                                         e.printStackTrace();
-                                                        throw e;
+                                                        return () -> {
+                                                                Alert alert = new Alert(AlertType.ERROR);
+                                                                alert.setTitle("DAISY Pipeline 2");
+                                                                alert.setHeaderText("An error happened while starting DAISY Pipeline 2");
+                                                                alert.setContentText(e.getMessage());
+                                                                GridPane details = new GridPane();
+                                                                details.setMaxWidth(Double.MAX_VALUE);
+                                                                details.add(new Label("Stacktrace:"), 0, 0);
+                                                                TextArea stackTrace = new TextArea(Throwables.getStackTraceAsString(e));
+                                                                stackTrace.setEditable(false);
+                                                                stackTrace.setWrapText(true);
+                                                                stackTrace.setMaxWidth(Double.MAX_VALUE);
+                                                                stackTrace.setMaxHeight(Double.MAX_VALUE);
+                                                                GridPane.setVgrow(stackTrace, Priority.ALWAYS);
+                                                                GridPane.setHgrow(stackTrace, Priority.ALWAYS);
+                                                                details.add(stackTrace, 0, 1);
+                                                                alert.getDialogPane().setExpandableContent(details);
+                                                                alert.show();
+                                                                // FIXME: exit with error code?
+                                                        };
                                                 }
                                         }
                                 }
@@ -106,7 +132,6 @@ public class PipelineApplication extends Application {
                                                         throw new RuntimeException(e); }
                                         splashStage.hide();
                                 } else if (newState == Worker.State.FAILED) {
-                                        // FIXME: show that there has been an error
                                         splashStage.hide();
                                 }
                         });

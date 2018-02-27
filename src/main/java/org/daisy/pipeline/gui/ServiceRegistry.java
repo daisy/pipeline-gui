@@ -1,6 +1,7 @@
 package org.daisy.pipeline.gui;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 
 import com.google.common.util.concurrent.Monitor;
@@ -67,9 +68,20 @@ public class ServiceRegistry {
         }
         
         public void waitUntilReady() throws InterruptedException {
+                waitUntilReady(-1);
+        }
+        
+        public boolean waitUntilReady(long timeout) throws InterruptedException {
                 try {
-                        monitor.enterWhen(this.servicesAvailable);
+                        boolean ready;
+                        if (timeout >= 0)
+                                ready = monitor.enterWhen(this.servicesAvailable, timeout, TimeUnit.MILLISECONDS);
+                        else {
+                                monitor.enterWhen(this.servicesAvailable);
+                                ready = true;
+                        }
                         logger.debug("setting serviceregistry");
+                        return ready;
                 } catch (InterruptedException ie) {
                         throw ie;
                 } finally {

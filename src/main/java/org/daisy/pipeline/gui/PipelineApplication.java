@@ -1,5 +1,7 @@
 package org.daisy.pipeline.gui;
 
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -37,8 +39,11 @@ public class PipelineApplication extends Application {
                                         protected Runnable call() throws InterruptedException {
                                                 try {
                                                         updateMessage("Starting application...");
-                                                        ServiceRegistry services = loadServices();
-                                                        return () -> showMainWindow(stage, services);
+                                                        Optional<ServiceRegistry> services = loadServices();
+                                                        if (services.isPresent())
+                                                                return () -> showMainWindow(stage, services.get());
+                                                        else
+                                                                throw new RuntimeException("Gave up waiting for the Pipeline services");
                                                 } catch (RuntimeException e) {
                                                         e.printStackTrace();
                                                         throw e;
@@ -47,7 +52,7 @@ public class PipelineApplication extends Application {
                                 }
                         );
                 } else {
-                        showMainWindow(stage, loadServices());
+                        showMainWindow(stage, ServiceRegistry.getInstance());
                 }
         }
 
@@ -116,11 +121,14 @@ public class PipelineApplication extends Application {
                 stage.show();
         }
 
-        private static ServiceRegistry loadServices() {
+        private static Optional<ServiceRegistry> loadServices() {
                 try {
                         ServiceRegistry services = ServiceRegistry.getInstance();
-                        services.waitUntilReady();
-                        return services;
+                        // timeout after 20 seconds
+                        if (services.waitUntilReady(20000))
+                                return Optional.of(services);
+                        else
+                                return Optional.empty();
                 } catch (InterruptedException e) {
                         throw new RuntimeException("Interrupted while waiting for services", e);
                 }

@@ -26,6 +26,7 @@ import org.daisy.pipeline.gui.databridge.EventBusListener;
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 import org.daisy.pipeline.gui.databridge.Script;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
+import org.daisy.pipeline.gui.utils.Settings;
 
 public class MainWindow extends BorderPane {
 
@@ -52,6 +53,9 @@ public class MainWindow extends BorderPane {
 	
 	public MainWindow(ServiceRegistry pipelineServices, HostServices hostServices) {
 		super();
+		
+		Settings.init();
+		
 		this.pipelineServices = pipelineServices;
 		this.hostServices = hostServices;
 		

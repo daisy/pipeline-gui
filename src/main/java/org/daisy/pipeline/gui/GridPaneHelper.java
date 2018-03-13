@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.daisy.pipeline.gui.databridge.ScriptField.DataType;
+import org.daisy.pipeline.gui.databridge.ScriptField.FieldType;
 import org.daisy.pipeline.gui.databridge.ScriptFieldAnswer;
 import org.daisy.pipeline.gui.utils.MarkdownToJavafx;
 import org.daisy.pipeline.gui.utils.PlatformUtils;
@@ -178,41 +179,23 @@ public class GridPaneHelper extends GridPane {
                                 if (answer_.getField().getDataType() == DataType.FILE) {
                         FileChooser fileChooser = new FileChooser();
                         fileChooser.setTitle("Select File");
-                        // If default output directory set use that, else if last output directory set use that, else don't set (use default)
-                        String defOutDir = Settings.getString(Prefs.DEF_OUT_DIR);
-                        String lastOutDir = Settings.getString(Prefs.LAST_OUT_DIR);
-                        if (!defOutDir.equals(Prefs.DEF_OUT_DIR.defString())) {
-                            fileChooser.setInitialDirectory(new File(defOutDir));
-                        } else if (!lastOutDir.equals(Prefs.LAST_OUT_DIR.defString())){
-                            fileChooser.setInitialDirectory(new File(lastOutDir));
-                        }
+                        setInitialDirPickerDirectory(fileChooser, answer.getField().getFieldType());
                         file = fileChooser.showOpenDialog(null);
                                 }
                                 // assume directory
                                 else {
                                         DirectoryChooser dirChooser = new DirectoryChooser();
                         dirChooser.setTitle("Select Directory");
-                        // If default output directory set use that, else if last output directory set use that, else don't set (use default)
-                        String defOutDir = Settings.getString(Prefs.DEF_OUT_DIR);
-                        String lastOutDir = Settings.getString(Prefs.LAST_OUT_DIR);
-                        if (!defOutDir.equals(Prefs.DEF_OUT_DIR.defString())) {
-                            dirChooser.setInitialDirectory(new File(defOutDir));
-                        } else if (!lastOutDir.equals(Prefs.LAST_OUT_DIR.defString())){
-                            dirChooser.setInitialDirectory(new File(lastOutDir));
-                        }
+                        setInitialDirPickerDirectory(dirChooser, answer.getField().getFieldType());
                         file = dirChooser.showDialog(null);
                                 }
                                 if(file != null) {
                         answer_.answerProperty().add(file.getPath());
-                        String fileDirPath = "";
-                        if (file.isDirectory())
-                            fileDirPath = file.getPath();
-                        else
-                            fileDirPath = (file.getParent() != null)? file.getParent(): "";
-                        Settings.putString(Prefs.LAST_OUT_DIR, fileDirPath);
+                        setLastDirectory(file, answer.getField().getFieldType());
+                    }
                 }
                         }
-                });
+                );
                 
                 removeFileButton.setDisable(true);
                 removeFileButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -308,6 +291,7 @@ public class GridPaneHelper extends GridPane {
                 String desc = answer.getField().getDescription();
                 if (desc != null)
                     inputFileText.setTooltip(new Tooltip(desc.split("\\r?\\n")[0]));
+                setDirFieldDefault(inputFileText, answer.getField().getFieldType());
                 Button inputFileButton = new Button("Browse");
                 VBox vbox = new VBox();
                 vbox.getChildren().addAll(label);
@@ -324,38 +308,19 @@ public class GridPaneHelper extends GridPane {
                         if (answer_.getField().getDataType() == DataType.FILE) {
 	                        FileChooser fileChooser = new FileChooser();
 	                        fileChooser.setTitle("Select File");
-                            // If default output directory set use that, else if last output directory set use that, else don't set (use default)
-                            String defOutDir = Settings.getString(Prefs.DEF_OUT_DIR);
-                            String lastOutDir = Settings.getString(Prefs.LAST_OUT_DIR);
-                            if (!defOutDir.equals(Prefs.DEF_OUT_DIR.defString())) {
-                                fileChooser.setInitialDirectory(new File(defOutDir));
-                            } else if (!lastOutDir.equals(Prefs.LAST_OUT_DIR.defString())){
-                                fileChooser.setInitialDirectory(new File(lastOutDir));
-                            }
+                            setInitialDirPickerDirectory(fileChooser, answer.getField().getFieldType());
 	                        file = fileChooser.showOpenDialog(null);
                         }
                         // assume directory
                         else {
                             DirectoryChooser dirChooser = new DirectoryChooser();
 	                        dirChooser.setTitle("Select Directory");
-                            // If default output directory set use that, else if last output directory set use that, else don't set (use default)
-                            String defOutDir = Settings.getString(Prefs.DEF_OUT_DIR);
-                            String lastOutDir = Settings.getString(Prefs.LAST_OUT_DIR);
-                            if (!defOutDir.equals(Prefs.DEF_OUT_DIR.defString())) {
-                                dirChooser.setInitialDirectory(new File(defOutDir));
-                            } else if (!lastOutDir.equals(Prefs.LAST_OUT_DIR.defString())){
-                                dirChooser.setInitialDirectory(new File(lastOutDir));
-                            }
+                            setInitialDirPickerDirectory(dirChooser, answer.getField().getFieldType());
 	                        file = dirChooser.showDialog(null);
                         }
                         if (file != null) {
                         	inputFileText.setText(file.getPath());
-                            String fileDirPath = "";
-                            if (file.isDirectory())
-                                fileDirPath = file.getPath();
-                            else
-                                fileDirPath = (file.getParent() != null)? file.getParent(): "";
-                            Settings.putString(Prefs.LAST_OUT_DIR, fileDirPath);
+                            setLastDirectory(file, answer.getField().getFieldType());
                         }
                     }
                 });
@@ -376,28 +341,72 @@ public class GridPaneHelper extends GridPane {
                 public void handle(ActionEvent event) {
                     DirectoryChooser dirChooser = new DirectoryChooser();
                     dirChooser.setTitle("Select Directory");
-                    // If default output directory set use that, else if last output directory set use that, else don't set (use default)
-                    String defOutDir = Settings.getString(Prefs.DEF_OUT_DIR);
-                    String lastOutDir = Settings.getString(Prefs.LAST_OUT_DIR);
-                    if (!defOutDir.equals(Prefs.DEF_OUT_DIR.defString())) {
-                        dirChooser.setInitialDirectory(new File(defOutDir));
-                    } else if (!lastOutDir.equals(Prefs.LAST_OUT_DIR.defString())) {
-                        dirChooser.setInitialDirectory(new File(lastOutDir));
-                    }
+                    setInitialDirPickerDirectory(dirChooser, FieldType.OUTPUT);
                     File file = dirChooser.showDialog(null);
                     if (file != null) {
                     	inputFileText.setText(file.getPath());
-                        String fileDirPath = "";
-                        if (file.isDirectory())
-                            fileDirPath = file.getPath();
-                        else
-                            fileDirPath = (file.getParent() != null)? file.getParent(): "";
-                        Settings.putString(Prefs.LAST_OUT_DIR, fileDirPath);
+                        setLastDirectory(file, FieldType.OUTPUT);
                     }
                 }
             });
         }
         
+    private void setDirFieldDefault(TextField field, FieldType fieldType) {
+        String initialDirectory = getInitialDirectory(fieldType);
+        if (initialDirectory != null)
+            field.setText(initialDirectory);
+    }
+
+    private void setInitialDirPickerDirectory(FileChooser fileChooser, FieldType fieldType) {
+        String initialDirectory = getInitialDirectory(fieldType);
+        if (initialDirectory != null)
+            fileChooser.setInitialDirectory(new File(initialDirectory));
+        // else use system default
+    }
+
+    private void setInitialDirPickerDirectory(DirectoryChooser dirChooser, FieldType fieldType) {
+        String initialDirectory = getInitialDirectory(fieldType);
+        if (initialDirectory != null)
+            dirChooser.setInitialDirectory(new File(initialDirectory));
+        // else use system default
+    }
+
+    private String getInitialDirectory(FieldType fieldType) {
+        String initialDirectory = null;
+        switch (fieldType) {
+        case OPTION:
+        case INPUT:
+            if (Settings.getBoolean(Prefs.DEF_IN_DIR_ENABLED))
+                initialDirectory = Settings.getString(Prefs.DEF_IN_DIR);
+            else
+                initialDirectory = Settings.getString(Prefs.LAST_IN_DIR);
+            break;
+        case OUTPUT:
+            if (Settings.getBoolean(Prefs.DEF_OUT_DIR_ENABLED))
+                initialDirectory = Settings.getString(Prefs.DEF_OUT_DIR);
+            else
+                initialDirectory = Settings.getString(Prefs.LAST_OUT_DIR);
+            break;
+        }
+        return (initialDirectory != null && !initialDirectory.equals(""))? initialDirectory: null;
+    }
+
+    private void setLastDirectory(File file, FieldType fieldType) {
+        String fileDirPath = "";
+        if (file.isDirectory())
+            fileDirPath = file.getPath();
+        else
+            fileDirPath = (file.getParent() != null)? file.getParent(): ""; // extract parent directory
+        switch (fieldType) {
+        case OPTION: case INPUT:
+            Settings.putString(Prefs.LAST_IN_DIR, fileDirPath);
+            break;
+        case OUTPUT:
+            Settings.putString(Prefs.LAST_OUT_DIR, fileDirPath);
+            break;
+        }
+    }
+
         // add the descriptive text to its own row (sometimes it's added in other ways, which is why
         // these help text functions are broken into 3)
         private void addHelpText(ScriptFieldAnswer answer) {

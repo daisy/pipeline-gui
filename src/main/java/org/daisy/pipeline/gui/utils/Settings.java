@@ -15,7 +15,11 @@ public class Settings {
     
     public enum Prefs {
         LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Last Output Directory", ""),
-        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Default Output Directory", "");
+        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Default Output Directory", ""),
+        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, "Default Output Directory Enabled", "false"),
+        LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Last Input Directory", ""),
+        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Default Input Directory", ""),
+        DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, "Default Input Directory Enabled", "false");
         
         PrefCategories category;
         String key, def;

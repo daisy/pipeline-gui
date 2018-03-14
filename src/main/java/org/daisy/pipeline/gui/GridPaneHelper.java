@@ -179,19 +179,22 @@ public class GridPaneHelper extends GridPane {
                                 if (answer_.getField().getDataType() == DataType.FILE) {
                         FileChooser fileChooser = new FileChooser();
                         fileChooser.setTitle("Select File");
-                        setInitialDirPickerDirectory(fileChooser, answer.getField().getFieldType());
+                        setInitialDirPickerDirectory(fileChooser, answer.getField().isResult(), 
+                                    answer.getField().isTemp(), answer.getField().getDataType());
                         file = fileChooser.showOpenDialog(null);
                                 }
                                 // assume directory
                                 else {
                                         DirectoryChooser dirChooser = new DirectoryChooser();
                         dirChooser.setTitle("Select Directory");
-                        setInitialDirPickerDirectory(dirChooser, answer.getField().getFieldType());
+                        setInitialDirPickerDirectory(dirChooser, answer.getField().isResult(), 
+                                answer.getField().isTemp(), answer.getField().getDataType());
                         file = dirChooser.showDialog(null);
                                 }
                                 if(file != null) {
                         answer_.answerProperty().add(file.getPath());
-                        setLastDirectory(file, answer.getField().getFieldType());
+                        setLastDirectory(file, answer.getField().isResult(), 
+                                    answer.getField().isTemp(), answer.getField().getDataType());
                     }
                 }
                         }
@@ -291,7 +294,8 @@ public class GridPaneHelper extends GridPane {
                 String desc = answer.getField().getDescription();
                 if (desc != null)
                     inputFileText.setTooltip(new Tooltip(desc.split("\\r?\\n")[0]));
-                setDirFieldDefault(inputFileText, answer.getField().getFieldType());
+                setDirFieldDefault(inputFileText, answer.getField().isResult(),
+                        answer.getField().isTemp(), answer.getField().getDataType());
                 Button inputFileButton = new Button("Browse");
                 VBox vbox = new VBox();
                 vbox.getChildren().addAll(label);
@@ -308,19 +312,22 @@ public class GridPaneHelper extends GridPane {
                         if (answer_.getField().getDataType() == DataType.FILE) {
 	                        FileChooser fileChooser = new FileChooser();
 	                        fileChooser.setTitle("Select File");
-                            setInitialDirPickerDirectory(fileChooser, answer.getField().getFieldType());
+                            setInitialDirPickerDirectory(fileChooser, answer.getField().isResult(), 
+                                    answer.getField().isTemp(), answer.getField().getDataType());
 	                        file = fileChooser.showOpenDialog(null);
                         }
                         // assume directory
                         else {
                             DirectoryChooser dirChooser = new DirectoryChooser();
 	                        dirChooser.setTitle("Select Directory");
-                            setInitialDirPickerDirectory(dirChooser, answer.getField().getFieldType());
+                            setInitialDirPickerDirectory(dirChooser, answer.getField().isResult(), 
+                                    answer.getField().isTemp(), answer.getField().getDataType());
 	                        file = dirChooser.showDialog(null);
                         }
                         if (file != null) {
                         	inputFileText.setText(file.getPath());
-                            setLastDirectory(file, answer.getField().getFieldType());
+                            setLastDirectory(file, answer.getField().isResult(), 
+                                    answer.getField().isTemp(), answer.getField().getDataType());
                         }
                     }
                 });
@@ -331,6 +338,7 @@ public class GridPaneHelper extends GridPane {
         	Text label = new Text("Output directory:");
             final TextField inputFileText = new TextField();
             inputFileText.textProperty().bindBidirectional(outputDir);
+            setDirFieldDefault(inputFileText, true, false, DataType.DIRECTORY);
             Button inputFileButton = new Button("Browse");
             VBox vbox = new VBox();
             vbox.getChildren().addAll(label);
@@ -341,70 +349,69 @@ public class GridPaneHelper extends GridPane {
                 public void handle(ActionEvent event) {
                     DirectoryChooser dirChooser = new DirectoryChooser();
                     dirChooser.setTitle("Select Directory");
-                    setInitialDirPickerDirectory(dirChooser, FieldType.OUTPUT);
+                    setInitialDirPickerDirectory(dirChooser, true, false, DataType.DIRECTORY);
                     File file = dirChooser.showDialog(null);
                     if (file != null) {
                     	inputFileText.setText(file.getPath());
-                        setLastDirectory(file, FieldType.OUTPUT);
+                        setLastDirectory(file, true, false, DataType.DIRECTORY);
                     }
                 }
             });
         }
         
-    private void setDirFieldDefault(TextField field, FieldType fieldType) {
-        String initialDirectory = getInitialDirectory(fieldType);
+    private void setDirFieldDefault(TextField field, boolean isResult, boolean isTemp, DataType dataType) {
+        String initialDirectory = getInitialDirectory(isResult, isTemp, dataType);
         if (initialDirectory != null)
             field.setText(initialDirectory);
     }
 
-    private void setInitialDirPickerDirectory(FileChooser fileChooser, FieldType fieldType) {
-        String initialDirectory = getInitialDirectory(fieldType);
+    private void setInitialDirPickerDirectory(FileChooser fileChooser, boolean isResult, boolean isTemp, DataType dataType) {
+        String initialDirectory = getInitialDirectory(isResult, isTemp, dataType);
         if (initialDirectory != null)
             fileChooser.setInitialDirectory(new File(initialDirectory));
         // else use system default
     }
 
-    private void setInitialDirPickerDirectory(DirectoryChooser dirChooser, FieldType fieldType) {
-        String initialDirectory = getInitialDirectory(fieldType);
+    private void setInitialDirPickerDirectory(DirectoryChooser dirChooser, boolean isResult, boolean isTemp, DataType dataType) {
+        String initialDirectory = getInitialDirectory(isResult, isTemp, dataType);
         if (initialDirectory != null)
             dirChooser.setInitialDirectory(new File(initialDirectory));
         // else use system default
     }
 
-    private String getInitialDirectory(FieldType fieldType) {
+    private String getInitialDirectory(boolean isResult, boolean isTemp, DataType dataType) {
         String initialDirectory = null;
-        switch (fieldType) {
-        case OPTION:
-        case INPUT:
+        
+        //Input
+        if (!isResult && !isTemp && dataType == DataType.FILE)
             if (Settings.getBoolean(Prefs.DEF_IN_DIR_ENABLED))
                 initialDirectory = Settings.getString(Prefs.DEF_IN_DIR);
             else
                 initialDirectory = Settings.getString(Prefs.LAST_IN_DIR);
-            break;
-        case OUTPUT:
+        // Output
+        else if (isResult)
             if (Settings.getBoolean(Prefs.DEF_OUT_DIR_ENABLED))
                 initialDirectory = Settings.getString(Prefs.DEF_OUT_DIR);
             else
                 initialDirectory = Settings.getString(Prefs.LAST_OUT_DIR);
-            break;
-        }
+        
         return (initialDirectory != null && !initialDirectory.equals(""))? initialDirectory: null;
     }
 
-    private void setLastDirectory(File file, FieldType fieldType) {
+    private void setLastDirectory(File file, boolean isResult, boolean isTemp, DataType dataType) {
         String fileDirPath = "";
+        
         if (file.isDirectory())
             fileDirPath = file.getPath();
-        else
-            fileDirPath = (file.getParent() != null)? file.getParent(): ""; // extract parent directory
-        switch (fieldType) {
-        case OPTION: case INPUT:
+        else // extract parent directory
+            fileDirPath = (file.getParent() != null)? file.getParent(): ""; 
+        
+        // Input
+        if (!isResult && !isTemp && dataType == DataType.FILE)
             Settings.putString(Prefs.LAST_IN_DIR, fileDirPath);
-            break;
-        case OUTPUT:
+        // Output
+        else if (isResult)
             Settings.putString(Prefs.LAST_OUT_DIR, fileDirPath);
-            break;
-        }
     }
 
         // add the descriptive text to its own row (sometimes it's added in other ways, which is why

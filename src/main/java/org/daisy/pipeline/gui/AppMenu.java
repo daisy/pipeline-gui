@@ -85,15 +85,19 @@ public class AppMenu extends MenuBar {
                 settings.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
                 settings.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent e) {
-                        SettingsPane settingsPane = new SettingsPane();
                         Stage otherStage = new Stage();
-                        Scene secondScene = new Scene(settingsPane, 600, 400);
+                        SettingsPane settingsPane = new SettingsPane(otherStage);
+                        Scene secondScene = new Scene(settingsPane, 450, 475);
                         String css = getClass().getResource("/org/daisy/pipeline/gui/resources/application.css").toExternalForm();
 
                         secondScene.getStylesheets().add(css);
                         settingsPane.build();
                         otherStage.setScene(secondScene);
                         otherStage.setTitle("Settings");
+                        // TODO would be nice to bind these somehow
+                        otherStage.setMinWidth(380);
+                        otherStage.setMinHeight(285);
+                        
                         otherStage.show();
                     }
                 });

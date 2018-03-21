@@ -253,8 +253,7 @@ public class NewJobPane extends VBox {
                         try {
                                 newJob = JobExecutor.runJob(main, pipelineServices, boundScript);
                                 if (newJob != null) {
-                                        ObservableJob objob = main.getDataManager().addJob(newJob);
-                                        objob.setBoundScript(boundScript);
+                                        ObservableJob objob = main.getDataManager().addJob(newJob, boundScript);
                                         main.getCurrentJobProperty().set(objob);
                                 } else {
                                         logger.error("Couldn't create the job");

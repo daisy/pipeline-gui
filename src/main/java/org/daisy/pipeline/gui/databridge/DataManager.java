@@ -21,6 +21,7 @@ public class DataManager {
 	MainWindow main;
 	ServiceRegistry pipelineServices;
 	ObservableList<Script> scriptData;
+	private int jobCount = 0;
 	
 	public DataManager(MainWindow main, ObservableList<Script> scriptData, ServiceRegistry pipelineServices) {
 		this.main = main;
@@ -46,8 +47,8 @@ public class DataManager {
 		main.getJobData().get(i).addMessage(message, level);
 	}
 	
-	public ObservableJob addJob(Job job) {
-		ObservableJob objob = new ObservableJob(job);
+	public ObservableJob addJob(Job job, BoundScript boundScript) {
+		ObservableJob objob = new ObservableJob(job, boundScript, ++jobCount);
 		main.getJobData().add(objob);
 		return objob;
 	}

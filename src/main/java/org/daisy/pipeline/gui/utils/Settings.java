@@ -13,25 +13,42 @@ public class Settings {
         BOOLEAN;
     }
     
+    public enum InputTypes {
+        NONE,
+        DIRECTORY_SEQUENCE,
+        CHECKBOX;
+    }
+    
     public enum Prefs {
-        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Last Output Directory", ""),
-        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Default Output Directory", ""),
-        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, "Default Output Directory Enabled", "false"),
-        LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Last Input Directory", ""),
-        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, "Default Input Directory", ""),
-        DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, "Default Input Directory Enabled", "false");
+        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Output Directory", "", null),
+        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Output Directory", "false", null),
+        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Output Directory", "", Prefs.DEF_OUT_DIR_ENABLED),
+        LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Input Directory", "", null),
+        DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Input Directory", "false", null),
+        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Input Directory", "", Prefs.DEF_IN_DIR_ENABLED);
+        
+    /*-------------------------------------------------------------------------------------------------------*/
         
         PrefCategories category;
         String key, def;
         Types type;
-        Prefs(PrefCategories category, Types type, String key, String def) {
+        InputTypes inputType;
+        Prefs enablePref;
+        
+        Prefs(PrefCategories category, Types type, InputTypes inputType, String key, String def, Prefs enablePref) {
             this.category = category;
             this.type = type;
+            this.inputType = inputType;
             this.key = key;
             this.def = def;
+            this.enablePref = enablePref;
         }
+        
+        /*-------------------------------------------------*/
+        
         public PrefCategories category() {return category;}
         public String key() {return key;}
+        public InputTypes inputType() {return inputType;}
         
         public String defString() {
             return def;
@@ -39,7 +56,8 @@ public class Settings {
         public boolean defBoolean() {
             return Boolean.parseBoolean(def);
         }
-        
+        public Prefs enablePref() {return enablePref;}
+        public boolean hasEnablePref() {return enablePref != null;}
     }
     
     public enum PrefCategories {
@@ -122,6 +140,10 @@ public class Settings {
             sysPrefs.node(pref.category.val).putBoolean(pref.key, newValue);
         else
             userPrefs.node(pref.category.val).putBoolean(pref.key, newValue);
+    }
+    
+    public static void toggleBoolean(Prefs pref) {
+        putBoolean(pref, !getBoolean(pref));
     }
 
     

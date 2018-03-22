@@ -73,7 +73,7 @@
 }
 
 /* SettingsPane */
-.category-set {
+.fieldset {
 	-fx-padding: 10;
 	-fx-border-insets: 10;
     -fx-background-insets: 10;
@@ -82,7 +82,7 @@
 	-fx-border-style: solid;
 }
 
-.category-set .grid-pane {
+.fieldset .grid-pane {
 	-fx-vgap: 2;
 	-fx-hgap: 5;
 	-fx-padding: 5 10 5 20;
@@ -90,13 +90,13 @@
     -fx-background-insets: 5 10 5 20;
 }
 
-.category-set .subtitle {
+.fieldset .subtitle {
 	-fx-padding: 0 10 0 0;
     -fx-border-insets: 0 10 0 0;
     -fx-background-insets: 0 10 0 0;
 }
 
-.category-set .check-box {
+.fieldset .check-box {
 	-fx-padding: 10 0 12 10;
     -fx-border-insets: 10 0 12 10;
     -fx-background-insets: 10 0 12 10;

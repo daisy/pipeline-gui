@@ -91,7 +91,12 @@ public class NewJobPane extends VBox {
 	    
 	    topGrid.setSpacing(20.0);
 	    
-		Label title = new Label("Choose a script:");
+		String paneTitle = "New job";
+		Label title = new Label("Script:");
+		
+		// prepend the pane title to the accessible text of the first node
+		// so that it is spoken when switching between panes with F6
+		title.setAccessibleText(paneTitle + " - Choose a script");
 		title.setLabelFor(scriptsCombo);
     //scriptsCombo.accessibleTextProperty().bind( new SimpleStringProperty( ((Script)scriptsCombo.getSelectionModel().selectedItemProperty().getValue()).getName()) );
     //scriptsCombo.accessibleHelpProperty().bind( new SimpleStringProperty( ((Script)scriptsCombo.getSelectionModel().selectedItemProperty().getValue()).getDescription()) );
@@ -147,6 +152,8 @@ public class NewJobPane extends VBox {
                                         Script oldValue, Script newValue) {
                                 
                                 newScriptSelected(newValue);
+                                // skip "Choose a script" when a script has been selected
+                                title.setAccessibleText(paneTitle);
                         }
                 });
                 

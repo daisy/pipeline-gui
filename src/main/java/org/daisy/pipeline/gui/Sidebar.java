@@ -2,11 +2,11 @@ package org.daisy.pipeline.gui;
 
 import java.util.Comparator;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.daisy.pipeline.gui.databridge.ObservableJob;
 
@@ -18,7 +18,8 @@ public class Sidebar extends VBox {
 		super();
 		this.getStyleClass().add("sidebar");
 		jobsList = new ListView<ObservableJob>();
-		Text title = new Text("Jobs");
+		Label title = new Label("Jobs");
+		title.setLabelFor(jobsList);
 		title.getStyleClass().add("title");
 		this.getChildren().add(title);
 		VBox.setVgrow(jobsList, Priority.ALWAYS);

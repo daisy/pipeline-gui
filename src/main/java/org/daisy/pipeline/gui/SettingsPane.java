@@ -124,7 +124,7 @@ public class SettingsPane extends BorderPane {
                         defOutDirFld = (TextField)categorySet.getNode(TextField.class.getName() + Prefs.DEF_OUT_DIR.key());
                 switch (pref) {
                     case DEF_IN_DIR:
-                        Button copyToOutDirBtn = new Button("▼");
+                        Button copyToOutDirBtn = new Button("▲");
                         copyToOutDirBtn.setOnAction(a -> {
                             Settings.putString(Prefs.DEF_OUT_DIR, defInDirFld.getText());
                             defOutDirFld.setText(defInDirFld.getText());
@@ -132,7 +132,7 @@ public class SettingsPane extends BorderPane {
                         categorySet.addNode(copyToOutDirBtn, categorySet.getRow(defInDirFld));
                         break;
                     case DEF_OUT_DIR:
-                        Button copyToInDirBtn = new Button("▲");
+                        Button copyToInDirBtn = new Button("▼");
                         copyToInDirBtn.setOnAction(a -> {
                             Settings.putString(Prefs.DEF_IN_DIR, defOutDirFld.getText());
                             defInDirFld.setText(defOutDirFld.getText());

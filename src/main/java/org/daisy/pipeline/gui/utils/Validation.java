@@ -61,7 +61,7 @@ public class Validation<N extends Node> {
 			lbl.setVisible(true);
 			lbl.setText("");
 		}
-		lbl.setText(msg);
+		lbl.setText(origTxt + ": " + msg);
 		lbl.setStyle("-fx-text-fill: #ff0000; font-weight: bold; " + lbl.getStyle());
 		n.setStyle("-fx-border-color: #ff0000; " + n.getStyle());
 		Toolkit.getDefaultToolkit().beep();

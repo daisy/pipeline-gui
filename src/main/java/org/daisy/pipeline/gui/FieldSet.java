@@ -3,6 +3,8 @@ package org.daisy.pipeline.gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -86,10 +88,7 @@ public class FieldSet extends GridPane {
      * @return - the label with text that is {@link Object#equals(Object)} the given text
      */
     public Label getLabel(String text) {
-        for (Node child: getChildren())
-            if (child.getClass().isAssignableFrom(Label.class) && ((Label)child).getText().equals(text))
-                return (Label)child;
-        return null;
+        return findChild(Label.class, child -> child.getText().equals(text));
     }
     
     /**
@@ -109,7 +108,7 @@ public class FieldSet extends GridPane {
      * 
      * Use this instead of {@link GridPane#setHgap(double)}.
      * 
-     * @param priority - the horizontal grow priority for this FieldSet
+     * @param hgap - the horizontal gap between all nodes in this FieldSet
      */
     public void setHGap(double hgap) {
         setHgap(hgap);
@@ -120,12 +119,20 @@ public class FieldSet extends GridPane {
      * 
      * Use this instead of {@link GridPane#setVgap(double)}.
      * 
-     * @param priority - the vertical grow priority for this FieldSet
+     * @param vgap - the vertical gap between all nodes in this FieldSet
      */
     public void setVGap(double vgap) {
         setVgap(vgap);
     }
     
+    /**
+     * Set the GridPane margin property for the given node.
+     * 
+     * Use this instead of {@link GridPane#setMargin(Node, Insets)}.
+     * 
+     * @param node - the node to set the margin for
+     * @param margin - the insets to use for the margin
+     */
     public void setMarginFor(Node node, Insets margin) {
         GridPane.setMargin(node, margin);
     }
@@ -139,6 +146,17 @@ public class FieldSet extends GridPane {
      */
     public int getRow(Node node) {
         return convertToRow(getRowIndex(node));
+    }
+    
+    /**
+     * Returns the row index for the row with the given rowUserData.
+     * 
+     * Use this instead of {@link GridPane#getRowIndex(Node)}.
+     * 
+     * @return null if a row wasn't found
+     */
+    public int getRow(Object rowUserData) {
+        return convertToRow(getRowIndex(findChild(Label.class, lbl -> lbl.getUserData() != null && lbl.getUserData().equals(rowUserData))) + 1);
     }
     
     /**
@@ -165,13 +183,22 @@ public class FieldSet extends GridPane {
      * @param subtitle - the subtitle label text
      */
     public void newRow(String subtitle) {
-        if (subtitle != null) {
-            add(new Label(subtitle), cols.get(lastRealRow), lastRealRow, 1, 1);
-            newRow(true);
-        } else {
-            add(new Label(""), cols.get(lastRealRow), lastRealRow, 1, 1);
-            newRow(false);
+        newRow(subtitle, null);
+    }
+    
+    public void newRow(String subtitle, Object rowUserData) {
+        Label lbl = null;
+        boolean hasSubtitle = false;
+        if (subtitle != null && !subtitle.isEmpty()) {
+            hasSubtitle = true;
+            lbl = new Label(subtitle);
         }
+        else
+            lbl = new Label("");
+        setMarginFor(lbl, new Insets(0, 0, 0, 8));
+        add(lbl, cols.get(lastRealRow), lastRealRow, 1, 1);
+        lbl.setUserData(rowUserData);
+        newRow(hasSubtitle);
     }
     
     // Helper
@@ -292,10 +319,7 @@ public class FieldSet extends GridPane {
     public Node getNode(int row, int col) {
         if (row < 0 || col < 0)
             throw new IllegalArgumentException("arguments row and col cannot be negative: " + row + ", " + col);
-        for (Node child: getChildren())
-            if (getRowIndex(child) == convertToRealRow(row) && getColumnIndex(child) == col)
-                return child;
-        return null;
+        return findChild(child -> getRowIndex(child) == convertToRealRow(row) && getColumnIndex(child) == col);
     }
     
     /**
@@ -305,19 +329,16 @@ public class FieldSet extends GridPane {
      * @return the desired node, null if not found
      */
     public Node getNode(Object userData) {
-        for (Node child: getChildren())
-            if (child.getUserData() != null && child.getUserData().equals(userData))
-                return child;
-        return null;
+        return findChild(child -> child.getUserData() != null && child.getUserData().equals(userData));
     }
     
     // Helper
     private void shiftCells(int row, int col, int colSpan) {
-        for (Node child: getChildren())
-            if (getRowIndex(child) == row && getColumnIndex(child) >= col) {
-                GridPane.setColumnIndex(child, col+colSpan);
-                respanTitles(row);
-            }
+        forEachChild(child -> getRowIndex(child) == row && getColumnIndex(child) >= col,
+                child -> {
+                    GridPane.setColumnIndex(child, col+colSpan);
+                    respanTitles(row);
+                });
     }
     
     // Helper
@@ -328,6 +349,29 @@ public class FieldSet extends GridPane {
     // Helper
     private int convertToRow(int realRow) {
         return (realRow-2)/2;
+    }
+    
+    // Helper
+    private <O> O findChild(Class<O> targetClass, Predicate<O> condition) {
+        for (Node child: getChildren())
+            if (child.getClass().isAssignableFrom(targetClass) && condition.test((O)child))
+                return (O)child;
+        return null;
+    }
+    
+    // Helper
+    private Node findChild(Predicate<Node> condition) {
+        for (Node child: getChildren())
+            if (condition.test(child))
+                return child;
+        return null;
+    }
+    
+    // Helper
+    private void forEachChild(Predicate<Node> condition, Consumer<Node> consume) {
+        for (Node child: getChildren())
+            if (condition.test(child))
+                consume.accept(child);
     }
     
     /**
@@ -341,9 +385,8 @@ public class FieldSet extends GridPane {
      */
     public void setRowDisabled(int row, boolean disabled, Node... exceptions) {
         List<Node> exceptionsList = Arrays.asList(exceptions);
-        for (Node child: getChildren())
-            if (getRowIndex(child) == convertToRealRow(row) && !exceptionsList.contains(child))
-                child.setDisable(disabled);
+        forEachChild(child -> getRowIndex(child) == convertToRealRow(row) && !exceptionsList.contains(child), 
+                child -> child.setDisable(disabled));
     }
     
     /**
@@ -357,9 +400,8 @@ public class FieldSet extends GridPane {
      */
     public void setRowDisabled(int row, boolean disabled, Object... userDataExceptions) {
         List<Object> exceptionsList = Arrays.asList(userDataExceptions);
-        for (Node child: getChildren())
-            if (getRowIndex(child) == row && !exceptionsList.contains(child.getUserData()))
-                child.setDisable(disabled);
+        forEachChild(child -> getRowIndex(child) == row && !exceptionsList.contains(child.getUserData()),
+                child -> child.setDisable(disabled));
     }
     
 }

@@ -19,6 +19,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -35,12 +39,18 @@ public class SettingsPane extends BorderPane {
     
     private Button submitBtn;
     
+    private KeyCombination closeCombination = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_ANY);
+    
 /*-----SETUP-------------------------------------------------------------*/
     
     public SettingsPane(Stage parentStage) {
         if (parentStage == null)
             throw new NullPointerException("parentStage cannot be null: ok and cancel buttons will not be able to close the stage");
         this.parentStage = parentStage;
+        addEventHandler(KeyEvent.KEY_RELEASED, a -> {
+            if (closeCombination.match(a))
+                parentStage.close();
+        });
     }
 
     public void build() {
@@ -63,6 +73,8 @@ public class SettingsPane extends BorderPane {
         BorderPane.setMargin(buttonRowBox, new Insets(15));
         buttonRowBox.getStyleClass().add("row");
         HBox.setHgrow(spacerBox, Priority.ALWAYS);
+        //default vals
+        submitBtn.setDisable(true);
         
         buttonRowBox.getChildren().addAll(submitBtn, spacerBox, cancelBtn);
         setBottom(buttonRowBox);
@@ -91,25 +103,22 @@ public class SettingsPane extends BorderPane {
         if (!Validation.run(validations))
             return;
         
-        if (submitBtn.getText().equals("Ok"))
-            parentStage.close();
-        else if (submitBtn.getText().equals("Apply")) {
-            for (FieldSet categorySet: categorySets)
-                for (Prefs pref: Prefs.values())
-                    if (pref.category().val().equals(categorySet.getTitle()))
-                        switch (pref.inputType()) {
-                            case DIRECTORY_SEQUENCE:
-                                TextField fld = (TextField)categorySet.getNode(categorySet.getRow(pref), 2);
-                                if (!fld.isDisable())
-                                    Settings.putString(pref, fld.getText());
-                                break;
-                            case CHECKBOX:
-                                //TODO implement when needed
-                                break;
-                            default: break;
-                        }
-            submitBtn.setText("Ok");
-        }
+        for (FieldSet categorySet: categorySets)
+            for (Prefs pref: Prefs.values())
+                if (pref.category().val().equals(categorySet.getTitle()))
+                    switch (pref.inputType()) {
+                        case DIRECTORY_SEQUENCE:
+                            TextField fld = (TextField)categorySet.getNode(categorySet.getRow(pref), 2);
+                            if (!fld.isDisable())
+                                Settings.putString(pref, fld.getText().trim());
+                            break;
+                        case CHECKBOX:
+                            //TODO implement when needed
+                            break;
+                        default: break;
+                    }
+        
+        parentStage.close();
     }
     
 /*---------LAYOUT---------------------------------------------------------------*/
@@ -186,7 +195,7 @@ public class SettingsPane extends BorderPane {
         });
         fld.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null)
-                submitBtn.setText("Apply");
+                submitBtn.setDisable(false);
         });
         
         //LAF

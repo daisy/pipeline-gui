@@ -20,12 +20,12 @@ public class Settings {
     }
     
     public enum Prefs {
-        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Output Directory", "", null),
-        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Output Directory", "false", null),
-        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Output Directory", "", Prefs.DEF_OUT_DIR_ENABLED),
         LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Input Directory", "", null),
         DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Input Directory", "false", null),
-        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Input Directory", "", Prefs.DEF_IN_DIR_ENABLED);
+        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Input Directory", "", Prefs.DEF_IN_DIR_ENABLED),
+        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Output Directory", "", null),
+        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Output Directory", "false", null),
+        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Output Directory", "", Prefs.DEF_OUT_DIR_ENABLED);
         
     /*-------------------------------------------------------------------------------------------------------*/
         

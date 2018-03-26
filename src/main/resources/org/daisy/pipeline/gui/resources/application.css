@@ -80,26 +80,8 @@
 	-fx-border-color: lightGray;
 	-fx-border-width: 2;
 	-fx-border-style: solid;
-}
-
-.fieldset .grid-pane {
-	-fx-vgap: 2;
 	-fx-hgap: 5;
-	-fx-padding: 5 10 5 20;
-    -fx-border-insets: 5 10 5 20;
-    -fx-background-insets: 5 10 5 20;
-}
-
-.fieldset .subtitle {
-	-fx-padding: 0 10 0 0;
-    -fx-border-insets: 0 10 0 0;
-    -fx-background-insets: 0 10 0 0;
-}
-
-.fieldset .check-box {
-	-fx-padding: 10 0 12 10;
-    -fx-border-insets: 10 0 12 10;
-    -fx-background-insets: 10 0 12 10;
+	-fx-vgap: 5;
 }
 
 /*

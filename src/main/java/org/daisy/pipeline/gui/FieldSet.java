@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -108,21 +109,25 @@ public class FieldSet extends GridPane {
      * 
      * Use this instead of {@link GridPane#setHgap(double)}.
      * 
-     * @param priority -  the horizontal grow priority for this FieldSet
+     * @param priority - the horizontal grow priority for this FieldSet
      */
     public void setHGap(double hgap) {
         setHgap(hgap);
     }
     
     /**
-     * Sets the GridPane Hgap property for this FieldSet.
+     * Sets the GridPane Vgap property for this FieldSet.
      * 
      * Use this instead of {@link GridPane#setVgap(double)}.
      * 
-     * @param priority -  the vertical grow priority for this FieldSet
+     * @param priority - the vertical grow priority for this FieldSet
      */
-    public void setVGap(double hgap) {
-        setVgap(hgap);
+    public void setVGap(double vgap) {
+        setVgap(vgap);
+    }
+    
+    public void setMarginFor(Node node, Insets margin) {
+        GridPane.setMargin(node, margin);
     }
     
     /**
@@ -232,6 +237,8 @@ public class FieldSet extends GridPane {
         
         int realRow = convertToRealRow(row);
         add(node, cols.get(realRow), realRow, colSpan, rowSpan);
+        if (cols.get(realRow) == 1)
+            setMargin(node, new Insets(0, 0, 0, 15));
         incrementCols(realRow);
         // make room for rowSpan
         if (rowSpan > 1)

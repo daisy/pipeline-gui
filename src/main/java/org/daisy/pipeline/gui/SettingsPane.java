@@ -33,6 +33,8 @@ public class SettingsPane extends BorderPane {
 
     private List<Validation<?>> validations;
     
+    private Button submitBtn;
+    
 /*-----SETUP-------------------------------------------------------------*/
     
     public SettingsPane(Stage parentStage) {
@@ -42,6 +44,8 @@ public class SettingsPane extends BorderPane {
     }
 
     public void build() {
+        submitBtn = new Button("Ok");
+        
         /* CENTER */
         mainPane = new AnchorPane();
         List<FieldSet> categorySets = addCategorySets();
@@ -50,21 +54,17 @@ public class SettingsPane extends BorderPane {
         
         /* BOTTOM */
         HBox buttonRowBox = new HBox();
-        Button okBtn = new Button("Ok");
         HBox spacerBox = new HBox();
         Button cancelBtn = new Button("Cancel");
         //actions
-        okBtn.setOnAction(a -> {
-            if (Validation.run(validations))
-                parentStage.close();
-        });
+        submitBtn.setOnAction(a -> submit(categorySets));
         cancelBtn.setOnAction(a -> parentStage.close());
         //LAF
         BorderPane.setMargin(buttonRowBox, new Insets(15));
         buttonRowBox.getStyleClass().add("row");
         HBox.setHgrow(spacerBox, Priority.ALWAYS);
         
-        buttonRowBox.getChildren().addAll(okBtn, spacerBox, cancelBtn);
+        buttonRowBox.getChildren().addAll(submitBtn, spacerBox, cancelBtn);
         setBottom(buttonRowBox);
     }
     
@@ -77,14 +77,39 @@ public class SettingsPane extends BorderPane {
                 TextField defInDirFld = (TextField)categorySet.getNode(TextField.class.getName() + Prefs.DEF_IN_DIR.key()),
                         defOutDirFld = (TextField)categorySet.getNode(TextField.class.getName() + Prefs.DEF_OUT_DIR.key());
                 
-                validations.add(new Validation<TextField>(defInDirLbl, defInDirFld, fld -> isDirectory(fld.getText()), "Not a valid directory path."));
-                validations.add(new Validation<TextField>(defOutDirLbl, defOutDirFld, fld -> isDirectory(fld.getText()), "Not a valid directory path."));
+                validations.add(new Validation<TextField>(defInDirLbl, defInDirFld, fld -> fld.isDisabled() || !isFile(fld.getText()), "Cannot point to a file."));
+                validations.add(new Validation<TextField>(defOutDirLbl, defOutDirFld, fld -> fld.isDisabled() || !isFile(fld.getText()), "Cannot point to a file."));
             }
     }
     
     // Helper
-    private boolean isDirectory(String path) {
-        return new File(path).isDirectory();
+    private boolean isFile(String path) {
+        return new File(path).isFile();
+    }
+    
+    private void submit(List<FieldSet> categorySets) {
+        if (!Validation.run(validations))
+            return;
+        
+        if (submitBtn.getText().equals("Ok"))
+            parentStage.close();
+        else if (submitBtn.getText().equals("Apply")) {
+            for (FieldSet categorySet: categorySets)
+                for (Prefs pref: Prefs.values())
+                    if (pref.category().val().equals(categorySet.getTitle()))
+                        switch (pref.inputType()) {
+                            case DIRECTORY_SEQUENCE:
+                                TextField fld = (TextField)categorySet.getNode(categorySet.getRow(pref), 2);
+                                if (!fld.isDisable())
+                                    Settings.putString(pref, fld.getText());
+                                break;
+                            case CHECKBOX:
+                                //TODO implement when needed
+                                break;
+                            default: break;
+                        }
+            submitBtn.setText("Ok");
+        }
     }
     
 /*---------LAYOUT---------------------------------------------------------------*/
@@ -147,19 +172,22 @@ public class SettingsPane extends BorderPane {
     private void layoutDirectorySequence(FieldSet fieldset, Prefs pref) {
         TextField fld = new TextField();
         Button browseBtn = new Button("Browse");
+        
+        //default vals
+        fld.setText(Settings.getString(pref));
         //actions
         browseBtn.setOnAction(a -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
-            if (!Settings.getString(pref).isEmpty())
-                dirChooser.setInitialDirectory(new File(Settings.getString(pref)));
+            if (new File(fld.getText()).isDirectory())
+                dirChooser.setInitialDirectory(new File(fld.getText()));
             File f = dirChooser.showDialog(parentStage);
-            if (f != null) {
+            if (f != null)
                 fld.setText(f.getAbsolutePath());
-                Settings.putString(pref, fld.getText());
-            }
         });
-        //default vals
-        fld.setText(Settings.getString(pref));
+        fld.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null)
+                submitBtn.setText("Apply");
+        });
         
         //LAF
         fieldset.setHGrow(fld, Priority.ALWAYS);
@@ -184,7 +212,7 @@ public class SettingsPane extends BorderPane {
         browseBtn.setUserData(browseBtn.getClass().getName());
         setupUserData(pref, enableChkBox, fld, browseBtn);
         //add
-        fieldset.newRow(pref.key());
+        fieldset.newRow(pref.key(), pref);
         if (enableChkBox != null)
             fieldset.addNode(enableChkBox);
         fieldset.addNode(fld);

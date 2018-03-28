@@ -20,27 +20,31 @@ public class Settings {
     }
     
     public enum Prefs {
-        LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Input Directory", "", null),
-        DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Input Directory", "false", null),
-        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Input Directory", "", Prefs.DEF_IN_DIR_ENABLED),
-        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Output Directory", "", null),
-        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Output Directory", "false", null),
-        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Output Directory", "", Prefs.DEF_OUT_DIR_ENABLED);
+        LAST_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Input Directory", "", null, null),
+        DEF_IN_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Input Directory", "false", "Enable use of default input directory.", null),
+        DEF_IN_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Input Directory", "", "Initial directory path used for Job Option file browsers in input fields.", Prefs.DEF_IN_DIR_ENABLED),
+        LAST_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.NONE, "Last Output Directory", "", null, null),
+        DEF_OUT_DIR_ENABLED(PrefCategories.JOB_OPTIONS, Types.BOOLEAN, InputTypes.CHECKBOX, "Toggle Default Output Directory", "false", "Enable use of default output directory.", null),
+        DEF_OUT_DIR(PrefCategories.JOB_OPTIONS, Types.STRING, InputTypes.DIRECTORY_SEQUENCE, "Default Output Directory", "", "Initial directory path used for Job Option file browsers in output fields.", Prefs.DEF_OUT_DIR_ENABLED);
         
     /*-------------------------------------------------------------------------------------------------------*/
         
         PrefCategories category;
-        String key, def;
+        String key, def, tooltip;
         Types type;
         InputTypes inputType;
         Prefs enablePref;
         
-        Prefs(PrefCategories category, Types type, InputTypes inputType, String key, String def, Prefs enablePref) {
+        
+        Prefs(PrefCategories category, Types type, InputTypes inputType, String key, String def, String tooltip, Prefs enablePref) {
             this.category = category;
             this.type = type;
             this.inputType = inputType;
             this.key = key;
             this.def = def;
+            if (!inputType.equals(InputTypes.NONE) && tooltip == null)
+                throw new NullPointerException("argument tooltip cannot be null for Prefs with inputTypes other than NONE.");
+            this.tooltip = tooltip;
             this.enablePref = enablePref;
         }
         
@@ -49,6 +53,7 @@ public class Settings {
         public PrefCategories category() {return category;}
         public String key() {return key;}
         public InputTypes inputType() {return inputType;}
+        public String tooltip() {return tooltip;}
         
         public String defString() {
             return def;

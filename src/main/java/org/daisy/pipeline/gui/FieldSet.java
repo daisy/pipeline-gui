@@ -2,6 +2,8 @@ package org.daisy.pipeline.gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -89,6 +91,15 @@ public class FieldSet extends GridPane {
      */
     public Label getLabel(String text) {
         return findChild(Label.class, child -> child.getText().equals(text));
+    }
+    
+    /**
+     * Returns a label for the row with the given rowUserData.
+     * @param text - the text to match
+     * @return - the label for the row with rowUserData that {@link Object#equals(Object)} the given rowUserData.
+     */
+    public Label getLabelFor(Object rowUserData) {
+        return findChild(Label.class, child -> child.getUserData() != null && child.getUserData().equals(rowUserData));
     }
     
     /**

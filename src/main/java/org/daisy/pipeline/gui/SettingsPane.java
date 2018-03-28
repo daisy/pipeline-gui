@@ -158,19 +158,15 @@ public class SettingsPane extends BorderPane {
                         defOutDirFld = (TextField)categorySet.getNode(TextField.class.getName() + Prefs.DEF_OUT_DIR.key());
                 switch (pref) {
                     case DEF_IN_DIR:
-                        Button copyToOutDirBtn = new Button("▲");
-                        copyToOutDirBtn.setOnAction(a -> {
-                            Settings.putString(Prefs.DEF_OUT_DIR, defInDirFld.getText());
-                            defOutDirFld.setText(defInDirFld.getText());
-                        });
+                        Button copyToOutDirBtn = new Button("▼");
+                        copyToOutDirBtn.setOnAction(a -> defOutDirFld.setText(defInDirFld.getText()));
+                        copyToOutDirBtn.setTooltip(new Tooltip("Copy contents of default input directory field to default output directory field."));
                         categorySet.addNode(copyToOutDirBtn, categorySet.getRow(defInDirFld));
                         break;
                     case DEF_OUT_DIR:
-                        Button copyToInDirBtn = new Button("▼");
-                        copyToInDirBtn.setOnAction(a -> {
-                            Settings.putString(Prefs.DEF_IN_DIR, defOutDirFld.getText());
-                            defInDirFld.setText(defOutDirFld.getText());
-                        });
+                        Button copyToInDirBtn = new Button("▲");
+                        copyToInDirBtn.setOnAction(a -> defInDirFld.setText(defOutDirFld.getText()));
+                        copyToInDirBtn.setTooltip(new Tooltip("Copy contents of default output directory field to default input directory field."));
                         categorySet.addNode(copyToInDirBtn, categorySet.getRow(defOutDirFld));
                         break;
                   default: break;
@@ -215,17 +211,24 @@ public class SettingsPane extends BorderPane {
                 Settings.putBoolean(pref.enablePref(), chkBox.isSelected());
                 fieldset.setRowDisabled(fieldset.getRow(chkBox), !chkBox.isSelected(), chkBox);
             });
+            //a11y
+            enableChkBox.setTooltip(new Tooltip(pref.enablePref().tooltip()));
         }
         
         fld.setUserData(fld.getClass().getName());
         browseBtn.setUserData(browseBtn.getClass().getName());
         setupUserData(pref, enableChkBox, fld, browseBtn);
+        //a11y
+        fld.setTooltip(new Tooltip(pref.tooltip()));
+        browseBtn.setTooltip(new Tooltip("Browse for directory."));
         //add
         fieldset.newRow(pref.key(), pref);
         if (enableChkBox != null)
             fieldset.addNode(enableChkBox);
         fieldset.addNode(fld);
         fieldset.addNode(browseBtn);
+        
+        fieldset.getLabelFor(pref).setLabelFor(fld);
     }
     
     private void setupUserData(Prefs pref, Node... nodes) {

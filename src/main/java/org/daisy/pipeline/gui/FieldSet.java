@@ -282,11 +282,36 @@ public class FieldSet extends GridPane {
         if (rowSpan > 1)
             for (int i = 0; i < rowSpan; i++)
                 newRow();
+        reorderChildren();
     }
     
     private void incrementCols(int row) {
         cols.set(row, cols.get(row)+1);
         respanTitles(row);
+    }
+    
+    private void reorderChildren() {
+        Node[] childrenArray = new Node[getChildren().size()];
+        List<Node> children = Arrays.asList(Arrays.copyOf(getChildren().toArray(childrenArray), getChildren().size()));
+        
+        Collections.sort(children, new Comparator<Node>() {
+            @Override
+            public int compare(Node o1, Node o2) {
+                if (getRowIndex(o1) < getRowIndex(o2))
+                    return -1;
+                else if (getRowIndex(o1) > getRowIndex(o2))
+                    return 1;
+                else
+                    if (getColumnIndex(o1) < getColumnIndex(o2))
+                        return -1;
+                    else if (getColumnIndex(o1) > getColumnIndex(o2))
+                        return 1;
+                    else return 0;
+            }
+        });
+        
+        getChildren().clear();
+        getChildren().addAll(children);
     }
     
     /**

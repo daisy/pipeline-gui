@@ -69,7 +69,7 @@ public class ObservableJob implements Comparable<ObservableJob>, BiConsumer<Mess
 		flattenMessages(job.getContext().getMonitor().getMessageAccessor().getAll().iterator(), 0);
 	}
 	private static String statusToString(Status status) {
-		if (status == Status.DONE) {
+		if (status == Status.SUCCESS) {
 			return "Done";
 		}
 		if (status == Status.ERROR) {

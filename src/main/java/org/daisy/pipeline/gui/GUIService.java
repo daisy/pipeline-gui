@@ -26,20 +26,18 @@ public class GUIService {
 
         @Activate
         public void start(BundleContext ctxt) {
-                if ("gui".equals(Properties.getProperty("org.daisy.pipeline.main.mode"))) {
-                        this.ctxt = ctxt;
-                        ServiceRegistry.getInstance().setGUIService(this);
-                        
-                        // The launch method does not return until the application has exited
-                        Thread t = new Thread() {
-                                public void run() {
-                                        Application.launch(PipelineApplication.class);
-                                }
-                        };
-                        t.setPriority(Thread.MAX_PRIORITY);
-                        t.start();
-                        logger.debug("Main Module is loaded!");
-                }
+                this.ctxt = ctxt;
+                ServiceRegistry.getInstance().setGUIService(this);
+
+                // The launch method does not return until the application has exited
+                Thread t = new Thread() {
+                        public void run() {
+                                Application.launch(PipelineApplication.class);
+                        }
+                };
+                t.setPriority(Thread.MAX_PRIORITY);
+                t.start();
+                logger.debug("Main Module is loaded!");
         }
 
         public void stop() {

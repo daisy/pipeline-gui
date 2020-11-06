@@ -81,7 +81,9 @@ public class ServiceRegistry {
                 } catch (InterruptedException ie) {
                         throw ie;
                 } finally {
-                        monitor.leave();
+                        try {
+                                monitor.leave();
+                        } catch (Throwable e) {}
                 }
         }
 
